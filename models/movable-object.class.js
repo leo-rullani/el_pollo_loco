@@ -1,7 +1,7 @@
 /* Schablone, welche sagt, welche Felder da drin sein sollen. Lässt sich in game.js integrieren bei Variablen-Definierung: let character = new MovableObject(); */
 class MovableObject {
   x = 120;
-  y = 250;
+  y = 280;
   img;
   height = 150;
   width = 100;

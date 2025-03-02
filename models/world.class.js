@@ -3,7 +3,10 @@ class World {
   enemies = [new chicken(), new chicken(), new chicken()];
   clouds = [new cloud()];
   backgroundObjects = [
+    new BackgroundObject("img/5_background/layers/air.png", 0), 
     new BackgroundObject("img/5_background/layers/3_third_layer/1.png", 0),
+    new BackgroundObject("img/5_background/layers/2_second_layer/1.png", 0), 
+    new BackgroundObject("img/5_background/layers/1_first_layer/1.png", 0),
   ];
   canvas;
   ctx;
@@ -15,17 +18,17 @@ class World {
   }
 
   draw() {
-    this.ctx.clearRect(
+    this.ctx.clearRect( /* diese Zeile löscht ganz am Anfang alles auf dem Bildschirm -> schwarzer Hintergrund, ehe die nachfolgenden Objects innert Milisekunden erscheinen 60FPS für uns nicht ersichtlich, da es sehr schnell geht */
       0,
       0,
       this.canvas.width,
       this.canvas.height
     ); /* immer ganz zu Beginn unserer draw()-Methode aufrufen */
 
-    this.addToMap(this.character);
+    this.addObjectsToMap(this.backgroundObjects);
+    this.addToMap(this.character); 
     this.addObjectsToMap(this.enemies);
     this.addObjectsToMap(this.clouds);
-    this.addObjectsToMap(this.backgroundObjects);
 
     /* sobald alles darüber ausgeführt ist, wird diese Funktion asynchron ausgeführt */
     let self =
