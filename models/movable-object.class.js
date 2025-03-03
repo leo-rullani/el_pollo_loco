@@ -7,6 +7,8 @@ class MovableObject {
   width = 100;
   imageCache =
     {}; /* JSON, das Bilder speichert, loadImages-Funktion basierend darauf erstellen */
+  currentImage = 0;
+  speed = 0.15;
 
   loadImage(path) {
     this.img =
@@ -18,11 +20,11 @@ class MovableObject {
    * @param {Array} arr - ['img/image1.png', 'img/image2.png', … ] /* durch diese Bildpfade durchiterieren und zum ImageCache hinzufügen
    */
   loadImages(arr) {
-    arr.forEach((path) => { /* dieses arr.forEach greift auf die 6 Bilder von Pepe Peligroso (Character) zu */
+    arr.forEach((path) => {
+      /* dieses arr.forEach greift auf die 6 Bilder von Pepe Peligroso (Character) zu */
       let img = new Image(); /* Variable mit neuem Bild wird angelegt */
       img.src = path; /* Bild wird geladen in das Image-Objekt */
-      this.imageCache[path] =
-        path; 
+      this.imageCache[path] = img;
     }); /* wir machen das für mehrere Bilder und gehen somit durch alle Pfade durch, loadImages inkl. alle Bildpfade (bspw. von Charakter in den jeweiligen Klassen als Array hinzufügen  */
   }
 
@@ -30,5 +32,9 @@ class MovableObject {
     console.log("Moving right");
   }
 
-  moveLeft() {}
+  moveLeft() {
+    setInterval(() => {
+      this.x -= this.speed;
+    }, 1000 / 60);
+  }
 }
