@@ -9,6 +9,7 @@ class MovableObject {
     {}; /* JSON, das Bilder speichert, loadImages-Funktion basierend darauf erstellen */
   currentImage = 0;
   speed = 0.15;
+  otherDirection = false;
 
   loadImage(path) {
     this.img =
