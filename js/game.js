@@ -8,7 +8,7 @@ function init() {
     document.getElementById(
       "canvas"
     ); /* Step 1: das canvas aus dem HTML wird hier zugewiesen dem canvas */
-  world = new World(canvas);
+  world = new World(canvas, keyboard);
   ctx =
     canvas.getContext(
       "2d"
@@ -17,6 +17,22 @@ function init() {
   console.log("My character is", world.character); /*chracter = MovableObject */
 }
 
-window.addEventListener("keypress", (e) => { /* Keyboard anlegen -> Konsole Test */
-  console.log(e);
+window.addEventListener("keydown", (e) => {
+  console.log("Key pressed: ", e.keyCode, e.key);
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.keyCode == 37) keyboard.LEFT = true;
+  if (e.keyCode == 39) keyboard.RIGHT = true;
+  if (e.keyCode == 38) keyboard.UP = true;
+  if (e.keyCode == 40) keyboard.DOWN = true;
+  if (e.keyCode == 32) keyboard.SPACE = true;
+});
+
+window.addEventListener("keyup", (e) => {
+  if (e.keyCode == 37) keyboard.LEFT = false;
+  if (e.keyCode == 39) keyboard.RIGHT = false;
+  if (e.keyCode == 38) keyboard.UP = false;
+  if (e.keyCode == 40) keyboard.DOWN = false;
+  if (e.keyCode == 32) keyboard.SPACE = false;
 });

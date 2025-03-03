@@ -1,24 +1,33 @@
 class World {
-  character = new Character(); /* Variable definiert und der ein Objekt zugewiesen */
+  character =
+    new Character(); /* Variable definiert und der ein Objekt zugewiesen */
   enemies = [new chicken(), new chicken(), new chicken()];
   clouds = [new cloud()];
   backgroundObjects = [
-    new BackgroundObject("img/5_background/layers/air.png", 0), 
+    new BackgroundObject("img/5_background/layers/air.png", 0),
     new BackgroundObject("img/5_background/layers/3_third_layer/1.png", 0),
-    new BackgroundObject("img/5_background/layers/2_second_layer/1.png", 0), 
+    new BackgroundObject("img/5_background/layers/2_second_layer/1.png", 0),
     new BackgroundObject("img/5_background/layers/1_first_layer/1.png", 0),
   ];
   canvas;
   ctx;
+  keyboard;
 
-  constructor(canvas) {
+  constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
+    this.keyboard = keyboard;
     this.draw();
+    this.setWorld();
+  }
+
+  setWorld() {
+    this.character.world = this;
   }
 
   draw() {
-    this.ctx.clearRect( /* diese Zeile löscht ganz am Anfang alles auf dem Bildschirm -> schwarzer Hintergrund, ehe die nachfolgenden Objects innert Milisekunden erscheinen 60FPS für uns nicht ersichtlich, da es sehr schnell geht */
+    this.ctx.clearRect(
+      /* diese Zeile löscht ganz am Anfang alles auf dem Bildschirm -> schwarzer Hintergrund, ehe die nachfolgenden Objects innert Milisekunden erscheinen 60FPS für uns nicht ersichtlich, da es sehr schnell geht */
       0,
       0,
       this.canvas.width,
@@ -26,7 +35,7 @@ class World {
     ); /* immer ganz zu Beginn unserer draw()-Methode aufrufen */
 
     this.addObjectsToMap(this.backgroundObjects);
-    this.addToMap(this.character); 
+    this.addToMap(this.character);
     this.addObjectsToMap(this.enemies);
     this.addObjectsToMap(this.clouds);
 
