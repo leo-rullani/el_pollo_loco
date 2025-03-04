@@ -18,9 +18,8 @@ class Endboss extends MovableObject {
     }
   
     animate() {
-      setInterval(() => {
-        // Beispiel: Alle 200ms laufe durch die IMAGES_WALKING
+      setInterval(() => { 
         this.playAnimation(this.IMAGES_WALKING);
       }, 200);
-    }
-  }  
+    }    
+}

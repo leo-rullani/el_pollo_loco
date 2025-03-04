@@ -37,17 +37,7 @@ class Character extends MovableObject {
     setInterval(() => {
       if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
         /* walk animation */
-        let i =
-          this.currentImage %
-          this.IMAGES_WALKING
-            .length; /* % = Rest, let i = 0 % = 6; % bedeutet 0/6 => 0 Rest 0 bsp. mit 5: 5/6 = 0 Rest 5, bsp. 6/6 = 1, Rest 0, 7/6 = 1, Rest 1*/
-        /* i = 0,1,2,3,4,5,6 und dann wieder 0 */
-        let path =
-          this.IMAGES_WALKING[
-            i
-          ]; /* % holt sich immer wieder das Bild nun, das ganze stürzt nie mehr ab  */
-        this.img = this.imageCache[path];
-        this.currentImage++; /* currentImage wird auf + erhöht */
+        this.playAnimation(this.IMAGES_WALKING);
       }
     }, 50); /* Animation: Bild wird alle 100ms gewechselt damit es flüssig aussieht */
   }
