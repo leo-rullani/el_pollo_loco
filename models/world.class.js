@@ -1,18 +1,6 @@
 class World {
-  character =
-    new Character(); /* Variable definiert und der ein Objekt zugewiesen */
-  enemies = [new chicken(), new chicken(), new chicken()];
-  clouds = [new cloud()];
-  backgroundObjects = [
-    new BackgroundObject("img/5_background/layers/air.png", 0),
-    new BackgroundObject("img/5_background/layers/3_third_layer/1.png", 0),
-    new BackgroundObject("img/5_background/layers/2_second_layer/1.png", 0),
-    new BackgroundObject("img/5_background/layers/1_first_layer/1.png", 0),
-    new BackgroundObject("img/5_background/layers/air.png", 719),
-    new BackgroundObject("img/5_background/layers/3_third_layer/2.png", 719),
-    new BackgroundObject("img/5_background/layers/2_second_layer/2.png", 719),
-    new BackgroundObject("img/5_background/layers/1_first_layer/2.png", 719),
-  ];
+  character = new Character(); /* Variable definiert und der ein Objekt zugewiesen */
+    level = level1;
   canvas;
   ctx;
   keyboard;
@@ -39,10 +27,10 @@ class World {
       this.canvas.height
     ); /* immer ganz zu Beginn unserer draw()-Methode aufrufen */
     this.ctx.translate(this.camera_x, 0);
-    this.addObjectsToMap(this.backgroundObjects);
+    this.addObjectsToMap(this.level.backgroundObjects);
     this.addToMap(this.character);
-    this.addObjectsToMap(this.enemies);
-    this.addObjectsToMap(this.clouds);
+    this.addObjectsToMap(this.level.enemies);
+    this.addObjectsToMap(this.level.clouds);
 
     this.ctx.translate(-this.camera_x, 0);
 
