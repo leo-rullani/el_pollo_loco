@@ -45,13 +45,14 @@ class MovableObject {
   }
 
   moveRight() {
-    console.log("Moving right");
+    this.x += this.speed;
+    this.otherDirection = false;
   }
 
   moveLeft() {
-    setInterval(() => {
       this.x -= this.speed;
-    }, 1000 / 60);
+      this.otherDirection = true;
+   
   }
   playAnimation(images) {
     let i = this.currentImage % images.length;
@@ -59,4 +60,8 @@ class MovableObject {
     this.img = this.imageCache[path];
     this.currentImage++;
   }  
+
+  jump() {
+    this.speedY = 30;
+  }
 }

@@ -20,6 +20,8 @@ class chicken extends MovableObject {
   }
 
   animate() {
+    setInterval(() => {
+    }, 1000 / 60);
     this.moveLeft();
     /* Aus dem imageCache wird das Bild geladen und diese Bilder zu dem aktuellen Bild gesetzt */
     setInterval(() => {
