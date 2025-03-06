@@ -31,6 +31,18 @@ class MovableObject {
       new Image(); /* this.img = document.getElementbyID('image') <img id= "image"> (wäre das gleiche) */
     this.img.src = path;
   }
+
+  draw(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+
+  drawFrame(ctx) {
+    ctx.beginPath();
+    ctx.lineWidth = "5";
+    ctx.strokeStyle = "blue";
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.stroke();
+  }
   /**
    *
    * @param {Array} arr - ['img/image1.png', 'img/image2.png', … ] /* durch diese Bildpfade durchiterieren und zum ImageCache hinzufügen
