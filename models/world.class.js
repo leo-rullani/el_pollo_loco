@@ -43,12 +43,51 @@ class World {
 
   checkCollisions() {
     this.level.enemies.forEach((enemy) => {
-      if(this.character.isColliding(enemy)) {
-        this.character.hit();
-        this.statusBar.setPercentage(this.character.energy);
+      if (enemy instanceof chicken) {
+        // 1) Charakter kollidiert mit Chicken
+        if (this.character.isColliding(enemy)) {
+          // Prüfen, ob Pepe von oben kommt => Sprung-Kill
+          if (this.character.speedY < 0) {
+            this.killChicken(enemy);
+          } else {
+            // Sonst => Charakter nimmt Schaden
+            this.character.hit();
+            this.statusBar.setPercentage(this.character.energy);
+          }
+        }
       }
     });
+  
+    // Falls du Flaschen-Treffer abfragen willst, kommt das hier:
+    this.throwableObjects.forEach((bottle) => {
+      this.level.enemies.forEach((enemy) => {
+        if (enemy instanceof chicken && bottle.isColliding(enemy)) {
+          this.killChicken(enemy);
+          this.removeThrowableObject(bottle); // z. B. Flasche verschwindet
+        }
+      });
+    });
   }
+  
+  killChicken(chicken) {
+    // 1) Dead-Animation abspielen
+    chicken.playDeadAnimation();
+  
+    // 2) Nach z. B. 500ms aus dem Array entfernen
+    setTimeout(() => {
+      let i = this.level.enemies.indexOf(chicken);
+      if (i > -1) {
+        this.level.enemies.splice(i, 1);
+      }
+    }, 500);
+  }
+  
+  removeThrowableObject(bottle) {
+    let i = this.throwableObjects.indexOf(bottle);
+    if (i > -1) {
+      this.throwableObjects.splice(i, 1);
+    }
+  }  
 
   draw() {
     this.ctx.clearRect(
