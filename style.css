@@ -10,6 +10,7 @@ body {
     background-position: center; 
     background-repeat: no-repeat; 
     overflow: hidden; 
+    font-family: 'zabras', Arial, Helvetica, sans-serif;
 }
 
 body::after {
@@ -27,4 +28,39 @@ canvas {
     background-color: black;
     border-radius: 20px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.6);
+    display: block;
+}
+
+@font-face {
+    font-family: 'zabras';
+    src: url('/fonts/zabras.ttf') format('truetype'); /* Format ohne Leerzeichen */
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1 {
+    font-size: 96px;
+    letter-spacing: 4px;
+    color: #ffc105;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+@media only screen and (max-width: 1000px) {
+    canvas {
+        width: 100%;
+        border-radius: 0px;
+    }
+    h1 {
+        display: none;
+    }
+    body {
+        background-image: none; 
+    }
+
+}
+
+@media only screen and (max-height: 480px) {
+    canvas {
+       height: 100vh;
+    }
 }
