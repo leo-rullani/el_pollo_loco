@@ -29,11 +29,17 @@ class World {
   }
 
   checkThrowObjects() {
-    if(this.keyboard.D) {
-      let bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100);
+    if (this.keyboard.D) {
+      // this => die Instanz der World
+      let bottle = new ThrowableObject(
+        this.character.x + 100, 
+        this.character.y + 100,
+        this // Referenz auf die aktuelle World
+      );
       this.throwableObjects.push(bottle);
     }
-  }
+  }  
+  
 
   checkCollisions() {
     this.level.enemies.forEach((enemy) => {
