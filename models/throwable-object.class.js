@@ -81,7 +81,7 @@ class ThrowableObject extends MovableObject {
     setTimeout(() => {
       clearInterval(this.breakInterval);
       this.removeBottleFromWorld();
-    }, 100);
+    }, 300);
   }
 
   /**

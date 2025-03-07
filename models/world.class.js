@@ -43,14 +43,15 @@ class World {
 
   checkCollisions() {
     this.level.enemies.forEach((enemy) => {
-      if (enemy instanceof chicken) {
-        // 1) Charakter kollidiert mit Chicken
+      // 1) Nur lebendes Huhn beachten
+      if (enemy instanceof chicken && !enemy.isDeadChicken) {
+        // Prüfen, ob Charakter kollidiert
         if (this.character.isColliding(enemy)) {
-          // Prüfen, ob Pepe von oben kommt => Sprung-Kill
+          // Option 1: SpeedY < 0 => Kill
           if (this.character.speedY < 0) {
             this.killChicken(enemy);
           } else {
-            // Sonst => Charakter nimmt Schaden
+            // Charakter nimmt Schaden
             this.character.hit();
             this.statusBar.setPercentage(this.character.energy);
           }
@@ -58,22 +59,26 @@ class World {
       }
     });
   
-    // Falls du Flaschen-Treffer abfragen willst, kommt das hier:
+    // Flaschen-Kollision
     this.throwableObjects.forEach((bottle) => {
       this.level.enemies.forEach((enemy) => {
-        if (enemy instanceof chicken && bottle.isColliding(enemy)) {
+        // Nur lebendes Huhn
+        if (enemy instanceof chicken && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
           this.killChicken(enemy);
-          this.removeThrowableObject(bottle); // z. B. Flasche verschwindet
+          this.removeThrowableObject(bottle);
         }
       });
     });
   }
   
   killChicken(chicken) {
-    // 1) Dead-Animation abspielen
+    // Kennzeichnung => ab jetzt nicht mehr kollidieren
+    chicken.isDeadChicken = true;
+  
+    // Dead-Animation
     chicken.playDeadAnimation();
   
-    // 2) Nach z. B. 500ms aus dem Array entfernen
+    // 500ms später aus Array entfernen
     setTimeout(() => {
       let i = this.level.enemies.indexOf(chicken);
       if (i > -1) {

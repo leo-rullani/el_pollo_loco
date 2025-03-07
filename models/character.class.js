@@ -2,7 +2,7 @@ class Character extends MovableObject {
   /* Character hat mit "extends" nun alle Eigenschaften, die MovableObject auch hat */
 
   height = 250;
-  y = 80;
+  y = 70;
   speed = 10;
   IMAGES_WALKING = [
     "img/2_character_pepe/2_walk/W-21.png",
