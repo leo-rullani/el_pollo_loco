@@ -1,7 +1,15 @@
 body {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url('/img/background/desert.png');
+    background-size: cover; /* Skaliert das Bild, damit es den gesamten Bildschirm bedeckt */
+    background-position: center; /* Zentriert das Bild */
+    background-repeat: no-repeat; /* Verhindert Wiederholungen des Bildes */
+    overflow: hidden; /* Verhindert Scrollen, falls das Bild zu groß wäre */
 }
 
 canvas {
