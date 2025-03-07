@@ -16,19 +16,15 @@ class MovableObject extends DrawableObject {
    */
   applyGravity() {
     this.gravityInterval = setInterval(() => {
-      // Solange das Objekt in der Luft ist oder noch nach oben fliegt
       if (this.isAboveGround() || this.speedY > 0) {
         this.y -= this.speedY;
         this.speedY -= this.acceleration;
       } else {
-        // => Das Objekt landet (Geschwindigkeit auf 0)
         this.speedY = 0;
-        // Nur bei Flaschen: Intervall beenden & onGroundHit() ausführen
         if (this instanceof ThrowableObject) {
           this.onGroundHit();
           clearInterval(this.gravityInterval);
         }
-        // Beim Character NICHT clearInterval, damit er erneut springen kann
       }
     }, 1000 / 25);
   }

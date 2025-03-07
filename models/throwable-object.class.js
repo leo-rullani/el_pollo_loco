@@ -10,32 +10,44 @@ class ThrowableObject extends MovableObject {
     "img/6_salsa_bottle/2_salsa_bottle_on_ground.png",
   ];
 
-  // Neues Flag
+  // Flag, um eindeutig festzustellen, ob die Flasche schon gelandet ist
   landed = false;
 
   constructor(x, y, world) {
+    // Startbild
     super().loadImage("img/6_salsa_bottle/salsa_bottle.png");
-    this.world = world;
     this.loadImages(this.IMAGES_ROTATION);
     this.loadImages(this.IMAGES_ON_GROUND);
+
+    // Welt-Referenz, um die Flasche später zu entfernen
+    this.world = world;
+
+    // Größe
     this.width = 50;
     this.height = 60;
+
+    // Startet direkt den Wurf
     this.throw(x, y);
   }
 
   throw(x, y) {
     this.x = x;
     this.y = y;
+    // Anfangs nach oben
     this.speedY = 30;
+
+    // Schwerkraft aktiv
     this.applyGravity();
 
-    // Nur starten, wenn !landed
+    // **Rotation-Interval**: Alle 80ms ein Bild aus IMAGES_ROTATION
     this.rotationInterval = setInterval(() => {
+      // Wichtig: Falls gelandet, NICHT mehr rotieren
       if (!this.landed) {
         this.playAnimation(this.IMAGES_ROTATION);
       }
     }, 80);
 
+    // **Bewegungs-Interval**: Alle 25ms x um 10 px nach rechts
     this.movementInterval = setInterval(() => {
       if (!this.landed) {
         this.x += 10;
@@ -43,31 +55,38 @@ class ThrowableObject extends MovableObject {
     }, 25);
   }
 
+  /**
+   * Wird aufgerufen, wenn das Objekt nicht mehr "isAboveGround()" ist.
+   * (siehe applyGravity in MovableObject)
+   */
   onGroundHit() {
-    this.landed = true; // Ab jetzt keine Rotation/Bewegung mehr
+    // Verhindert jegliche weitere Bewegung/Rotation
+    this.landed = true;
 
-    // Y-Position fixieren, falls nötig
+    // Endgültige y-Position. Passen, wenn Boden = 360
     this.y = 360;
 
-    // Rotation & Bewegung stoppen
+    // Bestehende Rotation und Bewegung stoppen
     clearInterval(this.rotationInterval);
     clearInterval(this.movementInterval);
 
-    // Boden-Animation
-    this.currentImage = 0;
+    // Animation am Boden starten
+    this.currentImage = 0; // Reset des Animations-Counters
     this.breakInterval = setInterval(() => {
-      // Nur weiter abspielen, wenn noch nicht entfernt
-      if (!this.landed) return;
+      // Nur weiter animieren, solange landed true ist
       this.playAnimation(this.IMAGES_ON_GROUND);
     }, 200);
 
-    // Nach 2 Sek: Boden-Animation beenden & aus Array entfernen
+    // Nach 2 Sekunden verschwindet die Flasche
     setTimeout(() => {
       clearInterval(this.breakInterval);
       this.removeBottleFromWorld();
-    }, 2000);
+    }, 100);
   }
 
+  /**
+   * Entfernt die Flasche aus world.throwableObjects
+   */
   removeBottleFromWorld() {
     let i = this.world.throwableObjects.indexOf(this);
     if (i > -1) {
