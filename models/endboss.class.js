@@ -3,6 +3,9 @@ class Endboss extends MovableObject {
   width = 250;
   y = 55;
   energy = 5;
+  moveInterval;
+  animationInterval;
+  deadInterval;
 
   IMAGES_WALK = [
     "img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -30,7 +33,7 @@ class Endboss extends MovableObject {
     "img/4_enemie_boss_chicken/3_attack/G17.png",
     "img/4_enemie_boss_chicken/3_attack/G18.png",
     "img/4_enemie_boss_chicken/3_attack/G19.png",
-    "img/4_enemie_boss_chicken/3_attack/G20.png"
+    "img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
 
   IMAGES_HURT = [
@@ -47,34 +50,76 @@ class Endboss extends MovableObject {
 
   constructor() {
     super().loadImage("img/4_enemie_boss_chicken/1_walk/G1.png");
-    this.loadImages(this.IMAGES_WALK);
-    this.loadImages(this.IMAGES_ALERT);
-    this.loadImages(this.IMAGES_ATTACK);
-    this.loadImages(this.IMAGES_HURT);
-    this.loadImages(this.IMAGES_DEAD);
-
+    this.loadAllImages();
     this.x = 2500;
     this.speed = 0.2 + Math.random() * 0.9;
     this.animate();
   }
 
-    animate() {
-    setInterval(() => {
-      this.moveLeft();
-    }, 1000 / 60);
-  
-    setInterval(() => {
-      if (this.isDead()) {
-        this.playAnimation(this.IMAGES_DEAD);
-      } else if (this.isHurt()) {
-        this.playAnimation(this.IMAGES_HURT);
-      } else if (this.isAttacking) {
-        this.playAnimation(this.IMAGES_ATTACK);
-      } else if (this.isAlert) {
-        this.playAnimation(this.IMAGES_ALERT);
-      } else {
-        this.playAnimation(this.IMAGES_WALK);
+  loadAllImages() {
+    this.loadImages(this.IMAGES_WALK);
+    this.loadImages(this.IMAGES_ALERT);
+    this.loadImages(this.IMAGES_ATTACK);
+    this.loadImages(this.IMAGES_HURT);
+    this.loadImages(this.IMAGES_DEAD);
+  }
+
+  animate() {
+    this.moveInterval = setInterval(() => this.moveLeft(), 1000 / 60);
+    this.animationInterval = setInterval(() => {
+      if (this.isDead()) this.playAnimation(this.IMAGES_DEAD);
+      else if (this.isHurt()) this.playAnimation(this.IMAGES_HURT);
+      else if (this.isAttacking) this.playAnimation(this.IMAGES_ATTACK);
+      else if (this.isAlert) this.playAnimation(this.IMAGES_ALERT);
+      else this.playAnimation(this.IMAGES_WALK);
+    }, 200);
+  }
+
+  playDeadAnimation() {
+    clearInterval(this.moveInterval);
+    clearInterval(this.animationInterval);
+    this.speedY = 0;
+    this.currentImage = 0;
+    setTimeout(() => {
+      this.fallToGround();
+    }, 300);
+  }
+
+  fallToGround() {
+    // Reaktiviere Gravitation, damit Boss "runterfällt"
+    this.applyGravity();
+    setTimeout(() => {
+      clearInterval(this.gravityInterval);
+      this.y = 80; // Force: Landet genau auf Boden
+      this.startDeadAnimationLoop();
+    }, 1000);
+  }
+
+  startDeadAnimationLoop() {
+    this.deadInterval = setInterval(() => {
+      this.playAnimation(this.IMAGES_DEAD);
+      if (this.currentImage >= this.IMAGES_DEAD.length) {
+        this.endDeadAnimation();
       }
-    }, 200 );
-  }  
+    }, 100);
+  }
+
+  endDeadAnimation() {
+    clearInterval(this.deadInterval);
+    this.currentImage = this.IMAGES_DEAD.length - 1;
+    setTimeout(() => {
+      this.sinkBoss();
+    }, 800);
+  }
+
+  sinkBoss() {
+    let sinkInterval = setInterval(() => {
+      this.y += 5;
+    }, 100);
+    setTimeout(() => {
+      clearInterval(sinkInterval);
+      // Entferne Boss aus Array oder trigger "You Win"
+      // z.B. world.removeBoss(this);
+    }, 1500);
+  }
 }

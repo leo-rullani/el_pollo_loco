@@ -43,41 +43,42 @@ class World {
   checkCollisionsEnemies() {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
-      if (!enemy.isDeadChicken && isHuhn && this.character.isColliding(enemy)) {
-        if (this.character.speedY < 0) {
-          this.killChicken(enemy);
-        } else {
+      let isBoss = enemy instanceof Endboss;
+      if (isHuhn && !enemy.isDeadChicken && this.character.isColliding(enemy)) {
+        if (this.character.speedY < 0) this.killChicken(enemy);
+        else {
           this.character.hit(enemy.damage);
           this.statusBar.setPercentage(this.character.energy);
         }
+      }
+      if (isBoss && this.character.isColliding(enemy)) {
+        this.character.hit(enemy.damage * 2);
+        this.statusBar.setPercentage(this.character.energy);
       }
     });
   }
 
   checkCollisionsThrowables() {
     this.throwableObjects.forEach((bottle) => {
-      this.level.enemies.forEach((enemy) => {
-        let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
-        let isBoss = enemy instanceof Endboss;
+      this.handleBottleCollisions(bottle);
+    });
+  }
   
-        // ============ CHICKEN-Kollision ============
-        if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
-          this.killChicken(enemy);
-          this.removeThrowableObject(bottle);
-        }
+  handleBottleCollisions(bottle) {
+    this.level.enemies.forEach((enemy) => {
+      let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
+      let isBoss = enemy instanceof Endboss;
   
-        // ============ BOSS-Kollision ==============
-        if (isBoss && bottle.isColliding(enemy)) {
-          enemy.hit(1);           // z. B. 1 Damage pro Flasche
-          enemy.lastHit = new Date().getTime();
-          this.removeThrowableObject(bottle);
-          // Prüfen, ob Boss nun tot -> z. B. BossKill-Methode
-          if (enemy.isDead()) {
-            // -> Boss-Dead-Animation, oder gleich "You Win!"
-            this.killEndboss(enemy); 
-          }
-        }
-      });
+      if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
+        this.killChicken(enemy);
+        this.removeThrowableObject(bottle);
+      }
+      if (isBoss && bottle.isColliding(enemy)) {
+        enemy.hit(1); 
+        enemy.lastHit = new Date().getTime();
+        this.removeThrowableObject(bottle);
+        if (enemy.isDead()) this.killEndboss(enemy);
+      }
     });
   }  
 
@@ -91,6 +92,18 @@ class World {
       }
     }, 500);
   }
+
+  killEndboss(boss) {
+    boss.playDeadAnimation();
+    setTimeout(() => {
+      boss.sinkBoss();
+      setTimeout(() => {
+        let i = this.level.enemies.indexOf(boss);
+        if (i > -1) this.level.enemies.splice(i, 1);
+        // z. B. showYouWinScreen();
+      }, 2000);
+    }, 500);
+  }  
 
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);
