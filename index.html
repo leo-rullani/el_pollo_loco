@@ -25,6 +25,15 @@
 </head>
 
 <body onload="init()">
+    <div id="overlay-gameover" class="overlay hidden">
+        <img src="img/You won, you lost/Game Over.png" alt="Game Over" />
+        <button onclick="restartGame()">Restart</button>
+    </div>
+
+    <div id="overlay-youwin" class="overlay hidden">
+        <img src="img/You won, you lost/You Won B.png" alt="You Won" />
+        <button onclick="restartGame()">Play Again</button>
+    </div>
 
     <h1>El Pollo Loco</h1>
 

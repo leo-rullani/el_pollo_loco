@@ -51,12 +51,12 @@ class StatusBar extends DrawableObject {
 class BossStatusBar extends DrawableObject {
     
     IMAGES = [
-      "img/7_statusbars/2_statusbar_endboss/blue.png",
-      "img/7_statusbars/2_statusbar_endboss/blue.png",
-      "img/7_statusbars/2_statusbar_endboss/blue.png",
-      "img/7_statusbars/2_statusbar_endboss/blue.png",
-      "img/7_statusbars/2_statusbar_endboss/blue.png",
-      "img/7_statusbars/2_statusbar_endboss/blue.png"
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/0.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/20.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/green/40.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/green/60.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/blue/80.png',
+        'img/7_statusbars/2_statusbar_endboss/blue.png'
     ];
   
     percentage = 100;
@@ -76,6 +76,7 @@ class BossStatusBar extends DrawableObject {
       let path = this.IMAGES[this.resolveImageIndex()];
       this.img = this.imageCache[path];
     }
+
   
     resolveImageIndex() {
       if (this.percentage == 100) return 5;

@@ -7,7 +7,7 @@ class World {
   camera_x = 0;
   statusBar = new StatusBar();
   throwableObjects = [];
-  bossBar = new BossStatusBar(); 
+  bossBar = new BossStatusBar();
 
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
@@ -45,6 +45,8 @@ class World {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
+
+      // === Huhn-Kollision ===
       if (isHuhn && !enemy.isDeadChicken && this.character.isColliding(enemy)) {
         if (this.character.speedY < 0) this.killChicken(enemy);
         else {
@@ -52,9 +54,16 @@ class World {
           this.statusBar.setPercentage(this.character.energy);
         }
       }
+
+      // === Boss-Kollision ===
       if (isBoss && this.character.isColliding(enemy)) {
         this.character.hit(enemy.damage * 2);
         this.statusBar.setPercentage(this.character.energy);
+      }
+
+      // === Prüfe Game Over ===
+      if (this.character.energy <= 0) {
+        this.showGameOver();
       }
     });
   }
@@ -64,33 +73,36 @@ class World {
       this.handleBottleCollisions(bottle);
     });
   }
-  
+
   handleBottleCollisions(bottle) {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
-  
+
+      // === Huhn-Treffer ===
       if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
         this.killChicken(enemy);
         this.removeThrowableObject(bottle);
       }
+
+      // === Boss-Treffer ===
       if (isBoss && bottle.isColliding(enemy)) {
-        enemy.hit(1); 
+        enemy.hit(1);
         enemy.lastHit = new Date().getTime();
+        this.bossBar.setPercentage(enemy.energy * 20);
         this.removeThrowableObject(bottle);
+
         if (enemy.isDead()) this.killEndboss(enemy);
       }
     });
-  }  
+  }
 
   killChicken(chicken) {
     chicken.isDeadChicken = true;
     chicken.playDeadAnimation();
     setTimeout(() => {
       let i = this.level.enemies.indexOf(chicken);
-      if (i > -1) {
-        this.level.enemies.splice(i, 1);
-      }
+      if (i > -1) this.level.enemies.splice(i, 1);
     }, 500);
   }
 
@@ -101,16 +113,24 @@ class World {
       setTimeout(() => {
         let i = this.level.enemies.indexOf(boss);
         if (i > -1) this.level.enemies.splice(i, 1);
-        // z. B. showYouWinScreen();
+        this.showYouWin(); // Endboss besiegt => You Win
       }, 2000);
     }, 500);
-  }  
+  }
 
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);
-    if (i > -1) {
-      this.throwableObjects.splice(i, 1);
-    }
+    if (i > -1) this.throwableObjects.splice(i, 1);
+  }
+
+  showGameOver() {
+    document.getElementById("overlay-gameover").classList.remove("hidden");
+    // Hier könntest du das Spiel stoppen oder weitere Aktionen ausführen
+  }
+
+  showYouWin() {
+    document.getElementById("overlay-youwin").classList.remove("hidden");
+    // Hier kannst du ggf. das Spiel stoppen, Sound abspielen etc.
   }
 
   draw() {
@@ -136,42 +156,34 @@ class World {
     this.addObjectsToMap(this.level.clouds);
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObjects);
-  
-    this.drawBossBarIfVisible(); // <= Aufruf
-  
+
+    this.drawBossBarIfVisible();
     this.ctx.translate(-this.camera_x, 0);
   }
-  
+
   drawBossBarIfVisible() {
-    let boss = this.findBoss();  // Sucht Endboss in level.enemies
-    // z. B. Abfrage, ob boss existiert und x < 2200
-    if (boss && boss.x < 2200) { 
-      // "fixe" Position am Canvasrand
+    let boss = this.findBoss();
+    if (boss && boss.x < 2200) {
       this.ctx.save();
       this.ctx.translate(-this.camera_x, 0);
-      this.addToMap(this.bossBar); // Hier zeichnest du bossBar
+      this.addToMap(this.bossBar);
       this.ctx.restore();
     }
   }
-  
+
   findBoss() {
-    // Sucht in this.level.enemies nach dem Endboss
     return this.level.enemies.find((e) => e instanceof Endboss);
-  }   
+  }
 
   addObjectsToMap(objects) {
     objects.forEach((o) => this.addToMap(o));
   }
 
   addToMap(mo) {
-    if (mo.otherDirection) {
-      this.flipImage(mo);
-    }
+    if (mo.otherDirection) this.flipImage(mo);
     mo.draw(this.ctx);
     mo.drawFrame(this.ctx);
-    if (mo.otherDirection) {
-      this.flipImageBack(mo);
-    }
+    if (mo.otherDirection) this.flipImageBack(mo);
   }
 
   flipImage(mo) {
