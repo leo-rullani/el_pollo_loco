@@ -1,6 +1,6 @@
 class World {
-  character = new Character(); /* Variable definiert und der ein Objekt zugewiesen */
-    level = level1;
+  character = new Character();
+  level = level1;
   canvas;
   ctx;
   keyboard;
@@ -21,64 +21,54 @@ class World {
     this.character.world = this;
   }
 
-  run(){
+  run() {
     setInterval(() => {
-      this.checkCollisions();
+      this.checkCollisionsEnemies();
+      this.checkCollisionsThrowables();
       this.checkThrowObjects();
     }, 200);
   }
 
   checkThrowObjects() {
     if (this.keyboard.D) {
-      // this => die Instanz der World
       let bottle = new ThrowableObject(
-        this.character.x + 100, 
+        this.character.x + 100,
         this.character.y + 100,
-        this // Referenz auf die aktuelle World
+        this
       );
       this.throwableObjects.push(bottle);
     }
-  }  
-  
+  }
 
-  checkCollisions() {
+  checkCollisionsEnemies() {
     this.level.enemies.forEach((enemy) => {
-      // 1) Nur lebendes Huhn beachten
-      if (enemy instanceof chicken && !enemy.isDeadChicken) {
-        // Prüfen, ob Charakter kollidiert
-        if (this.character.isColliding(enemy)) {
-          // Option 1: SpeedY < 0 => Kill
-          if (this.character.speedY < 0) {
-            this.killChicken(enemy);
-          } else {
-            // Charakter nimmt Schaden
-            this.character.hit();
-            this.statusBar.setPercentage(this.character.energy);
-          }
+      let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
+      if (!enemy.isDeadChicken && isHuhn && this.character.isColliding(enemy)) {
+        if (this.character.speedY < 0) {
+          this.killChicken(enemy);
+        } else {
+          this.character.hit(enemy.damage);
+          this.statusBar.setPercentage(this.character.energy);
         }
       }
     });
-  
-    // Flaschen-Kollision
+  }
+
+  checkCollisionsThrowables() {
     this.throwableObjects.forEach((bottle) => {
       this.level.enemies.forEach((enemy) => {
-        // Nur lebendes Huhn
-        if (enemy instanceof chicken && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
+        let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
+        if (!enemy.isDeadChicken && isHuhn && bottle.isColliding(enemy)) {
           this.killChicken(enemy);
           this.removeThrowableObject(bottle);
         }
       });
     });
   }
-  
+
   killChicken(chicken) {
-    // Kennzeichnung => ab jetzt nicht mehr kollidieren
     chicken.isDeadChicken = true;
-  
-    // Dead-Animation
     chicken.playDeadAnimation();
-  
-    // 500ms später aus Array entfernen
     setTimeout(() => {
       let i = this.level.enemies.indexOf(chicken);
       if (i > -1) {
@@ -86,61 +76,50 @@ class World {
       }
     }, 500);
   }
-  
+
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);
     if (i > -1) {
       this.throwableObjects.splice(i, 1);
     }
-  }  
+  }
 
   draw() {
-    this.ctx.clearRect(
-      /* diese Zeile löscht ganz am Anfang alles auf dem Bildschirm -> schwarzer Hintergrund, ehe die nachfolgenden Objects innert Milisekunden erscheinen 60FPS für uns nicht ersichtlich, da es sehr schnell geht */
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    ); /* immer ganz zu Beginn unserer draw()-Methode aufrufen */
+    this.clearCanvas();
+    this.drawScene();
+    let self = this;
+    requestAnimationFrame(function () {
+      self.draw();
+    });
+  }
+
+  clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  drawScene() {
     this.ctx.translate(this.camera_x, 0);
     this.addObjectsToMap(this.level.backgroundObjects);
-
-    this.ctx.translate(-this.camera_x, 0); // Back
-    // ------ Space for fixed Objects ------
+    this.ctx.translate(-this.camera_x, 0);
     this.addToMap(this.statusBar);
-    this.ctx.translate(this.camera_x, 0); // Forwards
-
-
+    this.ctx.translate(this.camera_x, 0);
     this.addToMap(this.character);
     this.addObjectsToMap(this.level.clouds);
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObjects);
-
-
     this.ctx.translate(-this.camera_x, 0);
-
-    /* sobald alles darüber ausgeführt ist, wird diese Funktion asynchron ausgeführt */
-    let self =
-      this; /*draw() wird wimmer wieder aufgerufen, diese Funktion befindet sich nicht in unserer aktuellen Welt, daher mit self arbeiten */
-    requestAnimationFrame(function () {
-      /* diese Funktion ruft this.ctx so oft auf, wie oft es die Grafikkarte es hergibt (gute Grafikkarte bis zu 25-60 FPS aufgerufen) */ self.draw();
-    });
   }
 
   addObjectsToMap(objects) {
-    objects.forEach((o) => {
-      this.addToMap(o);
-    });
+    objects.forEach((o) => this.addToMap(o));
   }
 
   addToMap(mo) {
     if (mo.otherDirection) {
-      this.flipImage (mo);
+      this.flipImage(mo);
     }
     mo.draw(this.ctx);
     mo.drawFrame(this.ctx);
-
-    
     if (mo.otherDirection) {
       this.flipImageBack(mo);
     }
