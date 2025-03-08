@@ -45,28 +45,31 @@ class World {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
-
+  
       // === Huhn-Kollision ===
       if (isHuhn && !enemy.isDeadChicken && this.character.isColliding(enemy)) {
-        if (this.character.speedY < 0) this.killChicken(enemy);
-        else {
+        if (this.character.speedY < 0) {
+          this.killChicken(enemy);
+        } else {
           this.character.hit(enemy.damage);
           this.statusBar.setPercentage(this.character.energy);
         }
       }
-
+  
       // === Boss-Kollision ===
       if (isBoss && this.character.isColliding(enemy)) {
+        // z. B. doppelter Schaden
         this.character.hit(enemy.damage * 2);
         this.statusBar.setPercentage(this.character.energy);
       }
-
-      // === Prüfe Game Over ===
-      if (this.character.energy <= 0) {
-        this.showGameOver();
-      }
     });
-  }
+  
+    // HP prüfen
+    if (this.character.energy <= 0 && !this.gameOverShown) {
+      this.gameOverShown = true;
+      this.showGameOver();
+    }
+  }  
 
   checkCollisionsThrowables() {
     this.throwableObjects.forEach((bottle) => {
