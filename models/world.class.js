@@ -58,13 +58,28 @@ class World {
     this.throwableObjects.forEach((bottle) => {
       this.level.enemies.forEach((enemy) => {
         let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
-        if (!enemy.isDeadChicken && isHuhn && bottle.isColliding(enemy)) {
+        let isBoss = enemy instanceof Endboss;
+  
+        // ============ CHICKEN-Kollision ============
+        if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
           this.killChicken(enemy);
           this.removeThrowableObject(bottle);
         }
+  
+        // ============ BOSS-Kollision ==============
+        if (isBoss && bottle.isColliding(enemy)) {
+          enemy.hit(1);           // z. B. 1 Damage pro Flasche
+          enemy.lastHit = new Date().getTime();
+          this.removeThrowableObject(bottle);
+          // Prüfen, ob Boss nun tot -> z. B. BossKill-Methode
+          if (enemy.isDead()) {
+            // -> Boss-Dead-Animation, oder gleich "You Win!"
+            this.killEndboss(enemy); 
+          }
+        }
       });
     });
-  }
+  }  
 
   killChicken(chicken) {
     chicken.isDeadChicken = true;

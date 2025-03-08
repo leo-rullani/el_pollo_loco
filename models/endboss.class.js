@@ -54,12 +54,13 @@ class Endboss extends MovableObject {
     this.loadImages(this.IMAGES_DEAD);
 
     this.x = 2500;
+    this.speed = 0.2 + Math.random() * 0.9;
     this.animate();
   }
 
-  animate() {
+    animate() {
     setInterval(() => {
-      this.bossMovement();
+      this.moveLeft();
     }, 1000 / 60);
   
     setInterval(() => {
