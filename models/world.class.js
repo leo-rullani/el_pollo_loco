@@ -7,6 +7,7 @@ class World {
   camera_x = 0;
   statusBar = new StatusBar();
   throwableObjects = [];
+  bossBar = new BossStatusBar(); 
 
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
@@ -135,8 +136,28 @@ class World {
     this.addObjectsToMap(this.level.clouds);
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObjects);
+  
+    this.drawBossBarIfVisible(); // <= Aufruf
+  
     this.ctx.translate(-this.camera_x, 0);
   }
+  
+  drawBossBarIfVisible() {
+    let boss = this.findBoss();  // Sucht Endboss in level.enemies
+    // z. B. Abfrage, ob boss existiert und x < 2200
+    if (boss && boss.x < 2200) { 
+      // "fixe" Position am Canvasrand
+      this.ctx.save();
+      this.ctx.translate(-this.camera_x, 0);
+      this.addToMap(this.bossBar); // Hier zeichnest du bossBar
+      this.ctx.restore();
+    }
+  }
+  
+  findBoss() {
+    // Sucht in this.level.enemies nach dem Endboss
+    return this.level.enemies.find((e) => e instanceof Endboss);
+  }   
 
   addObjectsToMap(objects) {
     objects.forEach((o) => this.addToMap(o));
