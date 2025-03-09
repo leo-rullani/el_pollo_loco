@@ -2,11 +2,13 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="/img/background/chicken-flaticon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="/img/background/chicken-flaticon.png" />
     <title>El Pollo Loco</title>
+
+    <!-- Deine bestehenden Skripte: -->
     <script src="models/drawable-object.class.js"></script>
     <script src="/models/movable-object.class.js"></script>
     <script src="/models/character.class.js"></script>
@@ -24,24 +26,53 @@
     <script src="/js/game.js"></script>
 </head>
 
-<body onload="init()">
+<body>
+    <!-- MENÜ-Overlay (neu), standardmäßig sichtbar -->
+    <div id="overlay-menu" class="overlay">
+        <!-- Dein Startscreen-Bild -->
+        <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Menu" />
+
+        <div class="menu-buttons" style="display: flex; gap: 40px; margin-top: 40px;">
+            <!-- Beispiel: drei Spalten: Start, Settings, Help -->
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <img src="img/icons/settings.png" alt="Settings Icon"
+                    style="width:64px; height:64px; margin-bottom: 10px;" />
+                <button onclick="openSettings()">Settings</button>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <img src="img/icons/help.png" alt="Help Icon" style="width:64px; height:64px; margin-bottom: 10px;" />
+                <button onclick="openHelp()">Help</button>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <img src="img/icons/start.png" alt="Start Icon" style="width:64px; height:64px; margin-bottom: 10px;" />
+                <button onclick="startGame()">Start</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER Overlay -->
     <div id="overlay-gameover" class="overlay hidden">
         <img src="img/You won, you lost/Game Over.png" alt="Game Over" />
-        <button onclick="restartGame()">Restart</button>
+        <div style="display: flex; flex-direction: column; margin-top: 20px;">
+            <button onclick="restartGame()">Restart</button>
+            <!-- Neuer Button "Menu" -->
+            <button onclick="goToMenu()">Menu</button>
+        </div>
     </div>
 
+    <!-- YOU WIN Overlay -->
     <div id="overlay-youwin" class="overlay hidden">
         <img src="img/You won, you lost/You Won B.png" alt="You Won" />
-        <button onclick="restartGame()">Play Again</button>
+        <div style="display: flex; flex-direction: column; margin-top: 20px;">
+            <button onclick="restartGame()">Play Again</button>
+            <!-- Neuer Button "Menu" -->
+            <button onclick="goToMenu()">Menu</button>
+        </div>
     </div>
 
-
-    <h1>El Pollo Loco</h1>
-
-    <canvas id="canvas" width="720" height="480">
-
-    </canvas>
-
+    <!-- Titel & Canvas anfangs unsichtbar -->
+    <h1 style="display: none;">El Pollo Loco</h1>
+    <canvas id="canvas" width="720" height="480" style="display: none;"></canvas>
 </body>
 
 </html>

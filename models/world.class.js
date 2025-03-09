@@ -1,8 +1,6 @@
 function init() {
   let canvas = document.getElementById('canvas');
-  // 1) Wir rufen createLevel1() auf (in level1.js definiert)
   let level = createLevel1();
-  // 2) Neue World mit dem neuen Level
   world = new World(canvas, keyboard, level);
 }
 
@@ -19,6 +17,26 @@ function restartGame() {
   world = new World(canvas, keyboard, level);
 }
 
+/** 
+ * Neu: Zeigt das Hauptmenü (overlay-menu),
+ * blendet Canvas / H1 / gameover / youwin aus
+ */
+function goToMenu() {
+  // 1) Overlays verstecken
+  document.getElementById("overlay-gameover").classList.add("hidden");
+  document.getElementById("overlay-youwin").classList.add("hidden");
+
+  // 2) Canvas/H1 verstecken
+  document.getElementById('canvas').style.display = 'none';
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'none';
+
+  // 3) Zeige Menu-Overlay (falls du es in index.html angelegt hast)
+  document.getElementById('overlay-menu').classList.remove('hidden');
+
+  // optional: world.stopGame(); // falls du das Spiel an dieser Stelle komplett stoppen willst
+}
+
 class World {
   // Entfernt: "level = level1;" 
   character = new Character(); 
@@ -30,12 +48,11 @@ class World {
   throwableObjects = [];
   bossBar = new BossStatusBar();
 
-  // minimaler Eingriff: wir nehmen (canvas, keyboard, level)
   constructor(canvas, keyboard, level) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
-    this.level = level;          // ← neu: das frische Level
+    this.level = level; 
     this.draw();
     this.setWorld();
     this.run();
@@ -143,15 +160,11 @@ class World {
   }
 
   showGameOver() {
-    document
-      .getElementById("overlay-gameover")
-      .classList.remove("hidden");
+    document.getElementById("overlay-gameover").classList.remove("hidden");
   }
   
   showYouWin() {
-    document
-      .getElementById("overlay-youwin")
-      .classList.remove("hidden");
+    document.getElementById("overlay-youwin").classList.remove("hidden");
   }
 
   removeThrowableObject(bottle) {
@@ -176,19 +189,19 @@ class World {
     this.ctx.translate(this.camera_x, 0);
     this.addObjectsToMap(this.level.backgroundObjects);
     this.ctx.translate(-this.camera_x, 0);
-  
+
     this.addToMap(this.statusBar);
-  
+
     this.ctx.translate(this.camera_x, 0);
     this.addToMap(this.character);
     this.addObjectsToMap(this.level.clouds);
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObjects);
-  
+
     this.drawBossBarIfVisible();
     this.ctx.translate(-this.camera_x, 0);
   }
-    
+
   drawBossBarIfVisible() {
     let boss = this.findBoss();
     if (boss && boss.x < 2200) {
@@ -208,7 +221,9 @@ class World {
   }
 
   addToMap(mo) {
-    if (mo.otherDirection) this.flipImage(mo);
+    if (mo.otherDirection) {
+      this.flipImage(mo);
+    }
     mo.draw(this.ctx);
     mo.drawFrame(this.ctx);
     if (mo.otherDirection) {

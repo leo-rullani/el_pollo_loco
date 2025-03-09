@@ -3,42 +3,86 @@ let world;
 let keyboard = new Keyboard(); 
 
 function init() {
-  canvas = document.getElementById("canvas");
-  // 1) Erzeuge frisches Level über createLevel1()
-  let level = createLevel1();
-  
-  // 2) Übergebe das Level beim Erstellen der World
-  world = new World(canvas, keyboard, level);
-
-  // Du kannst optional ctx anlegen, wenn du es irgendwo brauchst
-  ctx = canvas.getContext("2d");
-
-  console.log("My character is", world.character);
+  // Im Zweifel machst du hier gar nichts oder nur minimal.
+  // Wir lassen init() so, falls du es für was anderes brauchst.
+  console.log("Init called");
 }
 
+/** 
+ * Startet das Spiel aus dem Menü heraus.
+ * Zeigt Canvas + h1 und blendet das Menü aus.
+ */
+function startGame() {
+  // 1) Menü-Overlay unsichtbar machen
+  document.getElementById('overlay-menu').classList.add('hidden');
+
+  // 2) Canvas + H1 einblenden (falls du sie anfangs per style="display:none" ausblendest)
+  document.getElementById('canvas').style.display = 'block';
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'block';
+
+  // 3) Neues Level + World
+  canvas = document.getElementById("canvas");
+  let level = createLevel1();
+  world = new World(canvas, keyboard, level);
+
+  console.log("Game started, character is", world.character);
+}
+
+/** 
+ * Ruft man auf, wenn Spieler "Restart" oder "Play Again" klickt.
+ */
 function restartGame() {
-  // Falls du die Intervalle stoppen willst, 
-  // greife auf world.stopGame() zu
   if (world) {
     world.stopGame();
   }
-
-  // Overlays ausblenden
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
 
-  // 1) Wieder Canvas selektieren
+  // Canvas + Title sicherstellen, dass sie sichtbar sind
+  document.getElementById('canvas').style.display = 'block';
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'block';
+
+  // Neues Level + World
   canvas = document.getElementById("canvas");
-
-  // 2) Neues Level anlegen
   let level = createLevel1();
-
-  // 3) Neue World mit dem frischen Level
   world = new World(canvas, keyboard, level);
 
-  // Optional: ctx = canvas.getContext("2d");
+  console.log("Restarted game, character is", world.character);
 }
 
+/** 
+ * Menü-Button in Game Over / Win
+ * Schaltet Overlays aus, versteckt Canvas/H1,
+ * und zeigt wieder overlay-menu.
+ */
+function goToMenu() {
+  // Overlays aus
+  document.getElementById("overlay-gameover").classList.add("hidden");
+  document.getElementById("overlay-youwin").classList.add("hidden");
+
+  // Canvas & H1 wieder ausblenden
+  document.getElementById('canvas').style.display = 'none';
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'none';
+
+  // Zeige Menü
+  document.getElementById('overlay-menu').classList.remove('hidden');
+
+  // optional: world.stopGame(); 
+  console.log("Back to menu");
+}
+
+function openSettings() {
+  alert("No settings yet!");
+}
+
+function openHelp() {
+  alert("Use arrow keys to move, SPACE to jump, D to throw a bottle!");
+}
+
+// Deine Key-Events bleiben unverändert:
 window.addEventListener("keydown", (e) => {
   console.log("Key pressed: ", e.keyCode, e.key);
 });
