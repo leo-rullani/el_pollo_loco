@@ -1,6 +1,27 @@
+function init() {
+  let canvas = document.getElementById('canvas');
+  // 1) Wir rufen createLevel1() auf (in level1.js definiert)
+  let level = createLevel1();
+  // 2) Neue World mit dem neuen Level
+  world = new World(canvas, keyboard, level);
+}
+
+function restartGame() {
+  if (world) {
+    world.stopGame();
+  }
+  document.getElementById("overlay-gameover").classList.add("hidden");
+  document.getElementById("overlay-youwin").classList.add("hidden");
+
+  let canvas = document.getElementById('canvas');
+  // Wieder frisch:
+  let level = createLevel1();
+  world = new World(canvas, keyboard, level);
+}
+
 class World {
-  character = new Character();
-  level = level1;
+  // Entfernt: "level = level1;" 
+  character = new Character(); 
   canvas;
   ctx;
   keyboard;
@@ -9,13 +30,21 @@ class World {
   throwableObjects = [];
   bossBar = new BossStatusBar();
 
-  constructor(canvas, keyboard) {
+  // minimaler Eingriff: wir nehmen (canvas, keyboard, level)
+  constructor(canvas, keyboard, level) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
+    this.level = level;          // ← neu: das frische Level
     this.draw();
     this.setWorld();
     this.run();
+  }
+
+  stopGame() {
+    if (this.runInterval) clearInterval(this.runInterval);
+    if (this.moveInterval) clearInterval(this.moveInterval);
+    if (this.animationInterval) clearInterval(this.animationInterval);
   }
 
   setWorld() {
@@ -23,10 +52,12 @@ class World {
   }
 
   run() {
-    setInterval(() => {
-      this.checkCollisionsEnemies();
-      this.checkCollisionsThrowables();
-      this.checkThrowObjects();
+    this.runInterval = setInterval(() => {
+      if (!this.paused) {
+        this.checkCollisionsEnemies();
+        this.checkThrowObjects();
+        this.checkCollisionsThrowables(); 
+      }
     }, 200);
   }
 
@@ -45,8 +76,6 @@ class World {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
-  
-      // === Huhn-Kollision ===
       if (isHuhn && !enemy.isDeadChicken && this.character.isColliding(enemy)) {
         if (this.character.speedY < 0) {
           this.killChicken(enemy);
@@ -55,21 +84,16 @@ class World {
           this.statusBar.setPercentage(this.character.energy);
         }
       }
-  
-      // === Boss-Kollision ===
       if (isBoss && this.character.isColliding(enemy)) {
-        // z. B. doppelter Schaden
         this.character.hit(enemy.damage * 2);
         this.statusBar.setPercentage(this.character.energy);
       }
     });
-  
-    // HP prüfen
     if (this.character.energy <= 0 && !this.gameOverShown) {
       this.gameOverShown = true;
       this.showGameOver();
     }
-  }  
+  }
 
   checkCollisionsThrowables() {
     this.throwableObjects.forEach((bottle) => {
@@ -81,20 +105,15 @@ class World {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
-
-      // === Huhn-Treffer ===
       if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
         this.killChicken(enemy);
         this.removeThrowableObject(bottle);
       }
-
-      // === Boss-Treffer ===
       if (isBoss && bottle.isColliding(enemy)) {
         enemy.hit(1);
         enemy.lastHit = new Date().getTime();
         this.bossBar.setPercentage(enemy.energy * 20);
         this.removeThrowableObject(bottle);
-
         if (enemy.isDead()) this.killEndboss(enemy);
       }
     });
@@ -105,7 +124,9 @@ class World {
     chicken.playDeadAnimation();
     setTimeout(() => {
       let i = this.level.enemies.indexOf(chicken);
-      if (i > -1) this.level.enemies.splice(i, 1);
+      if (i > -1) {
+        this.level.enemies.splice(i, 1);
+      }
     }, 500);
   }
 
@@ -116,24 +137,26 @@ class World {
       setTimeout(() => {
         let i = this.level.enemies.indexOf(boss);
         if (i > -1) this.level.enemies.splice(i, 1);
-        this.showYouWin(); // Endboss besiegt => You Win
+        this.showYouWin();
       }, 2000);
     }, 500);
+  }
+
+  showGameOver() {
+    document
+      .getElementById("overlay-gameover")
+      .classList.remove("hidden");
+  }
+  
+  showYouWin() {
+    document
+      .getElementById("overlay-youwin")
+      .classList.remove("hidden");
   }
 
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);
     if (i > -1) this.throwableObjects.splice(i, 1);
-  }
-
-  showGameOver() {
-    document.getElementById("overlay-gameover").classList.remove("hidden");
-    // Hier könntest du das Spiel stoppen oder weitere Aktionen ausführen
-  }
-
-  showYouWin() {
-    document.getElementById("overlay-youwin").classList.remove("hidden");
-    // Hier kannst du ggf. das Spiel stoppen, Sound abspielen etc.
   }
 
   draw() {
@@ -186,7 +209,9 @@ class World {
     if (mo.otherDirection) this.flipImage(mo);
     mo.draw(this.ctx);
     mo.drawFrame(this.ctx);
-    if (mo.otherDirection) this.flipImageBack(mo);
+    if (mo.otherDirection) {
+      this.flipImageBack(mo);
+    }
   }
 
   flipImage(mo) {
