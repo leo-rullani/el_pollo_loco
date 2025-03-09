@@ -1,0 +1,63 @@
+/* =============================================
+   Container für alle Elemente unter dem Bild
+   (icons + buttons in einer vertikalen Liste)
+   ============================================= */
+   .menu-buttons {
+    display: flex;
+    flex-direction: column;  /* stapelt jede Zeile untereinander */
+    align-items: center;     /* zentriert horizontal */
+    gap: 20px;
+    margin-top: 20px; 
+  }
+  
+  /* =============================================
+     Startscreen-Bild in der Mitte
+     ============================================= */
+  .start-screen {
+    max-width: 20%;            /* kleineres Bild, 20% der Overlay-Breite */
+    height: auto;
+    margin: 0 auto 20px;       /* zentriert, 20px Abstand nach unten */
+    border-radius: 10px;       /* weiche Ecken */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    display: block;            /* damit margin: 0 auto greift */
+  }
+  
+  /* =============================================
+     Zeile mit Icon links & Button rechts
+     ============================================= */
+  .menu-column {
+    display: flex;
+    flex-direction: row;     /* Icon links, Button rechts */
+    align-items: center;
+    justify-content: center; /* zentriert beide horizontal (optional) */
+    gap: 20px;               /* Abstand zwischen Icon & Button */
+    width: 100%;             /* füllt den Elterncontainer in der Breite */
+    max-width: 400px;        /* optional, damit es nicht zu breit wird */
+  }
+  
+  /* Icon links: entfernen Shadow, etc. */
+  .menu-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    margin-bottom: 0; /* kein extra Unterabstand notwendig */
+    box-shadow: none; /* kein halbtransparentes Box-Design mehr */
+    background: none; /* falls du mal Transparent oder BG hattest */
+  }
+  
+  /* Button rechts: gleiche Breite für alle */
+  .menu-column button {
+    width: 200px; 
+    /* du kannst padding, etc. in style.css definieren oder hier */
+  }
+  
+  /* =============================================
+     Vertikale Buttons für Game Over / Win
+     ============================================= */
+  .menu-buttons--vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  

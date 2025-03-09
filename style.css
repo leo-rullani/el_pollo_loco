@@ -33,7 +33,7 @@ canvas {
 
 @font-face {
     font-family: 'zabras';
-    src: url('/fonts/zabras.ttf') format('truetype'); /* Format ohne Leerzeichen */
+    src: url('/fonts/zabras.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -45,55 +45,60 @@ h1 {
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
 }
 
+/* =====================================
+   Overlay: Bild oben, Buttons darunter
+   ===================================== */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    
-    /* Hintergrundbild + dunkler Overlay-Effekt: */
-    background: 
-      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), /* dunkle Tönung */
-      url('/img/background/desert.png') no-repeat center center; /* dein Bild */
-    background-size: cover;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  .overlay img {
-    max-width: 80%;
-    max-height: 80%;
-  }  
-  
-  .hidden {
-    display: none;
-  }
-  
-  .overlay img {
-    max-width: 80%;
-    max-height: 80%;
-  }  
 
-  button {
+    /* Hintergrundbild + dunkler Overlay-Effekt: */
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url('/img/background/desert.png') no-repeat center center;
+    background-size: cover;
+
+    /* Damit Bild + Buttons untereinander zentriert sind */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Overlay-Bild (z.B. Game Over, You Won, oder Startscreen) */
+.overlay img {
+    max-width: 50%;
+    max-height: 50%;
+    border-radius: 20px;
+    margin-bottom: 20px;  /* Abstand zum Buttonbereich darunter */
+}
+
+/* =====================================
+   Buttons (gleiche Breite, zentriert)
+   ===================================== */
+button {
     font-size: 32px;
     border-radius: 10px;
-    color: white;
-    background-color: #e04a57;
+    color: black;
+    background-color: #ffc105;
     transition: transform 0.3s ease;
     padding: 16px;
     margin: 16px;
     cursor: pointer;
     font-family: 'zabras';
     letter-spacing: 2px;
-    
+
+    /* Alle Buttons selbe Breite */
+    width: 240px; 
 }
 
 button:hover {
@@ -106,8 +111,6 @@ button:hover {
     100% { box-shadow: 0 0 20px #ff7c86; }
 }
 
-
-
 @media only screen and (max-width: 1000px) {
     canvas {
         width: 100%;
@@ -119,7 +122,6 @@ button:hover {
     body {
         background-image: none; 
     }
-
 }
 
 @media only screen and (max-height: 480px) {
