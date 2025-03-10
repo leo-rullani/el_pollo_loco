@@ -16,7 +16,7 @@ class StatusBar extends DrawableObject {
     constructor() {
         super(); /* Initialisierung des übergeordneten Objekts */
         this.loadImages(this.IMAGES);
-        this.x = 0;
+        this.x = 20;
         this.y = 0;
         this.width = 200;
         this.height = 60;
@@ -87,3 +87,51 @@ class BossStatusBar extends DrawableObject {
       else return 0;
     }
   }  
+
+  class CoinBar extends DrawableObject {
+    percentage = 0;
+  
+    constructor() {
+      super();
+      // Pfade anpassen! Beispiel:
+      this.IMAGES = [
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/blue/0.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/blue/20.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/blue/40.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/blue/60.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/blue/80.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/blue/100.png'
+      ];
+      this.loadImages(this.IMAGES);
+  
+      // Position / Größe anpassen
+      this.x = 20;
+      this.y = 50;  // etwas unterhalb der Lebensbar
+      this.width = 200;
+      this.height = 60;
+  
+      this.setPercentage(0); // Startwert
+    }
+  
+    setPercentage(percentage) {
+      this.percentage = percentage;
+      let path = this.resolveImageIndex(percentage);
+      this.img = this.imageCache[path];
+    }
+  
+    resolveImageIndex(percentage) {
+      if (percentage >= 100) {
+        return this.IMAGES[5];
+      } else if (percentage >= 80) {
+        return this.IMAGES[4];
+      } else if (percentage >= 60) {
+        return this.IMAGES[3];
+      } else if (percentage >= 40) {
+        return this.IMAGES[2];
+      } else if (percentage >= 20) {
+        return this.IMAGES[1];
+      } else {
+        return this.IMAGES[0];
+      }
+    }
+  }   

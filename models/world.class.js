@@ -47,6 +47,7 @@ class World {
   statusBar = new StatusBar();
   throwableObjects = [];
   bossBar = new BossStatusBar();
+  coinBar = new CoinBar();  
 
   constructor(canvas, keyboard, level) {
     this.ctx = canvas.getContext("2d");
@@ -192,6 +193,7 @@ class World {
     this.ctx.translate(-this.camera_x, 0);
 
     this.addToMap(this.statusBar);
+    this.addToMap(this.coinBar);
 
     this.ctx.translate(this.camera_x, 0);
     this.addToMap(this.character);
@@ -247,17 +249,21 @@ class World {
 
   checkCollisionsCoins() {
     this.level.coins.forEach((coin, index) => {
-      // Prüfen, ob der Character kollidiert UND über dem Boden ist
-      if (this.character.isColliding(coin) && this.character.isAboveGround()) {
-        console.log('Coin collision detected! In the air!');
-        // Coin entfernen
+      if (this.character.isColliding(coin)) {
         this.level.coins.splice(index, 1);
+  
+        // Zähler hoch
+        this.coinsCollected++;
+  
+        // z. B. jede Coin = +10%, max 100%
+        let percentage = this.coinsCollected * 10;
+        if (percentage > 100) {
+          percentage = 100;
+        }
+        this.coinBar.setPercentage(percentage);
 
         let coinSound = new Audio('audio/collect-coin.mp3');
         coinSound.play();
-
-        console.log('Coin collision detected: Sound played!');
-
       }
     });
   }  
