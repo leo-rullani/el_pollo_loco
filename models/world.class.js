@@ -48,6 +48,7 @@ class World {
   throwableObjects = [];
   bossBar = new BossStatusBar();
   coinBar = new CoinBar();  
+  coinsCollected = 0;
 
   constructor(canvas, keyboard, level) {
     this.ctx = canvas.getContext("2d");
@@ -248,23 +249,21 @@ class World {
   }
 
   checkCollisionsCoins() {
-    this.level.coins.forEach((coin, index) => {
-      if (this.character.isColliding(coin)) {
-        this.level.coins.splice(index, 1);
-  
-        // Zähler hoch
+    for (let i = this.level.coins.length - 1; i >= 0; i--) {
+      let coin = this.level.coins[i];
+      if (this.character.isColliding(coin) && this.character.isAboveGround()) {
+        // Coin entfernen + Zähler hoch      
+        this.level.coins.splice(i, 1);
         this.coinsCollected++;
-  
-        // z. B. jede Coin = +10%, max 100%
-        let percentage = this.coinsCollected * 10;
-        if (percentage > 100) {
-          percentage = 100;
-        }
+        let percentage = Math.floor(this.coinsCollected / 2) * 20;
+        if (percentage > 100) percentage = 100;
         this.coinBar.setPercentage(percentage);
-
+  
+        // Sound
         let coinSound = new Audio('audio/collect-coin.mp3');
         coinSound.play();
+        console.log('Coin #', this.coinsCollected, '=>', percentage, '%');
       }
-    });
+    }
   }  
 }

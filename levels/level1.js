@@ -18,9 +18,9 @@ function createLevel1() {
     ],
     [ new cloud() ],
 
-    [ new Coin(300, 150),
-      new Coin(600, 200),
-      new Coin(900, 250)],
+    [ new Coin(),
+      new Coin(),
+      new Coin()],
     [
       new BackgroundObject("img/5_background/layers/air.png", -719),
       new BackgroundObject("img/5_background/layers/3_third_layer/2.png", -719),
