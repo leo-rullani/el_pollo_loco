@@ -74,6 +74,7 @@ class World {
         this.checkCollisionsEnemies();
         this.checkThrowObjects();
         this.checkCollisionsThrowables(); 
+        this.checkCollisionsCoins();
       }
     }, 200);
   }
@@ -197,6 +198,7 @@ class World {
     this.addObjectsToMap(this.level.clouds);
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObjects);
+    this.addObjectsToMap(this.level.coins);
 
     this.drawBossBarIfVisible();
     this.ctx.translate(-this.camera_x, 0);
@@ -242,4 +244,21 @@ class World {
     mo.x = mo.x * -1;
     this.ctx.restore();
   }
+
+  checkCollisionsCoins() {
+    this.level.coins.forEach((coin, index) => {
+      // Prüfen, ob der Character kollidiert UND über dem Boden ist
+      if (this.character.isColliding(coin) && this.character.isAboveGround()) {
+        console.log('Coin collision detected! In the air!');
+        // Coin entfernen
+        this.level.coins.splice(index, 1);
+
+        let coinSound = new Audio('audio/collect-coin.mp3');
+        coinSound.play();
+
+        console.log('Coin collision detected: Sound played!');
+
+      }
+    });
+  }  
 }
