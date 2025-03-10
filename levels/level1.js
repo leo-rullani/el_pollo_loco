@@ -22,9 +22,9 @@ function createLevel1() {
       new Coin(),
       new Coin()],
     [
-      new Bottle(400, 330),
-      new Bottle(800, 320),
-      new Bottle(1200, 310)
+      new Bottle(),
+      new Bottle(),
+      new Bottle()
     ],
     [
       new BackgroundObject("img/5_background/layers/air.png", -719),
