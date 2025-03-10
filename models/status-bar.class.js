@@ -135,3 +135,56 @@ class BossStatusBar extends DrawableObject {
       }
     }
   }   
+
+  class BottleBar extends DrawableObject {
+    percentage = 0;
+  
+    constructor() {
+      super();
+      // Falls du die Bottle-Bilder in diesem Ordner hast:
+      this.IMAGES = [
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/0.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/20.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/40.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/60.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/80.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/100.png'
+      ];
+      this.loadImages(this.IMAGES);
+  
+      // Positionierung: direkt unter der Coin-Bar
+      // (Coin-Bar war z.B. y=50, also nimm y=100 oder so)
+      this.x = 20;
+      this.y = 100;
+      this.width = 200;
+      this.height = 60;
+  
+      // Standardmäßig 0%
+      this.setPercentage(0);
+    }
+  
+    /**
+     * Ähnlich wie bei CoinBar: percentage = 0..100
+     */
+    setPercentage(percentage) {
+      this.percentage = percentage;
+      const path = this.resolveImageIndex(percentage);
+      this.img = this.imageCache[path];
+    }
+  
+    resolveImageIndex(percentage) {
+      if (percentage >= 100) {
+        return this.IMAGES[5];
+      } else if (percentage >= 80) {
+        return this.IMAGES[4];
+      } else if (percentage >= 60) {
+        return this.IMAGES[3];
+      } else if (percentage >= 40) {
+        return this.IMAGES[2];
+      } else if (percentage >= 20) {
+        return this.IMAGES[1];
+      } else {
+        return this.IMAGES[0];
+      }
+    }
+  }  

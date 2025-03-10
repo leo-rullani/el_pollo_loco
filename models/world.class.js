@@ -49,6 +49,7 @@ class World {
   bossBar = new BossStatusBar();
   coinBar = new CoinBar();  
   coinsCollected = 0;
+  bottleBar = new BottleBar();
 
   constructor(canvas, keyboard, level) {
     this.ctx = canvas.getContext("2d");
@@ -195,6 +196,7 @@ class World {
 
     this.addToMap(this.statusBar);
     this.addToMap(this.coinBar);
+    this.addToMap(this.bottleBar);
 
     this.ctx.translate(this.camera_x, 0);
     this.addToMap(this.character);
@@ -202,6 +204,7 @@ class World {
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObjects);
     this.addObjectsToMap(this.level.coins);
+    this.addObjectsToMap(this.level.bottles);
 
     this.drawBossBarIfVisible();
     this.ctx.translate(-this.camera_x, 0);
