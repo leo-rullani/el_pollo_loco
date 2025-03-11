@@ -50,6 +50,7 @@ class World {
   coinBar = new CoinBar();  
   coinsCollected = 0;
   bottleBar = new BottleBar();
+  bottlesCollected = 0; 
 
   constructor(canvas, keyboard, level) {
     this.ctx = canvas.getContext("2d");
@@ -78,20 +79,31 @@ class World {
         this.checkThrowObjects();
         this.checkCollisionsThrowables(); 
         this.checkCollisionsCoins();
+        this.checkCollisionsBottles();
       }
     }, 200);
   }
 
   checkThrowObjects() {
-    if (this.keyboard.D) {
+    // Nur wenn D gedrückt ODER wir haben >= 1 Flasche
+    if (this.keyboard.D && this.bottlesCollected > 0) {
+      // Flasche werfen
       let bottle = new ThrowableObject(
         this.character.x + 100,
         this.character.y + 100,
         this
       );
       this.throwableObjects.push(bottle);
+  
+      // => Counter für geworfene Flasche senken
+      this.bottlesCollected--;
+  
+      // => Neu berechnen + Bar aktualisieren
+      let percentage = this.bottlesCollected * 20;
+      if (percentage < 0) percentage = 0; // nur zur Sicherheit
+      this.bottleBar.setPercentage(percentage);
     }
-  }
+  }  
 
   checkCollisionsEnemies() {
     this.level.enemies.forEach((enemy) => {
@@ -122,24 +134,6 @@ class World {
     });
   }
 
-  handleBottleCollisions(bottle) {
-    this.level.enemies.forEach((enemy) => {
-      let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
-      let isBoss = enemy instanceof Endboss;
-      if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
-        this.killChicken(enemy);
-        this.removeThrowableObject(bottle);
-      }
-      if (isBoss && bottle.isColliding(enemy)) {
-        enemy.hit(1);
-        enemy.lastHit = new Date().getTime();
-        this.bossBar.setPercentage(enemy.energy * 20);
-        this.removeThrowableObject(bottle);
-        if (enemy.isDead()) this.killEndboss(enemy);
-      }
-    });
-  }
-
   killChicken(chicken) {
     chicken.isDeadChicken = true;
     chicken.playDeadAnimation();
@@ -149,6 +143,31 @@ class World {
         this.level.enemies.splice(i, 1);
       }
     }, 500);
+  }
+
+  handleBottleCollisions(bottle) {
+    this.level.enemies.forEach((enemy) => {
+      let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
+      let isBoss = enemy instanceof Endboss;
+      if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
+        this.killChicken(enemy);
+        // Neu:
+        bottle.triggerSplash();  
+      }
+      
+      // Dasselbe für Endboss:
+      if (isBoss && bottle.isColliding(enemy)) {
+        enemy.hit(1);
+        this.bossBar.setPercentage(enemy.energy * 20);
+      
+        // Neu:
+        bottle.triggerSplash();
+      
+        if (enemy.isDead()) {
+          this.killEndboss(enemy);
+        }
+      }      
+    });
   }
 
   killEndboss(boss) {
@@ -266,6 +285,30 @@ class World {
         let coinSound = new Audio('audio/collect-coin.mp3');
         coinSound.play();
         console.log('Coin #', this.coinsCollected, '=>', percentage, '%');
+      }
+    }
+  }  
+
+  checkCollisionsBottles() {
+    for (let i = this.level.bottles.length - 1; i >= 0; i--) {
+      let bottleItem = this.level.bottles[i];
+      // Prüfen, ob Character die Flasche berührt
+      if (this.character.isColliding(bottleItem)) {
+        // => aus dem Array entfernen
+        this.level.bottles.splice(i, 1);
+  
+        // => Counter hochzählen
+        this.bottlesCollected++;
+        
+        // => Bottle-Bar aktualisieren. 
+        // => Je nach System: 1 Flasche = 20%, 5 Flaschen = 100%? 
+        let percentage = this.bottlesCollected * 20;
+        if (percentage > 100) percentage = 100;
+        this.bottleBar.setPercentage(percentage);
+  
+        // ggf. Sound abspielen
+        let bottleSound = new Audio('audio/collect-bottle.mp3');
+        bottleSound.play();
       }
     }
   }  
