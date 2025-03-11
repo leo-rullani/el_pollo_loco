@@ -57,6 +57,19 @@ class World {
     this.canvas = canvas;
     this.keyboard = keyboard;
     this.level = level; 
+    // 1) Hintergrundmusik laden
+    this.backgroundMusic = new Audio('audio/game-sound.mp3');
+
+    // 2) Lautstärke einstellen (z.B. 20%)
+    this.backgroundMusic.volume = 0.2;
+
+    // 3) Loop aktivieren
+    this.backgroundMusic.loop = true;
+
+    // 4) Optional: preLoad
+    //  => Schadet meist nicht, kann aber die Ladezeit minimal verlängern
+    this.backgroundMusic.preload = 'auto';
+    this.backgroundMusic.load();
     this.chickenDeathSound = new Audio('audio/chicken-noise.mp3');
     this.chickenDeathSound.preload = 'auto';
     this.chickenDeathSound.load();
@@ -144,6 +157,7 @@ class World {
     if (this.character.energy <= 0 && !this.gameOverShown) {
       this.gameOverShown = true;
       this.pepeDiesSound.play();
+      this.stopGame();
       this.showGameOver();
     }
   }
@@ -199,19 +213,31 @@ class World {
       setTimeout(() => {
         let i = this.level.enemies.indexOf(boss);
         if (i > -1) this.level.enemies.splice(i, 1);
+        this.stopGame(); // Hier
         this.showYouWin();
       }, 2000);
     }, 500);
   }
 
   showGameOver() {
+    this.backgroundMusic.pause();
     document.getElementById("overlay-gameover").classList.remove("hidden");
   }
   
   showYouWin() {
+    this.backgroundMusic.pause();
     this.winGameSound.play();
     document.getElementById("overlay-youwin").classList.remove("hidden");
+    this.stopGame();
   }
+
+  stopGame() {
+    if (this.runInterval) clearInterval(this.runInterval);
+    if (this.moveInterval) clearInterval(this.moveInterval);
+    if (this.animationInterval) clearInterval(this.animationInterval);
+    // Und evtl. andere Timer ...
+  }
+  
 
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);

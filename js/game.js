@@ -30,7 +30,7 @@ function startGame() {
   let level = createLevel1();
   world = new World(canvas, keyboard, level);
 
-  console.log("Game started, character is", world.character);
+  world.backgroundMusic.play();
 }
 
 /** 
