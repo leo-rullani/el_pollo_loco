@@ -297,6 +297,11 @@ body {
   #impressum-close-button {
     background-color: #FFFFFF; /* White */
   }
+
+  .linkedin-container {
+    display: flex; 
+    justify-content: center;
+  }
   
   /* LinkedIn circle in official color #0077B5 */
   #linkedin-button {
