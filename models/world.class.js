@@ -119,6 +119,9 @@ class World {
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
+      if (this.gameOverShown) {
+        return;
+      }
       if (isHuhn && !enemy.isDeadChicken && this.character.isColliding(enemy)) {
         if (this.character.speedY < 0) {
           this.killChicken(enemy);
