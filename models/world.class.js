@@ -57,6 +57,7 @@ class World {
     this.canvas = canvas;
     this.keyboard = keyboard;
     this.level = level; 
+    this.pepeHurtSound = new Audio('audio/pepe-hurt.mp3');
     this.draw();
     this.setWorld();
     this.run();
@@ -115,11 +116,13 @@ class World {
         } else {
           this.character.hit(enemy.damage);
           this.statusBar.setPercentage(this.character.energy);
+          this.pepeHurtSound.play();
         }
       }
       if (isBoss && this.character.isColliding(enemy)) {
         this.character.hit(enemy.damage * 2);
         this.statusBar.setPercentage(this.character.energy);
+        this.pepeHurtSound.play();
       }
     });
     if (this.character.energy <= 0 && !this.gameOverShown) {
