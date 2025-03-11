@@ -58,6 +58,10 @@ class World {
     this.keyboard = keyboard;
     this.level = level; 
     this.pepeHurtSound = new Audio('audio/pepe-hurt.mp3');
+    this.pepeDiesSound = new Audio('audio/pepe-dies.mp3');
+    // (Optional) Vorladen, um die Verzögerung zu minimieren
+    this.pepeDiesSound.preload = 'auto';
+    this.pepeDiesSound.load();
     this.draw();
     this.setWorld();
     this.run();
@@ -127,6 +131,7 @@ class World {
     });
     if (this.character.energy <= 0 && !this.gameOverShown) {
       this.gameOverShown = true;
+      this.pepeDiesSound.play();
       this.showGameOver();
     }
   }
