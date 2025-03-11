@@ -1,7 +1,4 @@
-/* =============================================
-   Container for the main menu's 3 buttons
-   (stacked vertically)
-============================================= */
+/* Container for the main menu's 3 buttons (stacked vertically) */
 .menu-buttons {
   display: flex;
   flex-direction: column;
@@ -43,9 +40,7 @@
   width: 200px; 
 }
 
-/* =============================================
-   Vertical Buttons for Game Over / Win
-============================================= */
+/* Vertical Buttons for Game Over / Win */
 .menu-buttons--vertical {
   display: flex;
   flex-direction: column;

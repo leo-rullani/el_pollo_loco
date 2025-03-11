@@ -1,30 +1,30 @@
 // game.js
 
-let canvas;
-let world;
+let canvas; 
+let world; 
 let keyboard = new Keyboard();
 
 // Flags for muting audio
 let musicMuted = false;
 let soundEffectsMuted = false;
 
-// Audio for button clicks (only plays when turning ON)
-let buttonClickSound = new Audio("audio/button-click.mp3");
-buttonClickSound.volume = 1.0; // Adjust if you like
+// Audio for button clicks (only plays when toggling ON)
+let buttonClickSound = new Audio('audio/button-click.mp3');
+buttonClickSound.volume = 1.0; // Adjust volume if you like
 
 function init() {
   console.log("Init called");
 }
 
-/**
+/** 
  * Start the game from the menu.
  */
 function startGame() {
-  document.getElementById("overlay-menu").classList.add("hidden");
-  document.getElementById("canvas").style.display = "block";
+  document.getElementById('overlay-menu').classList.add('hidden');
+  document.getElementById('canvas').style.display = 'block';
 
-  let title = document.querySelector("h1");
-  if (title) title.style.display = "block";
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'block';
 
   canvas = document.getElementById("canvas");
   let level = createLevel1();
@@ -33,7 +33,7 @@ function startGame() {
   console.log("Game started, character is", world.character);
 }
 
-/**
+/** 
  * Restart game after Win or Game Over
  */
 function restartGame() {
@@ -43,9 +43,9 @@ function restartGame() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
 
-  document.getElementById("canvas").style.display = "block";
-  let title = document.querySelector("h1");
-  if (title) title.style.display = "block";
+  document.getElementById('canvas').style.display = 'block';
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'block';
 
   canvas = document.getElementById("canvas");
   let level = createLevel1();
@@ -54,100 +54,108 @@ function restartGame() {
   console.log("Restarted game, character is", world.character);
 }
 
-/**
+/** 
  * Return to Menu from overlays
  */
 function goToMenu() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
-  document.getElementById("canvas").style.display = "none";
+  document.getElementById('canvas').style.display = 'none';
 
-  let title = document.querySelector("h1");
-  if (title) title.style.display = "none";
+  let title = document.querySelector('h1');
+  if (title) title.style.display = 'none';
 
-  document.getElementById("overlay-menu").classList.remove("hidden");
+  document.getElementById('overlay-menu').classList.remove('hidden');
   console.log("Back to menu");
 }
 
-/**
+/** 
  * Open Settings overlay
  */
 function openSettings() {
-  document.getElementById("overlay-settings").classList.remove("hidden");
+  document.getElementById('overlay-settings').classList.remove('hidden');
 }
 
-/**
- * Close Settings overlay (NO audio on close)
+/** 
+ * Close Settings overlay (no audio on close)
  */
 function closeSettings() {
-  document.getElementById("overlay-settings").classList.add("hidden");
+  document.getElementById('overlay-settings').classList.add('hidden');
 }
 
-/**
- * Show help (currently just an alert)
+/** 
+ * Open Help overlay
  */
 function openHelp() {
-  alert("Use arrow keys to move, SPACE to jump, D to throw a bottle!");
+  document.getElementById('overlay-help').classList.remove('hidden');
 }
 
-/**
- * Example Impressum
+/** 
+ * Close Help overlay
+ */
+function closeHelp() {
+  document.getElementById('overlay-help').classList.add('hidden');
+}
+
+/** 
+ * Open Impressum overlay
  */
 function openImpressum() {
-  alert("Example Impressum text here.");
+  document.getElementById('overlay-impressum').classList.remove('hidden');
 }
 
-/**
+/** 
+ * Close Impressum overlay
+ */
+function closeImpressum() {
+  document.getElementById('overlay-impressum').classList.add('hidden');
+}
+
+/** 
  * Toggle background music.
  * If turning OFF, no click sound.
  * If turning ON, play click sound.
  */
 function toggleMusic() {
-  let musicIcon = document.getElementById("music-icon");
-
+  let musicIcon = document.getElementById('music-icon');
   if (!musicMuted) {
-    // Currently ON, now turning OFF
+    // Currently ON, turning OFF
     musicMuted = true;
-    musicIcon.src = "img/background/music-cross.png";
+    musicIcon.classList.add('muted');
     console.log("Music muted.");
-    // no click sound
   } else {
-    // Currently OFF, now turning ON
+    // Currently OFF, turning ON
     musicMuted = false;
-    musicIcon.src = "img/background/music.png";
+    musicIcon.classList.remove('muted');
     console.log("Music unmuted.");
-    playButtonClick();
+    playButtonClick(); // only on turning ON
   }
-
   // TODO: actually mute/unmute your in-game music if you have it
 }
 
-/**
+/** 
  * Toggle sound effects.
  * If turning OFF, no click sound.
  * If turning ON, play click sound.
  */
 function toggleSoundEffects() {
-  let sfxIcon = document.getElementById("sfx-icon");
-
+  let sfxIcon = document.getElementById('sfx-icon');
   if (!soundEffectsMuted) {
     // Currently ON, turning OFF
     soundEffectsMuted = true;
-    sfxIcon.src = "img/background/sound-cross.png";
+    sfxIcon.classList.add('muted');
     console.log("Sound effects muted.");
-    // no click sound
   } else {
     // Currently OFF, turning ON
     soundEffectsMuted = false;
-    sfxIcon.src = "img/background/sound.png";
+    sfxIcon.classList.remove('muted');
     console.log("Sound effects unmuted.");
-    playButtonClick();
+    playButtonClick(); // only on turning ON
   }
-
   // TODO: actually mute/unmute your in-game SFX if you have them
 }
 
-/**
+/** 
  * Plays short button click sound (only used when toggling ON).
  */
 function playButtonClick() {
@@ -155,7 +163,7 @@ function playButtonClick() {
   buttonClickSound.play();
 }
 
-/**
+/** 
  * Key events (unchanged)
  */
 window.addEventListener("keydown", (e) => {

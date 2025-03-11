@@ -23,7 +23,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3); /* dark overlay */
+    background: rgba(0, 0, 0, 0.3);
     z-index: -1;
   }
   
@@ -79,7 +79,7 @@ body {
   }
   
   /* -----------------------
-     OVERLAY STYLES
+     OVERLAYS
   ------------------------ */
   .overlay {
     position: fixed;
@@ -110,12 +110,21 @@ body {
     max-height: 50%;
     border-radius: 20px;
     margin-bottom: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-image 0.3s ease;
+    border: 5px solid transparent; /* default no visible border */
   }
   
   .overlay img:hover {
     transform: scale(1.05);
     box-shadow: 0 0 20px #ffecb3;
+    /* 3-color border, each 33% for green/white/red */
+    border-image: linear-gradient(
+      to right, 
+      #006847 0%, #006847 33%, 
+      #ffffff 33%, #ffffff 66%, 
+      #ce1126 66%, #ce1126 100%
+    );
+    border-image-slice: 1;
   }
   
   /* -------------------------
@@ -160,26 +169,15 @@ body {
     opacity: 1;
   }
   
-  /* ============= MEXICAN COLORS for the menu buttons ============= */
+  /* ============= MEXICAN COLORS for the main menu ============= */
   #btn-start {
     background-color: #006847; /* Green */
   }
-  
   #btn-settings {
     background-color: #FFFFFF; /* White */
   }
-  
   #btn-help {
     background-color: #CE1126; /* Red */
-  }
-  
-  /* Make sure the text is black on white, and still black on green or red */
-  #btn-settings {
-    color: black; /* forced black if white BG */
-  }
-  
-  #btn-start, #btn-help {
-    color: black; /* black text on green/red is also fine */
   }
   
   /* Impressum link - white text, no button style */
@@ -202,7 +200,7 @@ body {
   }
   
   /* ----------------------------
-     SETTINGS OVERLAY CONTENT
+     SETTINGS Overlay Content
   ----------------------------- */
   .settings-content {
     max-width: 700px;
@@ -221,7 +219,7 @@ body {
     margin-top: 20px;
   }
   
-  /* Circle Buttons (use IDs for different colors) */
+  /* Circle Buttons (IDs for different colors) */
   .circle-button {
     width: 60px;
     height: 60px;
@@ -233,33 +231,76 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
+    text-decoration: none; /* for a or links */
   }
   
-  /* On hover, a small scale-up and brighter shadow */
   .circle-button:hover {
     transform: scale(1.1);
     box-shadow: 0 0 25px #ffecb3;
   }
   
-  /* Icon inside the circle button */
-  .circle-button img {
-    width: 60%;
-    height: 60%;
-    pointer-events: none; /* so clicks go to the button itself */
+  .circle-button svg {
+    pointer-events: none;
   }
   
-  /* Assign Mexican colors to each circle by ID */
+  /* Mexican colors for these circle buttons */
   #music-button {
     background-color: #006847; /* Green */
   }
   #sfx-button {
     background-color: #FFFFFF; /* White */
   }
-  #sfx-button img {
-    /* black icon on white background? If needed, ensure icon is visible */
-  }
   #close-button {
     background-color: #CE1126; /* Red */
+  }
+  
+  /* Slash is hidden by default, .muted shows it */
+  .slash {
+    display: none;
+  }
+  .muted .slash {
+    display: inline;
+  }
+  
+  /* -------------------------
+     HELP Overlay
+  -------------------------- */
+  .help-content {
+    max-width: 700px;
+    margin: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+  }
+  .help-close-container {
+    margin-top: 20px;
+  }
+  /* The green circle for Help-Close */
+  #help-close-button {
+    background-color: #006847; /* Green */
+  }
+  
+  /* -------------------------
+     IMPRESSUM Overlay
+  -------------------------- */
+  .impressum-content {
+    max-width: 700px;
+    margin: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+  }
+  .impressum-close-container {
+    margin-top: 20px;
+  }
+  /* White circle for Impressum-Close */
+  #impressum-close-button {
+    background-color: #FFFFFF; /* White */
+  }
+  
+  /* LinkedIn circle in official color #0077B5 */
+  #linkedin-button {
+    background-color: #0077B5;
   }
   
   /* ------------
