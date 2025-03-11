@@ -64,6 +64,7 @@ class World {
     this.pepeHurtSound.preload = 'auto';
     this.pepeHurtSound.load();
     this.pepeDiesSound = new Audio('audio/pepe-dies.mp3');
+    this.endbossDeathSound = new Audio('audio/endboss-noise.mp3');
     // (Optional) Vorladen, um die Verzögerung zu minimieren
     this.pepeDiesSound.preload = 'auto';
     this.pepeDiesSound.load();
@@ -188,6 +189,7 @@ class World {
   }
 
   killEndboss(boss) {
+    this.endbossDeathSound.play();
     boss.playDeadAnimation();
     setTimeout(() => {
       boss.sinkBoss();
