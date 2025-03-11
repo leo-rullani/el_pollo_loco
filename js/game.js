@@ -16,6 +16,18 @@ function init() {
   console.log("Init called");
 }
 
+function toggleMusic() {
+  if (window.world) {
+    world.toggleMusicMute();
+  }
+}
+
+function toggleSfx() {
+  if (window.world) {
+    world.toggleSfxMute();
+  }
+}
+
 /** 
  * Start the game from the menu.
  */

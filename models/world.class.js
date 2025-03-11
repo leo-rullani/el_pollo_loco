@@ -84,10 +84,27 @@ class World {
     this.winGameSound = new Audio('audio/win-game.mp3');
     this.winGameSound.preload = 'auto';
     this.winGameSound.load();
+    this.musicMuted = false;
+    this.sfxMuted = false;
     this.draw();
     this.setWorld();
     this.run();
   }
+
+  toggleMusicMute() {
+    this.musicMuted = !this.musicMuted;
+    this.backgroundMusic.muted = this.musicMuted;
+  }  
+  toggleSfxMute() {
+    this.sfxMuted = !this.sfxMuted;
+    this.chickenDeathSound.muted = this.sfxMuted;
+    this.chickenDeathSound.muted = this.sfxMuted;
+    this.pepeHurtSound.muted = this.sfxMuted;
+    this.pepeDiesSound.muted = this.sfxMuted;
+    this.endbossDeathSound.muted = this.sfxMuted;
+    this.winGameSound.muted = this.sfxMuted;
+  }
+  
 
   stopGame() {
     if (this.runInterval) clearInterval(this.runInterval);
