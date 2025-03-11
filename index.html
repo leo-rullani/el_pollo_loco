@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css" />
-    <!-- Neu: eigenes CSS nur für das Menü -->
     <link rel="stylesheet" href="menu.css" />
 
     <link rel="icon" type="image/png" href="/img/background/chicken-flaticon.png" />
     <title>El Pollo Loco</title>
 
-    <!-- Deine bestehenden Skripte: -->
+    <!-- Game Scripts -->
     <script src="models/drawable-object.class.js"></script>
     <script src="/models/movable-object.class.js"></script>
     <script src="models/bottle.class.js"></script>
@@ -32,22 +33,29 @@
 </head>
 
 <body>
-    <!-- MENÜ-Overlay, standardmäßig sichtbar -->
+    <!-- MENU Overlay (visible by default) -->
     <div id="overlay-menu" class="overlay">
-        <!-- Dein Startscreen-Bild -->
         <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Menu" />
 
+        <!-- Main menu buttons -->
         <div class="menu-buttons">
-            <!-- 3 Spalten: Settings, Help, Start -->
             <div class="menu-column">
-                <button onclick="openSettings()">Settings</button>
+                <!-- GREEN background: Start -->
+                <button id="btn-start" onclick="startGame()">Start</button>
             </div>
             <div class="menu-column">
-                <button onclick="openHelp()">Help</button>
+                <!-- WHITE background: Settings -->
+                <button id="btn-settings" onclick="openSettings()">Settings</button>
             </div>
             <div class="menu-column">
-                <button onclick="startGame()">Start</button>
+                <!-- RED background: Help -->
+                <button id="btn-help" onclick="openHelp()">Help</button>
             </div>
+        </div>
+
+        <!-- Impressum link, placed further down -->
+        <div class="impressum-row">
+            <div id="impressum-link" onclick="openImpressum()">Impressum</div>
         </div>
     </div>
 
@@ -56,7 +64,6 @@
         <img src="img/You won, you lost/Game Over.png" alt="Game Over" />
         <div class="menu-buttons--vertical">
             <button onclick="restartGame()">Restart</button>
-            <!-- Neuer Button "Menu" -->
             <button onclick="goToMenu()">Menu</button>
         </div>
     </div>
@@ -66,12 +73,45 @@
         <img src="img/You won, you lost/You Won B.png" alt="You Won" />
         <div class="menu-buttons--vertical">
             <button onclick="restartGame()">Play Again</button>
-            <!-- Neuer Button "Menu" -->
             <button onclick="goToMenu()">Menu</button>
         </div>
     </div>
 
-    <!-- Titel & Canvas anfangs unsichtbar -->
+    <!-- SETTINGS Overlay -->
+    <div id="overlay-settings" class="overlay hidden">
+        <h1>Game Settings</h1>
+        <div class="settings-content">
+            <h2>
+                Welcome to <strong>El Pollo Loco</strong>! <br />Here are the basics:
+            </h2>
+            <h3>
+                Collect coins to increase your health.<br />
+                Throw bottles (press "D") to eliminate enemies.<br />
+                Avoid getting hit or your health bar will decrease.<br />
+                The game ends when you defeat the end boss.<br />
+                Use arrow keys to move & jump, space bar to jump as well.
+            </h3>
+            <h3>Adjust your audio preferences below:</h3>
+
+            <div class="audio-buttons-container">
+                <!-- Music button (GREEN) -->
+                <div id="music-button" class="circle-button" onclick="toggleMusic()">
+                    <img id="music-icon" src="img/background/music.png" alt="Music" />
+                </div>
+                <!-- Sound effects button (WHITE) -->
+                <div id="sfx-button" class="circle-button" onclick="toggleSoundEffects()">
+                    <img id="sfx-icon" src="img/background/sound.png" alt="Sound Effects" />
+                </div>
+                <!-- Close button (RED) - no audio click -->
+                <div id="close-button" class="circle-button" onclick="closeSettings()">
+                    <img src="img/background/close.png" alt="Close" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END SETTINGS Overlay -->
+
+    <!-- Game Canvas + Title (initially hidden) -->
     <h1 style="display: none;">El Pollo Loco</h1>
     <canvas id="canvas" width="720" height="480" style="display: none;"></canvas>
 </body>

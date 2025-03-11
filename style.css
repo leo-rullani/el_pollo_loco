@@ -1,3 +1,6 @@
+/* ---------------------
+   GLOBAL STYLES
+---------------------- */
 body {
     display: flex;
     justify-content: center;
@@ -11,107 +14,258 @@ body {
     background-repeat: no-repeat; 
     overflow: hidden; 
     font-family: 'zabras', Arial, Helvetica, sans-serif;
-}
-
-body::after {
+  }
+  
+  body::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
-    z-index: -1; 
-}
-
-canvas {
+    background: rgba(0, 0, 0, 0.3); /* dark overlay */
+    z-index: -1;
+  }
+  
+  body::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+  
+  canvas {
     background-color: black;
     border-radius: 20px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.6);
     display: block;
-}
-
-@font-face {
+  }
+  
+  @font-face {
     font-family: 'zabras';
     src: url('/fonts/zabras.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-}
-
-h1 {
+  }
+  
+  /* ---------------
+     HEADINGS
+  --------------- */
+  h1 {
     font-size: 96px;
     letter-spacing: 4px;
     color: #ffc105;
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-}
-
-/* =====================================
-   Overlay: Bild oben, Buttons darunter
-   ===================================== */
-.overlay {
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+  
+  h2 {
+    font-size: 48px;
+    letter-spacing: 4px;
+    color: #ffc105;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  h3 {
+    font-size: 24px;
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* -----------------------
+     OVERLAY STYLES
+  ------------------------ */
+  .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-
-    /* Hintergrundbild + dunkler Overlay-Effekt: */
     background:
-      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
       url('/img/background/desert.png') no-repeat center center;
     background-size: cover;
-
-    /* Damit Bild + Buttons untereinander zentriert sind */
+  
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
+  
+    perspective: 1000px;
     z-index: 9999;
-}
-
-.hidden {
+  }
+  
+  .hidden {
     display: none;
-}
-
-/* Overlay-Bild (z.B. Game Over, You Won, oder Startscreen) */
-.overlay img {
+  }
+  
+  .overlay img {
     max-width: 50%;
     max-height: 50%;
     border-radius: 20px;
-    margin-bottom: 20px;  /* Abstand zum Buttonbereich darunter */
-}
-
-/* =====================================
-   Buttons (gleiche Breite, zentriert)
-   ===================================== */
-button {
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .overlay img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ffecb3;
+  }
+  
+  /* -------------------------
+     STANDARD BUTTONS
+  -------------------------- */
+  button {
     font-size: 32px;
     border-radius: 10px;
     color: black;
     background-color: #ffc105;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     padding: 16px;
-    margin: 16px;
+    margin: 8px;
     cursor: pointer;
     font-family: 'zabras';
     letter-spacing: 2px;
-
-    /* Alle Buttons selbe Breite */
-    width: 240px; 
-}
-
-button:hover {
+    width: 240px;
+    border: 3px solid transparent;
+    box-shadow: 0 0 10px #ffecb3;
+    position: relative;
+  }
+  
+  button:hover {
     transform: scale(1.05);
-    animation: pulse 1s infinite alternate;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 5px #e04a57; }
-    100% { box-shadow: 0 0 20px #ff7c86; }
-}
-
-@media only screen and (max-width: 1000px) {
+    box-shadow: 0 0 25px #ffecb3;
+  }
+  
+  button::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 10px;
+    border: 3px solid #ffecb3;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  button:hover::before {
+    opacity: 1;
+  }
+  
+  /* ============= MEXICAN COLORS for the menu buttons ============= */
+  #btn-start {
+    background-color: #006847; /* Green */
+  }
+  
+  #btn-settings {
+    background-color: #FFFFFF; /* White */
+  }
+  
+  #btn-help {
+    background-color: #CE1126; /* Red */
+  }
+  
+  /* Make sure the text is black on white, and still black on green or red */
+  #btn-settings {
+    color: black; /* forced black if white BG */
+  }
+  
+  #btn-start, #btn-help {
+    color: black; /* black text on green/red is also fine */
+  }
+  
+  /* Impressum link - white text, no button style */
+  .impressum-row {
+    margin-top: 30px;
+  }
+  #impressum-link {
+    font-size: 24px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: 'zabras';
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease, color 0.3s ease;
+    margin-top: 10px;
+  }
+  #impressum-link:hover {
+    transform: scale(1.05);
+    color: #ffc105;
+  }
+  
+  /* ----------------------------
+     SETTINGS OVERLAY CONTENT
+  ----------------------------- */
+  .settings-content {
+    max-width: 700px;
+    margin: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+  }
+  
+  /* Container for the circle icons side by side */
+  .audio-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin-top: 20px;
+  }
+  
+  /* Circle Buttons (use IDs for different colors) */
+  .circle-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ffecb3;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  /* On hover, a small scale-up and brighter shadow */
+  .circle-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px #ffecb3;
+  }
+  
+  /* Icon inside the circle button */
+  .circle-button img {
+    width: 60%;
+    height: 60%;
+    pointer-events: none; /* so clicks go to the button itself */
+  }
+  
+  /* Assign Mexican colors to each circle by ID */
+  #music-button {
+    background-color: #006847; /* Green */
+  }
+  #sfx-button {
+    background-color: #FFFFFF; /* White */
+  }
+  #sfx-button img {
+    /* black icon on white background? If needed, ensure icon is visible */
+  }
+  #close-button {
+    background-color: #CE1126; /* Red */
+  }
+  
+  /* ------------
+     RESPONSIVE
+  ------------- */
+  @media only screen and (max-width: 1000px) {
     canvas {
         width: 100%;
         border-radius: 0px;
@@ -122,10 +276,11 @@ button:hover {
     body {
         background-image: none; 
     }
-}
-
-@media only screen and (max-height: 480px) {
+  }
+  
+  @media only screen and (max-height: 480px) {
     canvas {
        height: 100vh;
     }
-}
+  }
+  

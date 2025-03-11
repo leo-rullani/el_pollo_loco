@@ -1,27 +1,31 @@
-let canvas; 
-let world; 
-let keyboard = new Keyboard(); 
+// game.js
+
+let canvas;
+let world;
+let keyboard = new Keyboard();
+
+// Flags for muting audio
+let musicMuted = false;
+let soundEffectsMuted = false;
+
+// Audio for button clicks (only plays when turning ON)
+let buttonClickSound = new Audio("audio/button-click.mp3");
+buttonClickSound.volume = 1.0; // Adjust if you like
 
 function init() {
-  // Im Zweifel machst du hier gar nichts oder nur minimal.
-  // Wir lassen init() so, falls du es für was anderes brauchst.
   console.log("Init called");
 }
 
-/** 
- * Startet das Spiel aus dem Menü heraus.
- * Zeigt Canvas + h1 und blendet das Menü aus.
+/**
+ * Start the game from the menu.
  */
 function startGame() {
-  // 1) Menü-Overlay unsichtbar machen
-  document.getElementById('overlay-menu').classList.add('hidden');
+  document.getElementById("overlay-menu").classList.add("hidden");
+  document.getElementById("canvas").style.display = "block";
 
-  // 2) Canvas + H1 einblenden (falls du sie anfangs per style="display:none" ausblendest)
-  document.getElementById('canvas').style.display = 'block';
-  let title = document.querySelector('h1');
-  if (title) title.style.display = 'block';
+  let title = document.querySelector("h1");
+  if (title) title.style.display = "block";
 
-  // 3) Neues Level + World
   canvas = document.getElementById("canvas");
   let level = createLevel1();
   world = new World(canvas, keyboard, level);
@@ -29,8 +33,8 @@ function startGame() {
   console.log("Game started, character is", world.character);
 }
 
-/** 
- * Ruft man auf, wenn Spieler "Restart" oder "Play Again" klickt.
+/**
+ * Restart game after Win or Game Over
  */
 function restartGame() {
   if (world) {
@@ -39,12 +43,10 @@ function restartGame() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
 
-  // Canvas + Title sicherstellen, dass sie sichtbar sind
-  document.getElementById('canvas').style.display = 'block';
-  let title = document.querySelector('h1');
-  if (title) title.style.display = 'block';
+  document.getElementById("canvas").style.display = "block";
+  let title = document.querySelector("h1");
+  if (title) title.style.display = "block";
 
-  // Neues Level + World
   canvas = document.getElementById("canvas");
   let level = createLevel1();
   world = new World(canvas, keyboard, level);
@@ -52,37 +54,110 @@ function restartGame() {
   console.log("Restarted game, character is", world.character);
 }
 
-/** 
- * Menü-Button in Game Over / Win
- * Schaltet Overlays aus, versteckt Canvas/H1,
- * und zeigt wieder overlay-menu.
+/**
+ * Return to Menu from overlays
  */
 function goToMenu() {
-  // Overlays aus
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
+  document.getElementById("canvas").style.display = "none";
 
-  // Canvas & H1 wieder ausblenden
-  document.getElementById('canvas').style.display = 'none';
-  let title = document.querySelector('h1');
-  if (title) title.style.display = 'none';
+  let title = document.querySelector("h1");
+  if (title) title.style.display = "none";
 
-  // Zeige Menü
-  document.getElementById('overlay-menu').classList.remove('hidden');
-
-  // optional: world.stopGame(); 
+  document.getElementById("overlay-menu").classList.remove("hidden");
   console.log("Back to menu");
 }
 
+/**
+ * Open Settings overlay
+ */
 function openSettings() {
-  alert("No settings yet!");
+  document.getElementById("overlay-settings").classList.remove("hidden");
 }
 
+/**
+ * Close Settings overlay (NO audio on close)
+ */
+function closeSettings() {
+  document.getElementById("overlay-settings").classList.add("hidden");
+}
+
+/**
+ * Show help (currently just an alert)
+ */
 function openHelp() {
   alert("Use arrow keys to move, SPACE to jump, D to throw a bottle!");
 }
 
-// Deine Key-Events bleiben unverändert:
+/**
+ * Example Impressum
+ */
+function openImpressum() {
+  alert("Example Impressum text here.");
+}
+
+/**
+ * Toggle background music.
+ * If turning OFF, no click sound.
+ * If turning ON, play click sound.
+ */
+function toggleMusic() {
+  let musicIcon = document.getElementById("music-icon");
+
+  if (!musicMuted) {
+    // Currently ON, now turning OFF
+    musicMuted = true;
+    musicIcon.src = "img/background/music-cross.png";
+    console.log("Music muted.");
+    // no click sound
+  } else {
+    // Currently OFF, now turning ON
+    musicMuted = false;
+    musicIcon.src = "img/background/music.png";
+    console.log("Music unmuted.");
+    playButtonClick();
+  }
+
+  // TODO: actually mute/unmute your in-game music if you have it
+}
+
+/**
+ * Toggle sound effects.
+ * If turning OFF, no click sound.
+ * If turning ON, play click sound.
+ */
+function toggleSoundEffects() {
+  let sfxIcon = document.getElementById("sfx-icon");
+
+  if (!soundEffectsMuted) {
+    // Currently ON, turning OFF
+    soundEffectsMuted = true;
+    sfxIcon.src = "img/background/sound-cross.png";
+    console.log("Sound effects muted.");
+    // no click sound
+  } else {
+    // Currently OFF, turning ON
+    soundEffectsMuted = false;
+    sfxIcon.src = "img/background/sound.png";
+    console.log("Sound effects unmuted.");
+    playButtonClick();
+  }
+
+  // TODO: actually mute/unmute your in-game SFX if you have them
+}
+
+/**
+ * Plays short button click sound (only used when toggling ON).
+ */
+function playButtonClick() {
+  buttonClickSound.currentTime = 0;
+  buttonClickSound.play();
+}
+
+/**
+ * Key events (unchanged)
+ */
 window.addEventListener("keydown", (e) => {
   console.log("Key pressed: ", e.keyCode, e.key);
 });
