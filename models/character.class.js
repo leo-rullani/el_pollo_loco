@@ -88,6 +88,7 @@ class Character extends MovableObject {
 
     this.applyGravity();
     this.animate();
+    this.jumpSound = new Audio('audio/jump.mp3');
   }
 
   // Zusätzliche Variable zum „Verlangsamen“ der Idle-Animation
@@ -171,5 +172,6 @@ class Character extends MovableObject {
 
   jump() {
     this.speedY = 30;
+    this.jumpSound.play();
   }
 }
