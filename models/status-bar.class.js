@@ -143,10 +143,10 @@ class BossStatusBar extends DrawableObject {
       super();
       // Falls du die Bottle-Bilder in diesem Ordner hast:
       this.IMAGES = [
-        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/0.png',
-        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/20.png',
-        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/40.png',
-        'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/60.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/20.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/green/40.png',
+        'img/7_statusbars/1_statusbar/3_statusbar_bottle/green/60.png',
         'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/80.png',
         'img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/100.png'
       ];
