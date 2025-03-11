@@ -68,6 +68,9 @@ class World {
     // (Optional) Vorladen, um die Verzögerung zu minimieren
     this.pepeDiesSound.preload = 'auto';
     this.pepeDiesSound.load();
+    this.winGameSound = new Audio('audio/win-game.mp3');
+    this.winGameSound.preload = 'auto';
+    this.winGameSound.load();
     this.draw();
     this.setWorld();
     this.run();
@@ -206,6 +209,7 @@ class World {
   }
   
   showYouWin() {
+    this.winGameSound.play();
     document.getElementById("overlay-youwin").classList.remove("hidden");
   }
 
