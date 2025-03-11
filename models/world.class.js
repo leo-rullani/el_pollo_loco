@@ -57,7 +57,12 @@ class World {
     this.canvas = canvas;
     this.keyboard = keyboard;
     this.level = level; 
+    this.chickenDeathSound = new Audio('audio/chicken-noise.mp3');
+    this.chickenDeathSound.preload = 'auto';
+    this.chickenDeathSound.load();
     this.pepeHurtSound = new Audio('audio/pepe-hurt.mp3');
+    this.pepeHurtSound.preload = 'auto';
+    this.pepeHurtSound.load();
     this.pepeDiesSound = new Audio('audio/pepe-dies.mp3');
     // (Optional) Vorladen, um die Verzögerung zu minimieren
     this.pepeDiesSound.preload = 'auto';
@@ -143,6 +148,7 @@ class World {
   }
 
   killChicken(chicken) {
+    this.chickenDeathSound.play();
     chicken.isDeadChicken = true;
     chicken.playDeadAnimation();
     setTimeout(() => {
