@@ -96,27 +96,57 @@ function restartGame() {
  * (wird aufgerufen, sobald World erkennt, dass das Level fertig ist).
  */
 function goToNextLevel() {
-  if (world) {
-    world.stopGame();  // Intervalle beenden
-  }
+  // 1) Alte Werte sichern
+  let oldEnergy = world.character.energy;
+  let oldCoins = world.coinsCollected;
+  let oldBottles = world.bottlesCollected;
+
+  world.stopGame();
   currentLevel++;
   if (currentLevel > 3) {
-    console.log("All levels done!");
+    console.log("Alle Levels abgeschlossen!");
     return;
   }
 
   let canvas = document.getElementById("canvas");
-  let level = loadCurrentLevel(); // => createLevel2() oder createLevel3()
+  let level = loadCurrentLevel();
+  // 2) Neue World erstellen
   world = new World(canvas, keyboard, level);
 
-  // **Wichtig**: character auf 0, camera_x auf 0
-  world.character.x = 0;
-  world.camera_x = 0;
+  // 3) Alte Werte direkt zuweisen
+  world.character.energy = oldEnergy;
+  world.coinsCollected = oldCoins;
+  world.bottlesCollected = oldBottles;
 
-  // Musik neu starten, falls gewünscht
+  // 4) Statusbars sofort updaten
+  // Health-Bar
+  world.statusBar.setPercentage(oldEnergy);
+
+  // Coin-Bar
+  let coinPercent = calcCoinPercentage(oldCoins);
+  world.coinBar.setPercentage(coinPercent);
+
+  // Bottle-Bar
+  let bottlePercent = calcBottlePercentage(oldBottles);
+  world.bottleBar.setPercentage(bottlePercent);
+
+  // Musik
   world.backgroundMusic.play().catch(err => console.log(err));
 }
 
+function calcCoinPercentage(coinCount) {
+  // Beispiel: Jede Coin = 10% (bei 10 = 100%)
+  let percentage = coinCount * 10;
+  if (percentage > 100) percentage = 100;
+  return percentage;
+}
+
+function calcBottlePercentage(bottleCount) {
+  // Beispiel: Jede Bottle = 20% (bei 5 = 100%)
+  let percentage = bottleCount * 20;
+  if (percentage > 100) percentage = 100;
+  return percentage;
+}
 
 /** 
  * Return to Menu from overlays
