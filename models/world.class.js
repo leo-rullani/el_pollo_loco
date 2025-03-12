@@ -168,7 +168,7 @@ class World {
 
   checkCollisionsEnemies() {
     if (!this.level) return;
-    
+
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
@@ -355,25 +355,25 @@ class World {
       if (this.character.isColliding(coin) && this.character.isAboveGround()) {
         this.level.coins.splice(i, 1);
         this.coinsCollected++;
-      
-        let percentage = calcCoinPercentage(this.coinsCollected); 
+
+        let percentage = calcCoinPercentage(this.coinsCollected);
         if (percentage > 100) percentage = 100;
         this.coinBar.setPercentage(percentage);
-      
+
         if (percentage >= 100) {
           this.coinsCollected = 0;
           this.coinBar.setPercentage(0);
-      
+
           this.character.energy += 20;
           if (this.character.energy > 100) {
             this.character.energy = 100;
           }
           this.statusBar.setPercentage(this.character.energy);
         }
-      
-        let coinSound = new Audio('audio/collect-coin.mp3');
+
+        let coinSound = new Audio("audio/collect-coin.mp3");
         coinSound.play();
-        console.log('Coin #', this.coinsCollected, '=>', percentage, '%');
+        console.log("Coin #", this.coinsCollected, "=>", percentage, "%");
       }
     }
   }
@@ -400,17 +400,29 @@ class World {
    * Wir entfernen "stopGame()" bei Levelend.
    * => So läuft das Spiel weiter, und wir rufen goToNextLevel() (in game.js).
    */
+  // In world.class.js
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
-  
+
     if (this.character.x >= this.level.level_end_x) {
       this.levelComplete = true;
-      // => Overlay "Level Complete"
-      // => Nach kurzer Zeit ins nächste Level, OHNE stopGame()
+
+      // 1) Level-Complete-Sound
+      let levelCompleteSound = new Audio("audio/level-complete.mp3");
+      levelCompleteSound.play();
+
+      // 2) Overlay-Text anpassen
+      let lvlOverlay = document.getElementById("overlay-levelcomplete");
+      lvlOverlay.innerHTML = `<h1>Level ${this.currentLevelNumber} Completed!</h1>`;
+      lvlOverlay.classList.remove("hidden");
+
+      // 3) Nach 1 Sekunde => Overlay wieder verstecken + next Level
       setTimeout(() => {
-        document.getElementById('overlay-levelcomplete').classList.add('hidden');
-        goToNextLevel(); 
-      }, 1); // z.B. 800ms
+        lvlOverlay.classList.add("hidden");
+
+        // => Rufe "goToNextLevel()" (aus game.js)
+        goToNextLevel();
+      }, 1000);
     }
   }
 
