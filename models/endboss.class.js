@@ -3,6 +3,7 @@ class Endboss extends MovableObject {
   height = 400;
   width = 250;
   y = 55;
+  x = 2200;
   energy = 5;
   moveInterval;
   animationInterval;

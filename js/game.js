@@ -39,7 +39,7 @@ function startGame() {
   if (title) title.style.display = 'block';
 
   canvas = document.getElementById("canvas");
-  let level = createLevel1();
+  let level = createLevel3();
   world = new World(canvas, keyboard, level);
 
   world.backgroundMusic.play();
@@ -60,7 +60,7 @@ function restartGame() {
   if (title) title.style.display = 'block';
 
   canvas = document.getElementById("canvas");
-  let level = createLevel1();
+  let level = createLevel3();
   world = new World(canvas, keyboard, level);
 
   console.log("Restarted game, character is", world.character);
