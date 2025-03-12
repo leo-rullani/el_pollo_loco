@@ -299,16 +299,31 @@ window.addEventListener("keyup", (e) => {
 });
 
 function toggleFullscreen() {
+  let btn = document.getElementById('btn-fullscreen');
   let canvas = document.getElementById('canvas');
-  
-  // Prüfe, ob wir bereits im Vollbild sind
+
+  // Prüfen, ob wir gerade im Vollbild sind
   if (!document.fullscreenElement) {
-    // => Falls noch nicht, versuche Canvas in den Vollbildmodus zu bringen
-    canvas.requestFullscreen().catch(err => {
-      console.log("Error trying fullscreen:", err);
+    // => Vollbild aktivieren
+    document.documentElement.requestFullscreen().catch(err => {
+      console.error("Fehler bei Fullscreen:", err);
     });
+    // Canvas vergrößern
+    canvas.style.width = "85%";
+    canvas.style.height = "85%";
+
+    // Button-Text ändern
+    btn.innerText = "Exit Fullscreen";
   } else {
-    // => Falls schon im Vollbild, beende ihn:
+    // => Vollbild verlassen
     document.exitFullscreen();
+
+    // Canvas zurück auf Standardgröße
+    canvas.style.width = "720px";
+    canvas.style.height = "480px";
+
+    // Button-Text ändern
+    btn.innerText = "Fullscreen";
   }
 }
+
