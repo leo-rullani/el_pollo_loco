@@ -311,6 +311,16 @@ body {
   #overlay-levelcomplete.hidden {
     display: none;
   }  
+
+  #btn-fullscreen {
+    position: absolute;
+    bottom: 10px; 
+    right: 10px;
+    /* z.B. minimaler Stil */
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
   
   /* ------------
      RESPONSIVE

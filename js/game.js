@@ -297,3 +297,18 @@ window.addEventListener("keyup", (e) => {
   if (e.keyCode === 32) keyboard.SPACE = false;
   if (e.keyCode === 68) keyboard.D = false;
 });
+
+function toggleFullscreen() {
+  let canvas = document.getElementById('canvas');
+  
+  // Prüfe, ob wir bereits im Vollbild sind
+  if (!document.fullscreenElement) {
+    // => Falls noch nicht, versuche Canvas in den Vollbildmodus zu bringen
+    canvas.requestFullscreen().catch(err => {
+      console.log("Error trying fullscreen:", err);
+    });
+  } else {
+    // => Falls schon im Vollbild, beende ihn:
+    document.exitFullscreen();
+  }
+}
