@@ -5,9 +5,9 @@ function createLevel2() {
         new chicken(), new chicken(), new chicken(), new chicken(),
         new chicken(), new chicken(), new chicken(), new chicken(),
         new chicken(), new chicken(), new chicken(), new chicken(),
-        new chicken(), new chicken(), new chicken(), new chicken()],
+        new chicken(), new chicken(), new chicken(), new chicken(),
   
-        [// 8 SmallChicken
+        // 8 SmallChicken
         new SmallChicken(), new SmallChicken(), new SmallChicken(), new SmallChicken(),
         new SmallChicken(), new SmallChicken(), new SmallChicken(), new SmallChicken(),
         new SmallChicken(), new SmallChicken(), new SmallChicken(), new SmallChicken()],

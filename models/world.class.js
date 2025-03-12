@@ -31,7 +31,7 @@ function goToMenu() {
   let title = document.querySelector("h1");
   if (title) title.style.display = "none";
 
-  // 3) Zeige Menu-Overlay
+  // 3) Zeige Menu-Overlay (falls du es in index.html angelegt hast)
   document.getElementById("overlay-menu").classList.remove("hidden");
   // optional: world.stopGame();
 }
@@ -128,6 +128,7 @@ class World {
         this.checkCollisionsThrowables();
         this.checkCollisionsCoins();
         this.checkCollisionsBottles();
+        this.checkLevelEnd();
       }
     }, 200);
   }
@@ -278,7 +279,6 @@ class World {
     this.ctx.translate(-this.camera_x, 0);
   }
 
-  /** Entferne die Abfrage (boss.x < 2200). Wir zeigen die Bossbar, sobald er existiert. */
   drawBossBarIfVisible() {
     let boss = this.findBoss();
     if (boss) {
@@ -352,4 +352,20 @@ class World {
       }
     }
   }
+
+  checkLevelEnd() {
+    // 1) Prüfen, ob wir bereits das Level abgeschlossen haben (damit wir es nicht mehrmals aufrufen)
+    if (this.levelComplete) {
+      return;
+    }
+  
+    // 2) Ist Charakter x >= level_end_x ?
+    if (this.character.x >= this.level.level_end_x) {
+      // => Markiere Level als abgeschlossen
+      this.levelComplete = true;
+  
+      // => Rufe den Wechsel zur nächsten Stufe auf
+      goToNextLevel();
+    }
+  }  
 }

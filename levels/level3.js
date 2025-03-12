@@ -18,7 +18,9 @@ function createLevel3() {
       ],
       [
         // 6 Coins
-        new Coin(), new Coin(), new Coin(), new Coin(), new Coin(), new Coin()
+        new Coin(), new Coin(), new Coin(), new Coin(), new Coin(), new Coin(),
+        new Coin(), new Coin(), new Coin(), new Coin(), new Coin(), new Coin(),
+        new Coin(), new Coin(), new Coin()
       ],
       [
         // 4 Bottles

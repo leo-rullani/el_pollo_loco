@@ -4,19 +4,37 @@ let canvas;
 let world; 
 let keyboard = new Keyboard();
 
-// Flags for muting audio
-let musicMuted = false;
-let soundEffectsMuted = false;
+// "Aktuelles Level" als globale Variable:
+let currentLevel = 1;
 
-// Audio for button clicks (only plays when toggling ON)
+/** 
+ * Helper-Funktion: 
+ * Gibt dir das passende Level-Objekt (Level 1, 2, oder 3)
+ */
+function loadCurrentLevel() {
+  if (currentLevel === 1) {
+    return createLevel1();
+  } else if (currentLevel === 2) {
+    return createLevel2();
+  } else {
+    // Level 3
+    return createLevel3();
+  }
+}
+
+// Audio für Button-Klicks (nur beim Einschalten von Musik/SFX)
 let buttonClickSound = new Audio('audio/button-click.mp3');
-buttonClickSound.volume = 1.0; // Adjust volume if you like
+buttonClickSound.volume = 1.0; // anpassen, falls zu laut
 
 function init() {
   console.log("Init called");
 }
 
+/**
+ * Diese Funktionen toggeln Musik + SFX in der "World"
+ */
 function toggleMusic() {
+  // Falls du den Button in HTML klickst
   if (window.world) {
     world.toggleMusicMute();
   }
@@ -30,19 +48,24 @@ function toggleSfx() {
 
 /** 
  * Start the game from the menu.
+ * Jetzt immer bei Level 1 anfangen.
  */
 function startGame() {
+  // 1) Overlays entfernen, Canvas anzeigen
   document.getElementById('overlay-menu').classList.add('hidden');
   document.getElementById('canvas').style.display = 'block';
 
   let title = document.querySelector('h1');
   if (title) title.style.display = 'block';
 
+  // 2) Canvas / Level laden
   canvas = document.getElementById("canvas");
-  let level = createLevel3();
+  currentLevel = 1;              // Start immer bei Level 1
+  let level = loadCurrentLevel(); // => createLevel1()
   world = new World(canvas, keyboard, level);
 
-  world.backgroundMusic.play();
+  // 3) Musik abspielen (falls nicht geblockt)
+  world.backgroundMusic.play().catch(err => console.log(err));
 }
 
 /** 
@@ -59,12 +82,41 @@ function restartGame() {
   let title = document.querySelector('h1');
   if (title) title.style.display = 'block';
 
+  // Wieder bei Level 1 anfangen:
+  currentLevel = 1;
   canvas = document.getElementById("canvas");
-  let level = createLevel3();
+  let level = loadCurrentLevel(); // => createLevel1()
   world = new World(canvas, keyboard, level);
 
   console.log("Restarted game, character is", world.character);
 }
+
+/** 
+ * Bei Bedarf: Gehe zum nächsten Level 
+ * (wird aufgerufen, sobald World erkennt, dass das Level fertig ist).
+ */
+function goToNextLevel() {
+  if (world) {
+    world.stopGame();  // Intervalle beenden
+  }
+  currentLevel++;
+  if (currentLevel > 3) {
+    console.log("All levels done!");
+    return;
+  }
+
+  let canvas = document.getElementById("canvas");
+  let level = loadCurrentLevel(); // => createLevel2() oder createLevel3()
+  world = new World(canvas, keyboard, level);
+
+  // **Wichtig**: character auf 0, camera_x auf 0
+  world.character.x = 0;
+  world.camera_x = 0;
+
+  // Musik neu starten, falls gewünscht
+  world.backgroundMusic.play().catch(err => console.log(err));
+}
+
 
 /** 
  * Return to Menu from overlays
@@ -127,6 +179,9 @@ function closeImpressum() {
  * Toggle background music.
  * If turning OFF, no click sound.
  * If turning ON, play click sound.
+ * 
+ * (Diese Funktion toggelt NUR das Symbol. 
+ *  Um World-Musik stummzuschalten, brauchst du "toggleMusic()" oben.)
  */
 function toggleMusic() {
   let musicIcon = document.getElementById('music-icon');
@@ -142,13 +197,17 @@ function toggleMusic() {
     console.log("Music unmuted.");
     playButtonClick(); // only on turning ON
   }
-  // TODO: actually mute/unmute your in-game music if you have it
+  // TODO: eigentlich solltest du hier "world.toggleMusicMute()" aufrufen
+  //  oder musicMuted in world übernehmen
 }
 
 /** 
  * Toggle sound effects.
  * If turning OFF, no click sound.
  * If turning ON, play click sound.
+ * 
+ * (Diese Funktion toggelt NUR das Icon. 
+ *  Um Sound-Effekte stummzuschalten, brauchst du "toggleSfx()" oben.)
  */
 function toggleSoundEffects() {
   let sfxIcon = document.getElementById('sfx-icon');
@@ -164,7 +223,7 @@ function toggleSoundEffects() {
     console.log("Sound effects unmuted.");
     playButtonClick(); // only on turning ON
   }
-  // TODO: actually mute/unmute your in-game SFX if you have them
+  // TODO: eigentlich solltest du hier "world.toggleSfxMute()" aufrufen
 }
 
 /** 
