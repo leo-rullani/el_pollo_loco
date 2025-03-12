@@ -8,16 +8,17 @@ let keyboard = new Keyboard();
 let currentLevel = 1;
 
 /** 
- * Helper-Funktion: 
- * Gibt dir das passende Level-Objekt (Level 1, 2, oder 3)
+ * Hilfsfunktion: 
+ * Gibt das gewünschte Levelobjekt (Level 1, 2 oder 3) zurück,
+ * also enemies, coins, backgroundObjects etc.
  */
 function loadCurrentLevel() {
   if (currentLevel === 1) {
-    return createLevel1();
+    return createLevel1(); 
   } else if (currentLevel === 2) {
-    return createLevel2();
+    return createLevel2(); 
   } else {
-    // Level 3
+    // => Level 3
     return createLevel3();
   }
 }
@@ -32,9 +33,9 @@ function init() {
 
 /**
  * Diese Funktionen toggeln Musik + SFX in der "World"
+ * (für Buttons in HTML).
  */
 function toggleMusic() {
-  // Falls du den Button in HTML klickst
   if (window.world) {
     world.toggleMusicMute();
   }
@@ -47,32 +48,41 @@ function toggleSfx() {
 }
 
 /** 
- * Start the game from the menu.
- * Jetzt immer bei Level 1 anfangen.
+ * Start das Spiel bei Level 1
  */
 function startGame() {
-  // 1) Overlays entfernen, Canvas anzeigen
   document.getElementById('overlay-menu').classList.add('hidden');
   document.getElementById('canvas').style.display = 'block';
 
   let title = document.querySelector('h1');
   if (title) title.style.display = 'block';
 
-  // 2) Canvas / Level laden
   canvas = document.getElementById("canvas");
-  currentLevel = 1;              // Start immer bei Level 1
-  let level = loadCurrentLevel(); // => createLevel1()
-  world = new World(canvas, keyboard, level);
 
-  // 3) Musik abspielen (falls nicht geblockt)
+  // => 1) Setze currentLevel auf 1
+  currentLevel = 1;
+
+  // => 2) Erzeuge eine "leere" World (OHNE Level-Daten)
+  //    In world.class.js wird der Konstruktor so angepasst,
+  //    dass er KEIN "level" direkt setzt.
+  world = new World(canvas, keyboard);
+
+  // => 3) Lade die Level-1-Daten:
+  let levelData = loadCurrentLevel(); // => createLevel1()
+  // => 4) Rufe loadLevelData() auf, das die Arrays (enemies, coins usw.) übernimmt
+  world.loadLevelData(levelData);
+
+  // => 5) Musik abspielen
   world.backgroundMusic.play().catch(err => console.log(err));
 }
 
 /** 
- * Restart game after Win or Game Over
+ * Restart: Geht auch immer zurück zu Level 1
  */
 function restartGame() {
   if (world) {
+    // => hier machen wir "stopGame()" 
+    //    (wenn wir es so wollen – z.B. alle Intervalle beenden)
     world.stopGame();
   }
   document.getElementById("overlay-gameover").classList.add("hidden");
@@ -82,18 +92,22 @@ function restartGame() {
   let title = document.querySelector('h1');
   if (title) title.style.display = 'block';
 
-  // Wieder bei Level 1 anfangen:
+  // => Wieder Level 1
   currentLevel = 1;
   canvas = document.getElementById("canvas");
-  let level = loadCurrentLevel(); // => createLevel1()
-  world = new World(canvas, keyboard, level);
+
+  // => Neue World (frisch)
+  world = new World(canvas, keyboard);
+  let levelData = loadCurrentLevel(); // => Level 1
+  world.loadLevelData(levelData);
 
   console.log("Restarted game, character is", world.character);
 }
 
-/** 
- * Bei Bedarf: Gehe zum nächsten Level 
- * (wird aufgerufen, sobald World erkennt, dass das Level fertig ist).
+/**
+ * Wechselt von aktuellem Level => nächstes Level
+ * OHNE neue World zu erzeugen. 
+ * => Wir tauschen nur die Arrays (Enemies, Clouds, Coins, etc.)
  */
 function goToNextLevel() {
   // 1) Alte Werte sichern
@@ -101,48 +115,49 @@ function goToNextLevel() {
   let oldCoins = world.coinsCollected;
   let oldBottles = world.bottlesCollected;
 
-  world.stopGame();
   currentLevel++;
   if (currentLevel > 3) {
     console.log("Alle Levels abgeschlossen!");
     return;
   }
 
-  let canvas = document.getElementById("canvas");
-  let level = loadCurrentLevel();
-  // 2) Neue World erstellen
-  world = new World(canvas, keyboard, level);
+  // => 2) Lade das neue Level-Objekt
+  let newLevelData = loadCurrentLevel(); 
+    // => createLevel2() oder createLevel3()
+  
+  // => 3) In der WORLD "loadLevelData()" aufrufen
+  world.loadLevelData(newLevelData);
 
-  // 3) Alte Werte direkt zuweisen
+  // => 4) Alte Werte wiederherstellen
   world.character.energy = oldEnergy;
   world.coinsCollected = oldCoins;
   world.bottlesCollected = oldBottles;
 
-  // 4) Statusbars sofort updaten
-  // Health-Bar
+  // => Statusbars updaten
   world.statusBar.setPercentage(oldEnergy);
 
-  // Coin-Bar
   let coinPercent = calcCoinPercentage(oldCoins);
   world.coinBar.setPercentage(coinPercent);
 
-  // Bottle-Bar
   let bottlePercent = calcBottlePercentage(oldBottles);
   world.bottleBar.setPercentage(bottlePercent);
 
-  // Musik
-  world.backgroundMusic.play().catch(err => console.log(err));
+  // => Keine new World, keine stopGame() => Minimales Stocken
+  // => Musik läuft durch
+  // => Alles bleibt so, 
+  // => wir haben nur Arrays ausgetauscht
+  console.log(`Switched to Level ${currentLevel} with old stats (HP:${oldEnergy}, coins:${oldCoins}, bottles:${oldBottles})`);
 }
 
 function calcCoinPercentage(coinCount) {
-  // Beispiel: Jede Coin = 10% (bei 10 = 100%)
+  // Beispiel: Jede Coin = 10% => 10 coins = 100%
   let percentage = coinCount * 10;
   if (percentage > 100) percentage = 100;
   return percentage;
 }
 
 function calcBottlePercentage(bottleCount) {
-  // Beispiel: Jede Bottle = 20% (bei 5 = 100%)
+  // Jede Bottle = 20% => 5 bottles = 100%
   let percentage = bottleCount * 20;
   if (percentage > 100) percentage = 100;
   return percentage;
@@ -164,54 +179,35 @@ function goToMenu() {
 }
 
 /** 
- * Open Settings overlay
+ * Open/Close Overlays ...
  */
 function openSettings() {
   document.getElementById('overlay-settings').classList.remove('hidden');
 }
 
-/** 
- * Close Settings overlay (no audio on close)
- */
 function closeSettings() {
   document.getElementById('overlay-settings').classList.add('hidden');
 }
 
-/** 
- * Open Help overlay
- */
 function openHelp() {
   document.getElementById('overlay-help').classList.remove('hidden');
 }
 
-/** 
- * Close Help overlay
- */
 function closeHelp() {
   document.getElementById('overlay-help').classList.add('hidden');
 }
 
-/** 
- * Open Impressum overlay
- */
 function openImpressum() {
   document.getElementById('overlay-impressum').classList.remove('hidden');
 }
 
-/** 
- * Close Impressum overlay
- */
 function closeImpressum() {
   document.getElementById('overlay-impressum').classList.add('hidden');
 }
 
 /** 
- * Toggle background music.
- * If turning OFF, no click sound.
- * If turning ON, play click sound.
- * 
- * (Diese Funktion toggelt NUR das Symbol. 
- *  Um World-Musik stummzuschalten, brauchst du "toggleMusic()" oben.)
+ * Toggle background music (Icon only).
+ * In "toggleMusic()" oben rufst du world.toggleMusicMute() auf.
  */
 function toggleMusic() {
   let musicIcon = document.getElementById('music-icon');
@@ -227,33 +223,26 @@ function toggleMusic() {
     console.log("Music unmuted.");
     playButtonClick(); // only on turning ON
   }
-  // TODO: eigentlich solltest du hier "world.toggleMusicMute()" aufrufen
-  //  oder musicMuted in world übernehmen
+  // TODO: Actually call world.toggleMusicMute() if you want to link it
 }
 
 /** 
- * Toggle sound effects.
- * If turning OFF, no click sound.
- * If turning ON, play click sound.
- * 
- * (Diese Funktion toggelt NUR das Icon. 
- *  Um Sound-Effekte stummzuschalten, brauchst du "toggleSfx()" oben.)
+ * Toggle sound effects (Icon only).
+ * Actually call "world.toggleSfxMute()" to mute them in the game.
  */
 function toggleSoundEffects() {
   let sfxIcon = document.getElementById('sfx-icon');
   if (!soundEffectsMuted) {
-    // Currently ON, turning OFF
     soundEffectsMuted = true;
     sfxIcon.classList.add('muted');
     console.log("Sound effects muted.");
   } else {
-    // Currently OFF, turning ON
     soundEffectsMuted = false;
     sfxIcon.classList.remove('muted');
     console.log("Sound effects unmuted.");
     playButtonClick(); // only on turning ON
   }
-  // TODO: eigentlich solltest du hier "world.toggleSfxMute()" aufrufen
+  // TODO: world.toggleSfxMute()
 }
 
 /** 
@@ -265,7 +254,7 @@ function playButtonClick() {
 }
 
 /** 
- * Key events (unchanged)
+ * Key events (unchanged, just logs plus sets "keyboard" states)
  */
 window.addEventListener("keydown", (e) => {
   console.log("Key pressed: ", e.keyCode, e.key);

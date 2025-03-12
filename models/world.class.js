@@ -1,7 +1,12 @@
 function init() {
   let canvas = document.getElementById("canvas");
-  let level = createLevel3(); // DIREKT Level 3 zum Testen
-  world = new World(canvas, keyboard, level);
+  // => Hier hast du testweise createLevel3(),
+  //    das fällt aber in diesem "fortgeschrittenen" Ansatz
+  //    eigentlich weg, da wir dem Konstruktor keinen level mehr übergeben.
+  // => Siehe "startGame()" in game.js, wo wir loadLevelData() aufrufen.
+  let level = createLevel3(); // DIREKT Level 3 (nur test)
+  world = new World(canvas, keyboard);
+  // => Dann erst: world.loadLevelData(level);
 }
 
 function restartGame() {
@@ -14,7 +19,8 @@ function restartGame() {
   let canvas = document.getElementById("canvas");
   // Wieder frisch:
   let level = createLevel3(); // Wieder Level 3
-  world = new World(canvas, keyboard, level);
+  world = new World(canvas, keyboard);
+  world.loadLevelData(level);
 }
 
 /**
@@ -50,11 +56,17 @@ class World {
   bottleBar = new BottleBar();
   bottlesCollected = 0;
 
-  constructor(canvas, keyboard, level) {
+  /**
+   * Konstruktor OHNE Level-Parameter.
+   * (Wir laden die Leveldaten später via loadLevelData().)
+   */
+  constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
-    this.level = level;
+
+    // => initially no level loaded
+    this.level = null;
 
     // Hintergrundmusik laden
     this.backgroundMusic = new Audio("audio/game-sound.mp3");
@@ -121,8 +133,11 @@ class World {
   }
 
   run() {
+    // => wir rufen NICHT "stopGame()" beim Levelwechsel
+    // => so bleibt der runInterval bestehen = kein Stocken
     this.runInterval = setInterval(() => {
-      if (!this.paused) {
+      if (!this.paused && this.level) {
+        // => nur Sinn, wenn this.level != null
         this.checkCollisionsEnemies();
         this.checkThrowObjects();
         this.checkCollisionsThrowables();
@@ -134,7 +149,8 @@ class World {
   }
 
   checkThrowObjects() {
-    // Nur wenn D gedrückt ODER >= 1 Flasche
+    if (!this.level) return; // Abbruch, falls Level noch nicht geladen
+
     if (this.keyboard.D && this.bottlesCollected > 0) {
       let bottle = new ThrowableObject(
         this.character.x + 100,
@@ -151,6 +167,8 @@ class World {
   }
 
   checkCollisionsEnemies() {
+    if (!this.level) return;
+    
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
@@ -174,12 +192,13 @@ class World {
     if (this.character.energy <= 0 && !this.gameOverShown) {
       this.gameOverShown = true;
       this.pepeDiesSound.play();
-      this.stopGame();
+      this.stopGame(); // => echtes Game Over
       this.showGameOver();
     }
   }
 
   checkCollisionsThrowables() {
+    if (!this.level) return;
     this.throwableObjects.forEach((bottle) => {
       this.handleBottleCollisions(bottle);
     });
@@ -198,6 +217,8 @@ class World {
   }
 
   handleBottleCollisions(bottle) {
+    if (!this.level) return;
+
     this.level.enemies.forEach((enemy) => {
       let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
       let isBoss = enemy instanceof Endboss;
@@ -224,7 +245,7 @@ class World {
       setTimeout(() => {
         let i = this.level.enemies.indexOf(boss);
         if (i > -1) this.level.enemies.splice(i, 1);
-        this.stopGame();
+        this.stopGame(); // => Das Spiel endet = You Win
         this.showYouWin();
       }, 2000);
     }, 500);
@@ -259,6 +280,11 @@ class World {
   }
 
   drawScene() {
+    if (!this.level) {
+      // => Falls Level noch nicht geladen
+      return;
+    }
+
     this.ctx.translate(this.camera_x, 0);
     this.addObjectsToMap(this.level.backgroundObjects);
     this.ctx.translate(-this.camera_x, 0);
@@ -290,6 +316,7 @@ class World {
   }
 
   findBoss() {
+    if (!this.level) return null;
     return this.level.enemies.find((e) => e instanceof Endboss);
   }
 
@@ -321,46 +348,39 @@ class World {
   }
 
   checkCollisionsCoins() {
+    if (!this.level) return;
+
     for (let i = this.level.coins.length - 1; i >= 0; i--) {
       let coin = this.level.coins[i];
       if (this.character.isColliding(coin) && this.character.isAboveGround()) {
-        // 1) Coin entfernen + Zähler
         this.level.coins.splice(i, 1);
         this.coinsCollected++;
       
-        // 2) Neuen Prozentwert berechnen
         let percentage = calcCoinPercentage(this.coinsCollected); 
-          // calcCoinPercentage() => z.B. each coin = 10% (wenn 10 Coins = 100%)
         if (percentage > 100) percentage = 100;
         this.coinBar.setPercentage(percentage);
       
-        // 3) Check: Ist die Bar bei 100%?
         if (percentage >= 100) {
-          // a) Coinbar zurücksetzen
           this.coinsCollected = 0;
           this.coinBar.setPercentage(0);
       
-          // b) +20 Health (nicht über 100)
           this.character.energy += 20;
           if (this.character.energy > 100) {
             this.character.energy = 100;
           }
           this.statusBar.setPercentage(this.character.energy);
-      
-          // optional: Soundeffekt beim Heal
-          // let healSound = new Audio('audio/heal.mp3'); 
-          // healSound.play();
         }
       
-        // 4) Optional: Coin-Sound
         let coinSound = new Audio('audio/collect-coin.mp3');
         coinSound.play();
         console.log('Coin #', this.coinsCollected, '=>', percentage, '%');
-      }      
+      }
     }
   }
 
   checkCollisionsBottles() {
+    if (!this.level) return;
+
     for (let i = this.level.bottles.length - 1; i >= 0; i--) {
       let bottleItem = this.level.bottles[i];
       if (this.character.isColliding(bottleItem)) {
@@ -376,28 +396,43 @@ class World {
     }
   }
 
+  /**
+   * Wir entfernen "stopGame()" bei Levelend.
+   * => So läuft das Spiel weiter, und wir rufen goToNextLevel() (in game.js).
+   */
   checkLevelEnd() {
-    // 1) Prüfen, ob wir bereits das Level abgeschlossen haben
-    if (this.levelComplete) {
-      return;
-    }
+    if (!this.level || this.levelComplete) return;
   
-    // 2) Ist Charakter x >= level_end_x ?
     if (this.character.x >= this.level.level_end_x) {
-      // => Markiere Level als abgeschlossen
       this.levelComplete = true;
-  
-      // => 1) Overlay „Level Complete“ zeigen
-      document.getElementById('overlay-levelcomplete').classList.remove('hidden');
-  
-      // => 2) Spiel stoppen
-      this.stopGame();
-  
-      // => 3) Nach einer Sekunde ins nächste Level
+      // => Overlay "Level Complete"
+      // => Nach kurzer Zeit ins nächste Level, OHNE stopGame()
       setTimeout(() => {
         document.getElementById('overlay-levelcomplete').classList.add('hidden');
         goToNextLevel(); 
-      }, 1);
+      }, 1); // z.B. 800ms
     }
-  }  
+  }
+
+  /**
+   * Neue Methode:
+   * Lädt die Leveldaten in THIS World, ohne die World neu zu instanzieren.
+   */
+  loadLevelData(newLevel) {
+    // => 1) Falls wir noch alte Gegner etc. haben, säubere sie
+    // (optional) this.level?.enemies.forEach(...clearInterval?...) etc.
+
+    // => 2) Arrays "überschreiben"
+    this.level = newLevel;
+    this.levelComplete = false; // reset
+    this.throwableObjects = [];
+
+    // => Charakter an Startposition
+    this.character.x = 0;
+    this.character.y = 70; // oder Boden
+    this.camera_x = 0;
+
+    // => Falls du z.B. Clouds, Enemies etc. auf 0 fahren willst:
+    //    (optional) so wie in einem brandneuen Levelstart.
+  }
 }
