@@ -408,10 +408,6 @@ class World {
     if (this.character.x >= this.level.level_end_x) {
       this.levelComplete = true;
 
-      // 1) Level-Complete-Sound
-      let levelCompleteSound = new Audio("audio/level-complete.mp3");
-      levelCompleteSound.play();
-
       // 2) Overlay-Text anpassen
       let lvlOverlay = document.getElementById("overlay-levelcomplete");
       if (lvlOverlay) {
