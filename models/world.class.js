@@ -324,16 +324,39 @@ class World {
     for (let i = this.level.coins.length - 1; i >= 0; i--) {
       let coin = this.level.coins[i];
       if (this.character.isColliding(coin) && this.character.isAboveGround()) {
+        // 1) Coin entfernen + Zähler
         this.level.coins.splice(i, 1);
         this.coinsCollected++;
-        let percentage = Math.floor(this.coinsCollected / 2) * 20;
+      
+        // 2) Neuen Prozentwert berechnen
+        let percentage = calcCoinPercentage(this.coinsCollected); 
+          // calcCoinPercentage() => z.B. each coin = 10% (wenn 10 Coins = 100%)
         if (percentage > 100) percentage = 100;
         this.coinBar.setPercentage(percentage);
-
-        let coinSound = new Audio("audio/collect-coin.mp3");
+      
+        // 3) Check: Ist die Bar bei 100%?
+        if (percentage >= 100) {
+          // a) Coinbar zurücksetzen
+          this.coinsCollected = 0;
+          this.coinBar.setPercentage(0);
+      
+          // b) +20 Health (nicht über 100)
+          this.character.energy += 20;
+          if (this.character.energy > 100) {
+            this.character.energy = 100;
+          }
+          this.statusBar.setPercentage(this.character.energy);
+      
+          // optional: Soundeffekt beim Heal
+          // let healSound = new Audio('audio/heal.mp3'); 
+          // healSound.play();
+        }
+      
+        // 4) Optional: Coin-Sound
+        let coinSound = new Audio('audio/collect-coin.mp3');
         coinSound.play();
-        console.log("Coin #", this.coinsCollected, "=>", percentage, "%");
-      }
+        console.log('Coin #', this.coinsCollected, '=>', percentage, '%');
+      }      
     }
   }
 
