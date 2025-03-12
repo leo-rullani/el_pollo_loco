@@ -377,7 +377,7 @@ class World {
   }
 
   checkLevelEnd() {
-    // 1) Prüfen, ob wir bereits das Level abgeschlossen haben (damit wir es nicht mehrmals aufrufen)
+    // 1) Prüfen, ob wir bereits das Level abgeschlossen haben
     if (this.levelComplete) {
       return;
     }
@@ -387,8 +387,17 @@ class World {
       // => Markiere Level als abgeschlossen
       this.levelComplete = true;
   
-      // => Rufe den Wechsel zur nächsten Stufe auf
-      goToNextLevel();
+      // => 1) Overlay „Level Complete“ zeigen
+      document.getElementById('overlay-levelcomplete').classList.remove('hidden');
+  
+      // => 2) Spiel stoppen
+      this.stopGame();
+  
+      // => 3) Nach einer Sekunde ins nächste Level
+      setTimeout(() => {
+        document.getElementById('overlay-levelcomplete').classList.add('hidden');
+        goToNextLevel(); 
+      }, 1);
     }
   }  
 }
