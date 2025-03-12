@@ -11,7 +11,7 @@ class cloud extends MovableObject {
     this.x =
       0 +
       Math.random() *
-        500; /* Chicken wird auf auf der x-Achse beliebig/zufällig rechts positioniert */
+        5000; /* Chicken wird auf auf der x-Achse beliebig/zufällig rechts positioniert */
     this.animate();
   }
 

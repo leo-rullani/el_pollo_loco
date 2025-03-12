@@ -22,7 +22,17 @@ function createLevel3() {
         new SmallChicken(), new SmallChicken(), new SmallChicken(), new SmallChicken(),
         new SmallChicken(), new SmallChicken(), new SmallChicken(), new SmallChicken()],
         [ // Clouds
-        new cloud()
+        new cloud(),
+        new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud(),
+      new cloud()
       ],
       [
         // 6 Coins

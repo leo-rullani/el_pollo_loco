@@ -1,7 +1,7 @@
 class Character extends MovableObject {
   // Grundwerte
   height = 250;
-  y = 70;
+  y = 85;
   speed = 10;
 
   // Lauf-Animationen (bereits bekannt)

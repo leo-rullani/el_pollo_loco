@@ -443,7 +443,7 @@ class World {
 
     // 2) Charakter an Startposition
     this.character.x = 0;
-    this.character.y = 70;
+    this.character.y = 85;
     this.camera_x = 0;
   }
 }
