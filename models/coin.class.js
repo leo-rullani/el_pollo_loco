@@ -4,7 +4,7 @@ class Coin extends MovableObject {
       
       // In der Coin-Klasse oder dort, wo du 'x' und 'y' randomisierst:
       this.x = 200 + Math.random() * 5000;
-      this.y = 120 - Math.random() * 50; 
+      this.y = 190 - Math.random() * 50; 
 // => z.B. verteilt zwischen y=70 und y=120
 
   

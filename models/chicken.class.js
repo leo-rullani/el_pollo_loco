@@ -19,7 +19,7 @@ class chicken extends MovableObject {
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEAD);
     this.x = 200 + Math.random() * 5000 ;
-    this.speed = 0.15 + Math.random() * 0.5;
+    this.speed = 0.2 + Math.random() * 0.5;
     this.animate();
   }
 
