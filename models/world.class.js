@@ -1,12 +1,10 @@
 function init() {
   let canvas = document.getElementById("canvas");
-  // => Hier hast du testweise createLevel3(),
-  //    das fällt aber in diesem "fortgeschrittenen" Ansatz
-  //    eigentlich weg, da wir dem Konstruktor keinen level mehr übergeben.
-  // => Siehe "startGame()" in game.js, wo wir loadLevelData() aufrufen.
-  let level = createLevel3(); // DIREKT Level 3 (nur test)
+  // Ursprünglich war hier: let level = createLevel3();
+  // Für den fortgeschrittenen Ansatz brauchst du das hier gar nicht mehr.
+  // => Lass es weg bzw. leer. Der Start erfolgt in game.js -> startGame().
   world = new World(canvas, keyboard);
-  // => Dann erst: world.loadLevelData(level);
+  // => Dann erst: world.loadLevelData(...) wenn du init() testest.
 }
 
 function restartGame() {
@@ -18,9 +16,10 @@ function restartGame() {
 
   let canvas = document.getElementById("canvas");
   // Wieder frisch:
-  let level = createLevel3(); // Wieder Level 3
+  // => Lass das createLevel3() weg oder nur optional, 
+  // da "restartGame()" jetzt i.d.R. in game.js geregelt wird.
   world = new World(canvas, keyboard);
-  world.loadLevelData(level);
+  // => world.loadLevelData(...) - StartLevel
 }
 
 /**
@@ -56,9 +55,12 @@ class World {
   bottleBar = new BottleBar();
   bottlesCollected = 0;
 
+  // Aktuelle Level-Nummer (z.B. 1,2,3)
+  currentLevelNumber;
+
   /**
    * Konstruktor OHNE Level-Parameter.
-   * (Wir laden die Leveldaten später via loadLevelData().)
+   * (Wir laden die Leveldaten später via loadLevelData(...).)
    */
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
@@ -397,10 +399,9 @@ class World {
   }
 
   /**
-   * Wir entfernen "stopGame()" bei Levelend.
-   * => So läuft das Spiel weiter, und wir rufen goToNextLevel() (in game.js).
+   * Wir entfernen "stopGame()" bei Levelend,
+   * um den fortgeschrittenen Level-Wechsel zu ermöglichen.
    */
-  // In world.class.js
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
 
@@ -413,15 +414,17 @@ class World {
 
       // 2) Overlay-Text anpassen
       let lvlOverlay = document.getElementById("overlay-levelcomplete");
-      lvlOverlay.innerHTML = `<h1>Level ${this.currentLevelNumber} Completed!</h1>`;
-      lvlOverlay.classList.remove("hidden");
+      if (lvlOverlay) {
+        lvlOverlay.innerHTML = `<h1>Level ${this.currentLevelNumber} Completed!</h1>`;
+        lvlOverlay.classList.remove("hidden");
+      }
 
       // 3) Nach 1 Sekunde => Overlay wieder verstecken + next Level
       setTimeout(() => {
-        lvlOverlay.classList.add("hidden");
-
-        // => Rufe "goToNextLevel()" (aus game.js)
-        goToNextLevel();
+        if (lvlOverlay) {
+          lvlOverlay.classList.add("hidden");
+        }
+        goToNextLevel(); // Ruft die Funktion in game.js auf
       }, 1000);
     }
   }
@@ -429,22 +432,18 @@ class World {
   /**
    * Neue Methode:
    * Lädt die Leveldaten in THIS World, ohne die World neu zu instanzieren.
+   * => ZWEI Parameter: newLevel, levelNumber
    */
-  loadLevelData(newLevel) {
-    // => 1) Falls wir noch alte Gegner etc. haben, säubere sie
-    // (optional) this.level?.enemies.forEach(...clearInterval?...) etc.
-
-    // => 2) Arrays "überschreiben"
+  loadLevelData(newLevel, levelNumber) {
+    // 1) Arrays "überschreiben"
     this.level = newLevel;
-    this.levelComplete = false; // reset
+    this.currentLevelNumber = levelNumber; 
+    this.levelComplete = false; 
     this.throwableObjects = [];
 
-    // => Charakter an Startposition
+    // 2) Charakter an Startposition
     this.character.x = 0;
-    this.character.y = 70; // oder Boden
+    this.character.y = 70;
     this.camera_x = 0;
-
-    // => Falls du z.B. Clouds, Enemies etc. auf 0 fahren willst:
-    //    (optional) so wie in einem brandneuen Levelstart.
   }
 }
