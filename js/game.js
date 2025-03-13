@@ -1,14 +1,14 @@
 // game.js
 
-let canvas; 
-let world; 
+let canvas;
+let world;
 let keyboard = new Keyboard();
 
 // "Aktuelles Level" als globale Variable:
 let currentLevel = 1;
 
-/** 
- * Hilfsfunktion: 
+/**
+ * Hilfsfunktion:
  * Gibt das gewünschte Levelobjekt (Level 1, 2 oder 3) zurück
  */
 function loadCurrentLevel() {
@@ -23,14 +23,14 @@ function loadCurrentLevel() {
 }
 
 // Audio für Button-Klicks (nur beim Einschalten von Musik/SFX)
-let buttonClickSound = new Audio('audio/button-click.mp3');
-buttonClickSound.volume = 1.0; 
+let buttonClickSound = new Audio("audio/button-click.mp3");
+buttonClickSound.volume = 1.0;
 
 function init() {
   console.log("Init called");
 }
 
-/** 
+/**
  * Für Musik- & SFX-Toggle-Buttons in HTML
  */
 function toggleMusic() {
@@ -45,33 +45,34 @@ function toggleSfx() {
   }
 }
 
-/** 
+/**
  * Startet das Spiel bei Level 1
  */
 function startGame() {
-  document.getElementById('overlay-menu').classList.add('hidden');
-  document.getElementById('canvas').style.display = 'block';
+  // => Overlay + Canvas sichtbar
+  document.getElementById("overlay-menu").classList.add("hidden");
+  document.getElementById("canvas").style.display = "block";
 
-  let title = document.querySelector('h1');
-  if (title) title.style.display = 'block';
+  let title = document.querySelector("h1");
+  if (title) title.style.display = "block";
 
   canvas = document.getElementById("canvas");
   currentLevel = 1; // Bei jedem Start => Level 1
 
-  // 1) Erzeuge "leere" World (fortgeschrittener Ansatz)
+  // => Erzeuge leere World
   world = new World(canvas, keyboard);
 
-  // 2) Lade die Level-1-Daten:
-  let levelData = loadCurrentLevel(); 
-  // => world.loadLevelData(...) erwartet 2 Parameter: (newLevel, levelNumber)?
-  // => Wenn du in "world.class.js" loadLevelData(newLevel, levelNumber) definiert hast:
+  // => Lade Level-1-Daten
+  let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
 
-  // 3) Musik abspielen
-  world.backgroundMusic.play().catch(err => console.log(err));
+  // => Musik an
+  world.backgroundMusic.play().catch((err) => console.log(err));
+
+  console.log("Game started in normal browser window (canvas fills the page).");
 }
 
-/** 
+/**
  * Restart: Geht zurück zu Level 1
  */
 function restartGame() {
@@ -81,13 +82,14 @@ function restartGame() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
 
-  document.getElementById('canvas').style.display = 'block';
-  let title = document.querySelector('h1');
-  if (title) title.style.display = 'block';
+  document.getElementById("canvas").style.display = "block";
+  let title = document.querySelector("h1");
+  if (title) title.style.display = "block";
 
   currentLevel = 1;
   canvas = document.getElementById("canvas");
 
+  // => Neue World
   world = new World(canvas, keyboard);
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
@@ -97,189 +99,145 @@ function restartGame() {
 
 /**
  * Wechselt vom aktuellen Level => nächstes Level
- * OHNE eine neue World zu erzeugen. 
+ * OHNE eine neue World zu erzeugen.
  * => Erst Overlay + Sound "Level X Completed" mit altem Level-Wert,
  * => Dann nach kurzer Zeit: currentLevel++ und loadNextLevelData, Stats übernehmen.
  */
 function goToNextLevel() {
-  // 1) Charakterwerte sichern
   let oldEnergy = world.character.energy;
   let oldCoins = world.coinsCollected;
   let oldBottles = world.bottlesCollected;
 
-  // 2) "Level Completed"-Sound
+  // Sound + Overlay
   playLevelCompleteSound();
-
-  // 3) Overlay mit *altem* Level
   showLevelCompleteOverlay(currentLevel);
 
-  // 4) Warte 1 Sekunde, DANN level++ und lade neues Level
+  // Nach 1 Sek. Overlay weg, Level++ usw.
   setTimeout(() => {
-    // Overlay verstecken
-    let overlay = document.getElementById('overlay-levelcomplete');
-    if (overlay) {
-      overlay.classList.add('hidden');
-    }
+    let overlay = document.getElementById("overlay-levelcomplete");
+    if (overlay) overlay.classList.add("hidden");
 
-    // => Level jetzt hochzählen
     currentLevel++;
     if (currentLevel > 3) {
       console.log("Alle Levels abgeschlossen!");
-      // => Optional: "YouWin" 
       return;
     }
 
-    // => Lade neue Level-Daten
-    let newLevelData = loadCurrentLevel(); 
-    // => World soll in loadLevelData(...) "levelNumber" übernehmen
+    let newLevelData = loadCurrentLevel();
     world.loadLevelData(newLevelData, currentLevel);
 
-    // => Alte Werte wiederherstellen
+    // alte Werte wiederherstellen
     world.character.energy = oldEnergy;
     world.coinsCollected = oldCoins;
     world.bottlesCollected = oldBottles;
 
-    // => StatusBars updaten
+    // StatusBars updaten
     world.statusBar.setPercentage(oldEnergy);
-    let coinPercent = calcCoinPercentage(oldCoins);
-    world.coinBar.setPercentage(coinPercent);
-    let bottlePercent = calcBottlePercentage(oldBottles);
-    world.bottleBar.setPercentage(bottlePercent);
+    world.coinBar.setPercentage(calcCoinPercentage(oldCoins));
+    world.bottleBar.setPercentage(calcBottlePercentage(oldBottles));
 
-    console.log(`Switched to Level ${currentLevel} with old stats (HP:${oldEnergy}, coins:${oldCoins}, bottles:${oldBottles})`);
+    console.log(
+      `Switched to Level ${currentLevel} with old stats (HP:${oldEnergy}, coins:${oldCoins}, bottles:${oldBottles})`
+    );
   }, 1000);
 }
 
-/** 
- * Spielt "level-complete.mp3"
- */
 function playLevelCompleteSound() {
-  let levelCompleteAudio = new Audio('audio/level-complete.mp3');
-  levelCompleteAudio.play().catch(e => console.log(e));
+  let levelCompleteAudio = new Audio("audio/level-complete.mp3");
+  levelCompleteAudio.play().catch((e) => console.log(e));
 }
 
-/** 
- * Overlay: "Level X Completed!"
- */
 function showLevelCompleteOverlay(levelNumber) {
-  let overlay = document.getElementById('overlay-levelcomplete');
+  let overlay = document.getElementById("overlay-levelcomplete");
   if (!overlay) {
     console.warn("No #overlay-levelcomplete found in HTML!");
     return;
   }
   overlay.innerHTML = `<h1>Level ${levelNumber} Completed!</h1>`;
-  overlay.classList.remove('hidden');
+  overlay.classList.remove("hidden");
 }
 
-/** 
- * Rechnet coinCount => Prozent (max 100)
- */
 function calcCoinPercentage(coinCount) {
   let percentage = coinCount * 10;
-  if (percentage > 100) percentage = 100;
-  return percentage;
+  return percentage > 100 ? 100 : percentage;
 }
-
-/** 
- * Rechnet bottleCount => Prozent (max 100)
- */
 function calcBottlePercentage(bottleCount) {
   let percentage = bottleCount * 20;
-  if (percentage > 100) percentage = 100;
-  return percentage;
+  return percentage > 100 ? 100 : percentage;
 }
 
-/** 
- * Return to Menu from overlays
- */
 function goToMenu() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
-  document.getElementById('canvas').style.display = 'none';
+  document.getElementById("canvas").style.display = "none";
 
-  let title = document.querySelector('h1');
-  if (title) title.style.display = 'none';
+  let title = document.querySelector("h1");
+  if (title) title.style.display = "none";
 
-  document.getElementById('overlay-menu').classList.remove('hidden');
+  document.getElementById("overlay-menu").classList.remove("hidden");
   console.log("Back to menu");
 }
 
-/** 
- * Overlays ...
- */
+/* Overlays */
 function openSettings() {
-  document.getElementById('overlay-settings').classList.remove('hidden');
+  document.getElementById("overlay-settings").classList.remove("hidden");
 }
-
 function closeSettings() {
-  document.getElementById('overlay-settings').classList.add('hidden');
+  document.getElementById("overlay-settings").classList.add("hidden");
 }
-
 function openHelp() {
-  document.getElementById('overlay-help').classList.remove('hidden');
+  document.getElementById("overlay-help").classList.remove("hidden");
 }
-
 function closeHelp() {
-  document.getElementById('overlay-help').classList.add('hidden');
+  document.getElementById("overlay-help").classList.add("hidden");
 }
-
 function openImpressum() {
-  document.getElementById('overlay-impressum').classList.remove('hidden');
+  document.getElementById("overlay-impressum").classList.remove("hidden");
 }
-
 function closeImpressum() {
-  document.getElementById('overlay-impressum').classList.add('hidden');
+  document.getElementById("overlay-impressum").classList.add("hidden");
 }
 
-/** 
- * Toggle background music (Icon only).
- */
+/* Toggle background music (Icon only) */
 function toggleMusic() {
-  let musicIcon = document.getElementById('music-icon');
+  let musicIcon = document.getElementById("music-icon");
   if (!musicMuted) {
     musicMuted = true;
-    musicIcon.classList.add('muted');
+    musicIcon.classList.add("muted");
     console.log("Music muted.");
   } else {
     musicMuted = false;
-    musicIcon.classList.remove('muted');
+    musicIcon.classList.remove("muted");
     console.log("Music unmuted.");
     playButtonClick();
   }
 }
 
-/** 
- * Toggle sound effects (Icon only).
- */
+/* Toggle sound effects (Icon only) */
 function toggleSoundEffects() {
-  let sfxIcon = document.getElementById('sfx-icon');
+  let sfxIcon = document.getElementById("sfx-icon");
   if (!soundEffectsMuted) {
     soundEffectsMuted = true;
-    sfxIcon.classList.add('muted');
+    sfxIcon.classList.add("muted");
     console.log("Sound effects muted.");
   } else {
     soundEffectsMuted = false;
-    sfxIcon.classList.remove('muted');
+    sfxIcon.classList.remove("muted");
     console.log("Sound effects unmuted.");
     playButtonClick();
   }
 }
 
-/** 
- * Plays short button click sound (only used when toggling ON).
- */
+/* Plays short button click sound */
 function playButtonClick() {
   buttonClickSound.currentTime = 0;
   buttonClickSound.play();
 }
 
-/** 
- * Key events (unchanged)
- */
+/* Key events */
 window.addEventListener("keydown", (e) => {
   console.log("Key pressed: ", e.keyCode, e.key);
 });
-
 window.addEventListener("keydown", (e) => {
   if (e.keyCode === 37) keyboard.LEFT = true;
   if (e.keyCode === 39) keyboard.RIGHT = true;
@@ -288,7 +246,6 @@ window.addEventListener("keydown", (e) => {
   if (e.keyCode === 32) keyboard.SPACE = true;
   if (e.keyCode === 68) keyboard.D = true;
 });
-
 window.addEventListener("keyup", (e) => {
   if (e.keyCode === 37) keyboard.LEFT = false;
   if (e.keyCode === 39) keyboard.RIGHT = false;
@@ -298,31 +255,60 @@ window.addEventListener("keyup", (e) => {
   if (e.keyCode === 68) keyboard.D = false;
 });
 
-function toggleFullscreen() {
-  let btn = document.getElementById('btn-fullscreen');
-  let canvas = document.getElementById('canvas');
+const fsBtn = document.getElementById('btn-fullscreen');
+if (fsBtn) {
+  fsBtn.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.keyCode === 32) {
+      e.preventDefault();
+    }
+  });
+}
 
-  // Prüfen, ob wir gerade im Vollbild sind
+/**
+ * Fullscreen-TOGGLE (Browserfenster).
+ * Klick 1 => requestFullscreen(), Klick 2 => exitFullscreen().
+ * Canvas bleibt immer "width=100%, height=100%".
+ */
+function toggleFullscreen() {
   if (!document.fullscreenElement) {
-    // => Vollbild aktivieren
-    document.documentElement.requestFullscreen().catch(err => {
+    document.documentElement.requestFullscreen().catch((err) => {
       console.error("Fehler bei Fullscreen:", err);
     });
-    // Canvas vergrößern
-    canvas.style.width = "85%";
-    canvas.style.height = "85%";
-
-    // Button-Text ändern
-    btn.innerText = "Exit Fullscreen";
+    console.log("Entered real fullscreen (browser).");
   } else {
-    // => Vollbild verlassen
-    document.exitFullscreen();
-
-    // Canvas zurück auf Standardgröße
-    canvas.style.width = "720px";
-    canvas.style.height = "480px";
-
-    // Button-Text ändern
-    btn.innerText = "Fullscreen";
+    document.exitFullscreen().catch((err) => {
+      console.error("Fehler beim Exit Fullscreen:", err);
+    });
+    console.log("Exited real fullscreen, back to normal window size.");
   }
+
+  // NEU: Fokus entfernen => Space triggert keinen Klick mehr
+  document.getElementById('btn-fullscreen').blur();
+}
+
+/* Pausiert / ent-pausiert das Spiel */
+function toggleBreak() {
+  const breakBtn = document.getElementById("btn-break");
+  if (!window.world) return;
+
+  world.paused = !world.paused;
+  if (world.paused) {
+    breakBtn.innerText = "Continue";
+    console.log("Game paused");
+  } else {
+    breakBtn.innerText = "Break";
+    console.log("Game continued");
+  }
+}
+
+/* Spiel beenden => Zurück zum Menu */
+function quitGame() {
+  if (window.world) {
+    world.stopGame();
+    world.backgroundMusic.pause();
+    world = null;
+  }
+  document.getElementById('canvas').style.display = 'none';
+  document.getElementById('overlay-menu').classList.remove('hidden');
+  console.log("Quit game => Back to menu");
 }

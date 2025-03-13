@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html translate="no">
 
 <head>
     <meta charset="UTF-8" />
@@ -34,18 +34,11 @@
     <script src="levels/level2.js"></script>
     <script src="levels/level3.js"></script>
 
-    <!-- Hier kommt game.js -->
+    <!-- game.js -->
     <script src="/js/game.js"></script>
-
-    <!-- Falls wir später eine neue JS-Datei für den fortgeschrittenen Ansatz brauchen,
-         könnten wir sie hier einbinden:
-    <script src="js/level-data-loader.js"></script>
-    -->
 </head>
 
 <body>
-    <!-- Pause Overlay, zunächst hidden -->
-
     <!-- MENU Overlay (visible by default) -->
     <div id="overlay-menu" class="overlay">
         <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Menu" />
@@ -71,22 +64,12 @@
             <div id="impressum-link" onclick="openImpressum()">Impressum</div>
         </div>
     </div>
+    <!-- END MENU Overlay -->
 
-    <button id="btn-fullscreen" onclick="toggleFullscreen()">Fullscreen</button>
-    <div id="overlay-pause" class="overlay hidden">
-
-    </div>
-
-
-    <!-- 
-      Overlay für "Level Complete" - 
-      steht **außerhalb** von overlay-menu, 
-      so kann "document.getElementById('overlay-levelcomplete')" gefunden werden
-    -->
+    <!-- Level Complete Overlay -->
     <div id="overlay-levelcomplete" class="overlay hidden">
         <h1>Level Complete!</h1>
     </div>
-
 
     <!-- GAME OVER Overlay -->
     <div id="overlay-gameover" class="overlay hidden">
@@ -128,9 +111,9 @@
                     <!-- Inline SVG: music note with hidden slash -->
                     <svg id="music-icon" viewBox="0 0 50 50" width="32" height="32" fill="black">
                         <path d="M15 7 L35 7 L35 28 C30 26 25 28 21 31 C18 34 17 38 17 41 
-                     C17 44 19 45 21 45 C23 45 25 44 25 41 C25 39 23 38 21 38 
-                     C19 38 18 39 18 41 C18 43 19 44 21 44 C27 44 31 39 31 34 
-                     L31 12 L15 12 Z" />
+                                C17 44 19 45 21 45 C23 45 25 44 25 41 C25 39 23 38 21 38 
+                                C19 38 18 39 18 41 C18 43 19 44 21 44 C27 44 31 39 31 34 
+                                L31 12 L15 12 Z" />
                         <path class="slash" d="M5 45 L45 5" stroke="black" stroke-width="5" fill="none" />
                     </svg>
                 </div>
@@ -142,7 +125,7 @@
                         <path class="slash" d="M5 45 L45 5" stroke="black" stroke-width="5" fill="none" />
                     </svg>
                 </div>
-                <!-- Close button (RED) - just an X, no click sound -->
+                <!-- Close button (RED) -->
                 <div id="close-button" class="circle-button" onclick="closeSettings()">
                     <svg viewBox="0 0 50 50" width="32" height="32" stroke="black" stroke-width="5" fill="none">
                         <line x1="10" y1="10" x2="40" y2="40" />
@@ -203,10 +186,15 @@
             <div class="linkedin-container">
                 <a href="https://www.linkedin.com/in/leo-rullani-5b17a5274/" target="_blank" class="circle-button"
                     id="linkedin-button">
-                    <!-- Simple LinkedIn Icon as inline SVG (white "in" on a #0077B5 background) -->
                     <svg viewBox="0 0 128 128" width="36" height="36">
-                        <path fill="#fff"
-                            d="M21.06 49.67h18.2v58.66h-18.2zm9.07-29.12c5.88 0 9.53 3.85 9.53 8.68 0 4.77-3.68 8.68-9.44 8.68h-.11c-5.84 0-9.52-3.91-9.52-8.68 0-4.83 3.7-8.68 9.37-8.68zM52.33 49.67h17.47v8.02h.25c2.44-4.62 8.4-9.49 17.31-9.49 18.52 0 21.93 12.18 21.93 28V108.33h-18.19V79.92c0-6.78-.13-15.52-9.46-15.52-9.46 0-10.91 7.39-10.91 15.05v28.88h-18.2z" />
+                        <path fill="#fff" d="M21.06 49.67h18.2v58.66h-18.2zm9.07-29.12
+                                 c5.88 0 9.53 3.85 9.53 8.68 0 4.77-3.68 8.68-9.44 8.68
+                                 h-.11c-5.84 0-9.52-3.91-9.52-8.68
+                                 0-4.83 3.7-8.68 9.37-8.68zM52.33 49.67
+                                 h17.47v8.02h.25c2.44-4.62 8.4-9.49 17.31-9.49
+                                 18.52 0 21.93 12.18 21.93 28V108.33h-18.19
+                                 V79.92c0-6.78-.13-15.52-9.46-15.52
+                                 -9.46 0-10.91 7.39-10.91 15.05v28.88h-18.2z" />
                     </svg>
                 </a>
             </div>
@@ -224,9 +212,38 @@
     </div>
     <!-- END IMPRESSUM Overlay -->
 
-    <!-- Game Canvas + Title (initially hidden) -->
-    <h1 style="display: none;">El Pollo Loco</h1>
-    <canvas id="canvas" width="720" height="480" style="display: none;"></canvas>
+    <!-- CANVAS-Bereich + Buttons -->
+    <div class="canvas-container">
+        <!-- Canvas (initially display: none -> shown on startGame()) -->
+        <canvas id="canvas" width="720" height="480" style="display: none;"></canvas>
+
+        <!-- DIE 3 BUTTONS OBEN RECHTS -->
+        <div class="canvas-buttons">
+            <button id="btn-fullscreen" type="button" onclick="toggleFullscreen()" class="circle-icon-btn">
+                <!-- FS Icon -->
+                <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
+                    <path d="M 10 10 L 20 10 L 20 12 L 12 12 L 12 20 L 10 20 Z
+                             M 30 10 L 40 10 L 40 20 L 38 20 L 38 12 L 30 12 Z
+                             M 10 30 L 12 30 L 12 38 L 20 38 L 20 40 L 10 40 Z
+                             M 38 30 L 40 30 L 40 40 L 30 40 L 30 38 L 38 38 Z" />
+                </svg>
+            </button>
+            <button id="btn-break" type="button" onclick="toggleBreak()" class="circle-icon-btn">
+                <!-- Pause-Symbol "||" -->
+                <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
+                    <rect x="12" y="10" width="6" height="30" />
+                    <rect x="26" y="10" width="6" height="30" />
+                </svg>
+            </button>
+            <button id="btn-quit" type="button" onclick="quitGame()" class="circle-icon-btn">
+                <!-- X-Symbol -->
+                <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
+                    <line x1="10" y1="10" x2="40" y2="40" stroke="black" stroke-width="5" />
+                    <line x1="40" y1="10" x2="10" y2="40" stroke="black" stroke-width="5" />
+                </svg>
+            </button>
+        </div>
+    </div>
 </body>
 
 </html>

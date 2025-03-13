@@ -175,6 +175,7 @@ class Character extends MovableObject {
       this.speedY = 23;
       if (!this.sfxMuted) {
         this.jumpSound.play();
+        console.log('');
       }
     }
   }

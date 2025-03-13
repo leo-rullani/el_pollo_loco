@@ -1,347 +1,357 @@
 /* ---------------------
    GLOBAL STYLES
 ---------------------- */
+
+/* 100% Höhe/Breite für html + body */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Verhindert Scrollen */
+}
+
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-    background-image: url('/img/background/desert.png');
-    background-size: cover; 
-    background-position: center; 
-    background-repeat: no-repeat; 
-    overflow: hidden; 
-    font-family: 'zabras', Arial, Helvetica, sans-serif;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh; /* Fallback 100% Höhe */
   
-  body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: -1;
-  }
+  /* Hintergrund */
+  background-image: url('/img/background/desert.png');
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat; 
+  font-family: 'zabras', Arial, Helvetica, sans-serif;
+  position: relative; 
+}
+
+/* Halbtransparentes Overlay */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: -1;
+}
+body::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}
+
+/* 
+   .canvas-container füllt von vornherein
+   das gesamte Browser-Fenster
+*/
+.canvas-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+}
+
+/* Canvas füllt den gesamten Container */
+.canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
   
-  body::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
+  background-color: black;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Buttons oben rechts im Canvas-Container */
+.canvas-buttons {
+  position: absolute;
+  top: 16px;
+  right: 10px;
+  z-index: 2;
+}
+
+/* Kleine Kreis-Buttons */
+.circle-icon-btn {
+  width: 40px;   
+  height: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+  padding: 0;
+  margin: 0 5px; 
+  border: 2px solid #ccc; 
+  background-color: #ffc105; 
+  color: black;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 10px #ffecb3;
+}
+.circle-icon-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 25px #ffecb3;
+}
+
+/* ---------------
+   CUSTOM FONT
+--------------- */
+@font-face {
+  font-family: 'zabras';
+  src: url('/fonts/zabras.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ---------------
+   HEADINGS
+--------------- */
+h1 {
+  font-size: 96px;
+  letter-spacing: 4px;
+  color: #ffc105;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+h2 {
+  font-size: 48px;
+  letter-spacing: 4px;
+  color: #ffc105;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+h3 {
+  font-size: 24px;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* -----------------------
+   OVERLAYS
+------------------------ */
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+
+  background:
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url('/img/background/desert.png') no-repeat center center;
+  background-size: cover;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  perspective: 1000px;
+  z-index: 9999; /* Overlay ganz oben */
+}
+.hidden {
+  display: none;
+}
+.overlay img {
+  max-width: 50%;
+  max-height: 50%;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-image 0.3s ease;
+  border: 5px solid transparent;
+}
+.overlay img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #ffecb3;
+  /* 3-color border, each 33% */
+  border-image: linear-gradient(
+    to right, 
+    #006847 0%, #006847 33%, 
+    #ffffff 33%, #ffffff 66%, 
+    #ce1126 66%, #ce1126 100%
+  );
+  border-image-slice: 1;
+}
+
+/* -------------------------
+   STANDARD BUTTONS
+-------------------------- */
+button {
+  font-size: 32px;
+  border-radius: 10px;
+  color: black;
+  background-color: #ffc105;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 16px;
+  margin: 8px;
+  cursor: pointer;
+  font-family: 'zabras';
+  letter-spacing: 2px;
+  width: 240px;
+  border: 3px solid transparent;
+  box-shadow: 0 0 10px #ffecb3;
+  position: relative;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #ffecb3;
+}
+button::before {
+  content: "";
+  position: absolute;
+  top: -5px; left: -5px;
+  right: -5px; bottom: -5px;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+button:hover::before {
+  opacity: 1;
+}
+
+/* MEXICAN COLORS for main menu */
+#btn-start {
+  background-color: #006847; /* Green */
+}
+#btn-settings {
+  background-color: #FFFFFF; /* White */
+}
+#btn-help {
+  background-color: #CE1126; /* Red */
+}
+/* Impressum link */
+.impressum-row {
+  margin-top: 30px;
+}
+#impressum-link {
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'zabras';
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease, color 0.3s ease;
+  margin-top: 10px;
+}
+#impressum-link:hover {
+  transform: scale(1.05);
+  color: #ffc105;
+}
+
+/* SETTINGS Overlay */
+.settings-content {
+  max-width: 700px;
+  margin: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 20px;
+}
+.audio-buttons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-top: 20px;
+}
+.circle-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ffecb3;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-decoration: none; 
+}
+.circle-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #ffecb3;
+}
+.circle-button svg {
+  pointer-events: none;
+}
+#music-button {
+  background-color: #006847; /* Green */
+}
+#sfx-button {
+  background-color: #FFFFFF; /* White */
+}
+#close-button {
+  background-color: #CE1126; /* Red */
+}
+/* Slash hidden by default */
+.slash {
+  display: none;
+}
+.muted .slash {
+  display: inline;
+}
+
+/* HELP Overlay */
+.help-content {
+  max-width: 700px;
+  margin: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 20px;
+}
+.help-close-container {
+  margin-top: 20px;
+}
+#help-close-button {
+  background-color: #006847; /* Green */
+}
+
+/* IMPRESSUM Overlay */
+.impressum-content {
+  max-width: 700px;
+  margin: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 20px;
+}
+.impressum-close-container {
+  margin-top: 20px;
+}
+#impressum-close-button {
+  background-color: #FFFFFF; /* White */
+}
+.linkedin-container {
+  display: flex; 
+  justify-content: center;
+}
+#linkedin-button {
+  background-color: #0077B5;
+}
+
+/* LEVEL COMPLETE Overlay */
+#overlay-levelcomplete.hidden {
+  display: none;
+}
+
+/* -----------
+   RESPONSIVE
+----------- */
+@media only screen and (max-width: 1000px) {
+  .canvas-container canvas {
+    border-radius: 0;
   }
-  
-  canvas {
-    background-color: black;
-    border-radius: 20px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.6);
-    display: block;
-  }
-  
-  @font-face {
-    font-family: 'zabras';
-    src: url('/fonts/zabras.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  /* ---------------
-     HEADINGS
-  --------------- */
   h1 {
-    font-size: 96px;
-    letter-spacing: 4px;
-    color: #ffc105;
-    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-    margin-block-start: 0;
-    margin-block-end: 0;
-  }
-  
-  h2 {
-    font-size: 48px;
-    letter-spacing: 4px;
-    color: #ffc105;
-    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-  }
-  
-  h3 {
-    font-size: 24px;
-    letter-spacing: 3px;
-    color: #fff;
-    text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-  }
-  
-  /* -----------------------
-     OVERLAYS
-  ------------------------ */
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-      linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-      url('/img/background/desert.png') no-repeat center center;
-    background-size: cover;
-  
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  
-    perspective: 1000px;
-    z-index: 9999;
-  }
-  
-  .hidden {
     display: none;
   }
-  
-  .overlay img {
-    max-width: 50%;
-    max-height: 50%;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-image 0.3s ease;
-    border: 5px solid transparent; /* default no visible border */
+  body {
+    background-image: none; 
   }
-  
-  .overlay img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #ffecb3;
-    /* 3-color border, each 33% for green/white/red */
-    border-image: linear-gradient(
-      to right, 
-      #006847 0%, #006847 33%, 
-      #ffffff 33%, #ffffff 66%, 
-      #ce1126 66%, #ce1126 100%
-    );
-    border-image-slice: 1;
+}
+@media only screen and (max-height: 480px) {
+  .canvas-container {
+    height: 100vh;
   }
-  
-  /* -------------------------
-     STANDARD BUTTONS
-  -------------------------- */
-  button {
-    font-size: 32px;
-    border-radius: 10px;
-    color: black;
-    background-color: #ffc105;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    padding: 16px;
-    margin: 8px;
-    cursor: pointer;
-    font-family: 'zabras';
-    letter-spacing: 2px;
-    width: 240px;
-    border: 3px solid transparent;
-    box-shadow: 0 0 10px #ffecb3;
-    position: relative;
-  }
-  
-  button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px #ffecb3;
-  }
-  
-  button::before {
-    content: "";
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    border-radius: 10px;
-    border: 3px solid #ffecb3;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-  }
-  
-  button:hover::before {
-    opacity: 1;
-  }
-  
-  /* ============= MEXICAN COLORS for the main menu ============= */
-  #btn-start {
-    background-color: #006847; /* Green */
-  }
-  #btn-settings {
-    background-color: #FFFFFF; /* White */
-  }
-  #btn-help {
-    background-color: #CE1126; /* Red */
-  }
-  
-  /* Impressum link - white text, no button style */
-  .impressum-row {
-    margin-top: 30px;
-  }
-  #impressum-link {
-    font-size: 24px;
-    color: #ffffff;
-    cursor: pointer;
-    font-family: 'zabras';
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease, color 0.3s ease;
-    margin-top: 10px;
-  }
-  #impressum-link:hover {
-    transform: scale(1.05);
-    color: #ffc105;
-  }
-  
-  /* ----------------------------
-     SETTINGS Overlay Content
-  ----------------------------- */
-  .settings-content {
-    max-width: 700px;
-    margin: 20px;
-    text-align: center;
-    color: #fff;
-    font-size: 20px;
-  }
-  
-  /* Container for the circle icons side by side */
-  .audio-buttons-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-    margin-top: 20px;
-  }
-  
-  /* Circle Buttons (IDs for different colors) */
-  .circle-button {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #ffecb3;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    text-decoration: none; /* for a or links */
-  }
-  
-  .circle-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px #ffecb3;
-  }
-  
-  .circle-button svg {
-    pointer-events: none;
-  }
-  
-  /* Mexican colors for these circle buttons */
-  #music-button {
-    background-color: #006847; /* Green */
-  }
-  #sfx-button {
-    background-color: #FFFFFF; /* White */
-  }
-  #close-button {
-    background-color: #CE1126; /* Red */
-  }
-  
-  /* Slash is hidden by default, .muted shows it */
-  .slash {
-    display: none;
-  }
-  .muted .slash {
-    display: inline;
-  }
-  
-  /* -------------------------
-     HELP Overlay
-  -------------------------- */
-  .help-content {
-    max-width: 700px;
-    margin: 20px;
-    text-align: center;
-    color: #fff;
-    font-size: 20px;
-  }
-  .help-close-container {
-    margin-top: 20px;
-  }
-  /* The green circle for Help-Close */
-  #help-close-button {
-    background-color: #006847; /* Green */
-  }
-  
-  /* -------------------------
-     IMPRESSUM Overlay
-  -------------------------- */
-  .impressum-content {
-    max-width: 700px;
-    margin: 20px;
-    text-align: center;
-    color: #fff;
-    font-size: 20px;
-  }
-  .impressum-close-container {
-    margin-top: 20px;
-  }
-  /* White circle for Impressum-Close */
-  #impressum-close-button {
-    background-color: #FFFFFF; /* White */
-  }
-
-  .linkedin-container {
-    display: flex; 
-    justify-content: center;
-  }
-  
-  /* LinkedIn circle in official color #0077B5 */
-  #linkedin-button {
-    background-color: #0077B5;
-  }
-
-  #overlay-levelcomplete.hidden {
-    display: none;
-  }  
-
-  #btn-fullscreen {
-    position: absolute;
-    bottom: 10px; 
-    right: 10px;
-    /* z.B. minimaler Stil */
-    padding: 8px 12px;
-    cursor: pointer;
-
-  } 
-  
-  
-  /* ------------
-     RESPONSIVE
-  ------------- */
-  @media only screen and (max-width: 1000px) {
-    canvas {
-        width: 100%;
-        border-radius: 0px;
-    }
-    h1 {
-        display: none;
-    }
-    body {
-        background-image: none; 
-    }
-  }
-  
-  @media only screen and (max-height: 480px) {
-    canvas {
-       height: 100vh;
-    }
-  }
-  
+}
