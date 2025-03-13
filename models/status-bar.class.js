@@ -16,10 +16,10 @@ class StatusBar extends DrawableObject {
     constructor() {
         super(); /* Initialisierung des übergeordneten Objekts */
         this.loadImages(this.IMAGES);
-        this.x = 20;
+        this.x = 30;
         this.y = 0;
         this.width = 200;
-        this.height = 60;
+        this.height = 60; 
         this.setPercentage(100);
     }
 
@@ -64,8 +64,8 @@ class BossStatusBar extends DrawableObject {
     constructor() {
       super();
       this.loadImages(this.IMAGES);
-      this.x = 480; // z. B. rechts oben
-      this.y = 0;
+      this.x = 470; // z. B. rechts oben
+      this.y = 50;
       this.width = 200;
       this.height = 60;
       this.setPercentage(100);
@@ -105,7 +105,7 @@ class BossStatusBar extends DrawableObject {
       this.loadImages(this.IMAGES);
   
       // Position / Größe anpassen
-      this.x = 20;
+      this.x = 30;
       this.y = 50;  // etwas unterhalb der Lebensbar
       this.width = 200;
       this.height = 60;
@@ -154,7 +154,7 @@ class BossStatusBar extends DrawableObject {
   
       // Positionierung: direkt unter der Coin-Bar
       // (Coin-Bar war z.B. y=50, also nimm y=100 oder so)
-      this.x = 20;
+      this.x = 30;
       this.y = 100;
       this.width = 200;
       this.height = 60;
