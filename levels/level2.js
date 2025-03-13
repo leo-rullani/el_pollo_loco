@@ -34,6 +34,7 @@ function createLevel2() {
       [
         // 6 Coins
         new Coin(), new Coin(), new Coin(), new Coin(), new Coin(), new Coin(),
+        new Coin(), new Coin(), new Coin(), new Coin(), new Coin(), new Coin(),
         new Coin(), new Coin(), new Coin(), new Coin(), new Coin(), new Coin()
       ],
       [

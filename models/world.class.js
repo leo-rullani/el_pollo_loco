@@ -57,6 +57,7 @@ class World {
 
   // Aktuelle Level-Nummer (z.B. 1,2,3)
   currentLevelNumber;
+  paused = false;
 
   /**
    * Konstruktor OHNE Level-Parameter.
@@ -135,11 +136,18 @@ class World {
   }
 
   run() {
-    // => wir rufen NICHT "stopGame()" beim Levelwechsel
-    // => so bleibt der runInterval bestehen = kein Stocken
+    // Wir rufen NICHT "stopGame()" beim Levelwechsel,
+    // damit der runInterval bestehen bleibt und kein Stocken auftritt
     this.runInterval = setInterval(() => {
-      if (!this.paused && this.level) {
-        // => nur Sinn, wenn this.level != null
+  
+      // NEU: Wenn "paused" => keine Updates
+      if (this.paused) {
+        return;
+        
+      }
+  
+      // Restliche Checks nur, wenn es ein Level gibt
+      if (this.level) {
         this.checkCollisionsEnemies();
         this.checkThrowObjects();
         this.checkCollisionsThrowables();
@@ -147,8 +155,9 @@ class World {
         this.checkCollisionsBottles();
         this.checkLevelEnd();
       }
+  
     }, 200);
-  }
+  }  
 
   checkThrowObjects() {
     if (!this.level) return; // Abbruch, falls Level noch nicht geladen
@@ -186,10 +195,16 @@ class World {
         }
       }
       if (isBoss && this.character.isColliding(enemy)) {
+        // 1) Schaden
         this.character.hit(enemy.damage * 2);
         this.statusBar.setPercentage(this.character.energy);
         this.pepeHurtSound.play();
-      }
+      
+        // 2) Blockieren, falls Pepe zu weit rechts
+        if (this.character.x + this.character.width > enemy.x) {
+          this.character.x = enemy.x - this.character.width;
+        }
+      }      
     });
     if (this.character.energy <= 0 && !this.gameOverShown) {
       this.gameOverShown = true;
@@ -215,7 +230,7 @@ class World {
       if (i > -1) {
         this.level.enemies.splice(i, 1);
       }
-    }, 500);
+    }, 250);
   }
 
   handleBottleCollisions(bottle) {
