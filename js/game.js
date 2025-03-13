@@ -326,4 +326,3 @@ function toggleFullscreen() {
     btn.innerText = "Fullscreen";
   }
 }
-

@@ -454,7 +454,7 @@ class World {
 
     // 2) Charakter an Startposition
     this.character.x = 0;
-    this.character.y = 85;
+    this.character.y = 95;
     this.camera_x = 0;
   }
 }

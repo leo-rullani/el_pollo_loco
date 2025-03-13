@@ -1,7 +1,7 @@
 class Character extends MovableObject {
   // Grundwerte
   height = 250;
-  y = 85;
+  y = 95;
   speed = 10;
 
   // Lauf-Animationen (bereits bekannt)
@@ -171,7 +171,11 @@ class Character extends MovableObject {
   }
 
   jump() {
-    this.speedY = 23;
-     this.jumpSound.play();
+    if (!this.isAboveGround()) {
+      this.speedY = 23;
+      if (!this.sfxMuted) {
+        this.jumpSound.play();
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 class chicken extends MovableObject {
   damage = 10; 
-  y = 360;
+  y = 370;
   height = 55;
   width = 70;
 
