@@ -336,6 +336,51 @@ button:hover::before {
   display: none;
 }
 
+#mobile-buttons {
+  position: fixed;  /* damit sie über dem Canvas stehen */
+  width: 100%;      /* nimmt die gesamte Bildschirmbreite */
+  height: 100%;     /* und Höhe. Innerhalb verteilen wir Buttons */
+  pointer-events: none; /* Durchlässig für Maus? 
+                           => evtl. 'none' und dann 'auto' auf den Buttons selbst */
+  z-index: 9999;    /* Ganz oben */
+}
+
+/* Jedes mobile-btn soll anklickbar sein */
+/* Jedes mobile-btn soll anklickbar sein */
+.mobile-btn {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 0 5px; 
+  background-color: #ffc105; 
+  color: black;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 10px #ffecb3;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icons sollen nicht zu groß sein */
+.mobile-btn img {
+  width: 15px;
+  height: 15px;
+}
+
+/* Standard-Position: OFFSCREEN (z.B. hidden) */
+#mobile-left,
+#mobile-right,
+#mobile-jump,
+#mobile-throw {
+  bottom: -100px;  /* z.B. weit außerhalb */
+  opacity: 0;      /* unsichtbar, wir schalten sie per Media Query */
+  transition: all 0.3s ease;
+}
+
 /* -----------
    RESPONSIVE
 ----------- */
@@ -350,8 +395,39 @@ button:hover::before {
     background-image: none; 
   }
 }
+
 @media only screen and (max-height: 480px) {
   .canvas-container {
     height: 100vh;
+  }
+}
+
+@media (max-width: 1400px) {
+  /* Buttons werden sichtbar und positioniert */
+  #mobile-left,
+  #mobile-right,
+  #mobile-jump,
+  #mobile-throw {
+    opacity: 1; 
+  }
+
+  /* Unten links: left + right */
+  #mobile-left {
+    bottom: 16px;
+    left: 30px;
+  }
+  #mobile-right {
+    bottom: 16px;
+    left: 70px; /* etwas rechts von #mobile-left */
+  }
+
+  /* Unten rechts: jump + throw */
+  #mobile-jump {
+    bottom: 16px;
+    right: 55px;
+  }
+  #mobile-throw {
+    bottom: 16px;
+    right: 10px;
   }
 }
