@@ -108,7 +108,7 @@ class Character extends MovableObject {
         this.otherDirection = true;
         noKeyPressed = false;
       }
-      if (this.world.keyboard.SPACE && !this.isAboveGround()) {
+      if ((this.world.keyboard.SPACE || this.world.keyboard.UP) && !this.isAboveGround()) {
         this.jump();
         noKeyPressed = false;
       }
