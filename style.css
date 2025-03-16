@@ -315,6 +315,10 @@ button:hover::before {
   z-index: 1;
 }
 
+.help-content {
+  font-size: 24px;
+}
+
 .mobile-btn {
   position: absolute;
   width: 30px;
@@ -349,9 +353,7 @@ button:hover::before {
 @media only screen and (max-width: 1000px) {
   .canvas-container canvas {
     border-radius: 0;
-  }
-  h1 {
-    display: none;
+  
   }
   body {
     background-image: none;
