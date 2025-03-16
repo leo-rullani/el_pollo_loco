@@ -170,9 +170,9 @@ h3 {
   /* 3-color border, each 33% */
   border-image: linear-gradient(
     to right, 
-    #006847 0%, #006847 33%, 
+    #006845 0%, #006845 33%, 
     #ffffff 33%, #ffffff 66%, 
-    #ce1126 66%, #ce1126 100%
+    #cf0821 66%, #cf0821 100%
   );
   border-image-slice: 1;
 }
@@ -215,18 +215,21 @@ button:hover::before {
 
 /* MEXICAN COLORS for main menu */
 #btn-start {
-  background-color: #006847; /* Green */
+  background-color: #006845; /* Green */
 }
 #btn-settings {
   background-color: #FFFFFF; /* White */
 }
+
 #btn-help {
-  background-color: #CE1126; /* Red */
+  background-color: #cf0821; /* Red */
 }
+
 /* Impressum link */
 .impressum-row {
   margin-top: 30px;
 }
+
 #impressum-link {
   font-size: 24px;
   color: #fff;
@@ -237,6 +240,7 @@ button:hover::before {
   transition: transform 0.3s ease, color 0.3s ease;
   margin-top: 10px;
 }
+
 #impressum-link:hover {
   transform: scale(1.05);
   color: #ffc105;
