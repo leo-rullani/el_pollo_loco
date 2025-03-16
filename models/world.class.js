@@ -1,10 +1,6 @@
 function init() {
   let canvas = document.getElementById("canvas");
-  // Ursprünglich war hier: let level = createLevel3();
-  // Für den fortgeschrittenen Ansatz brauchst du das hier gar nicht mehr.
-  // => Lass es weg bzw. leer. Der Start erfolgt in game.js -> startGame().
   world = new World(canvas, keyboard);
-  // => Dann erst: world.loadLevelData(...) wenn du init() testest.
 }
 
 function restartGame() {
@@ -15,30 +11,16 @@ function restartGame() {
   document.getElementById("overlay-youwin").classList.add("hidden");
 
   let canvas = document.getElementById("canvas");
-  // Wieder frisch:
-  // => Lass das createLevel3() weg oder nur optional, 
-  // da "restartGame()" jetzt i.d.R. in game.js geregelt wird.
   world = new World(canvas, keyboard);
-  // => world.loadLevelData(...) - StartLevel
 }
 
-/**
- * Neu: Zeigt das Hauptmenü (overlay-menu),
- * blendet Canvas / H1 / gameover / youwin aus
- */
 function goToMenu() {
-  // 1) Overlays verstecken
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
-
-  // 2) Canvas/H1 verstecken
   document.getElementById("canvas").style.display = "none";
   let title = document.querySelector("h1");
   if (title) title.style.display = "none";
-
-  // 3) Zeige Menu-Overlay (falls du es in index.html angelegt hast)
   document.getElementById("overlay-menu").classList.remove("hidden");
-  // optional: world.stopGame();
 }
 
 class World {
@@ -54,58 +36,43 @@ class World {
   coinsCollected = 0;
   bottleBar = new BottleBar();
   bottlesCollected = 0;
-
-  // Aktuelle Level-Nummer (z.B. 1,2,3)
   currentLevelNumber;
   paused = false;
 
-  /**
-   * Konstruktor OHNE Level-Parameter.
-   * (Wir laden die Leveldaten später via loadLevelData(...).)
-   */
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
 
-    // => initially no level loaded
     this.level = null;
 
-    // Hintergrundmusik laden
     this.backgroundMusic = new Audio("audio/game-sound.mp3");
     this.backgroundMusic.volume = 0.2;
     this.backgroundMusic.loop = true;
     this.backgroundMusic.preload = "auto";
     this.backgroundMusic.load();
 
-    // Chicken-Death
     this.chickenDeathSound = new Audio("audio/chicken-noise.mp3");
     this.chickenDeathSound.preload = "auto";
     this.chickenDeathSound.load();
 
-    // Pepe-Hurt
     this.pepeHurtSound = new Audio("audio/pepe-hurt.mp3");
     this.pepeHurtSound.preload = "auto";
     this.pepeHurtSound.load();
 
-    // Pepe-Dies
     this.pepeDiesSound = new Audio("audio/pepe-dies.mp3");
     this.pepeDiesSound.preload = "auto";
     this.pepeDiesSound.load();
 
-    // Endboss
     this.endbossDeathSound = new Audio("audio/endboss-noise.mp3");
 
-    // Win-Game-Sound
     this.winGameSound = new Audio("audio/win-game.mp3");
     this.winGameSound.preload = "auto";
     this.winGameSound.load();
 
-    // Mute-Flags
     this.musicMuted = false;
     this.sfxMuted = false;
 
-    // Start
     this.draw();
     this.setWorld();
     this.run();
@@ -133,6 +100,18 @@ class World {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
+
+    if (this.character && this.character.stopIntervals) {
+      this.character.stopIntervals();
+    }
+
+    if (this.level && this.level.enemies) {
+      this.level.enemies.forEach((enemy) => {
+        if (enemy.stopIntervals) {
+          enemy.stopIntervals();
+        }
+      });
+    }
   }
 
   setWorld() {
@@ -140,17 +119,11 @@ class World {
   }
 
   run() {
-    // Wir rufen NICHT "stopGame()" beim Levelwechsel,
-    // damit der runInterval bestehen bleibt und kein Stocken auftritt
     this.runInterval = setInterval(() => {
-  
-      // NEU: Wenn "paused" => keine Updates
       if (this.paused) {
         return;
-        
       }
   
-      // Restliche Checks nur, wenn es ein Level gibt
       if (this.level) {
         this.checkCollisionsEnemies();
         this.checkThrowObjects();
@@ -161,10 +134,10 @@ class World {
       }
   
     }, 200);
-  }  
+  }
 
   checkThrowObjects() {
-    if (!this.level) return; // Abbruch, falls Level noch nicht geladen
+    if (!this.level) return;
 
     if (this.keyboard.D && this.bottlesCollected > 0) {
       let bottle = new ThrowableObject(
@@ -199,12 +172,9 @@ class World {
         }
       }
       if (isBoss && this.character.isColliding(enemy)) {
-        // 1) Schaden
         this.character.hit(enemy.damage * 2);
         this.statusBar.setPercentage(this.character.energy);
         this.pepeHurtSound.play();
-      
-        // 2) Blockieren, falls Pepe zu weit rechts
         if (this.character.x + this.character.width > enemy.x) {
           this.character.x = enemy.x - this.character.width;
         }
@@ -213,7 +183,7 @@ class World {
     if (this.character.energy <= 0 && !this.gameOverShown) {
       this.gameOverShown = true;
       this.pepeDiesSound.play();
-      this.stopGame(); // => echtes Game Over
+      this.stopGame(); 
       this.showGameOver();
     }
   }
@@ -266,7 +236,7 @@ class World {
       setTimeout(() => {
         let i = this.level.enemies.indexOf(boss);
         if (i > -1) this.level.enemies.splice(i, 1);
-        this.stopGame(); // => Das Spiel endet = You Win
+        this.stopGame(); 
         this.showYouWin();
       }, 2000);
     }, 500);
@@ -302,7 +272,6 @@ class World {
 
   drawScene() {
     if (!this.level) {
-      // => Falls Level noch nicht geladen
       return;
     }
 
@@ -417,46 +386,32 @@ class World {
     }
   }
 
-  /**
-   * Wir entfernen "stopGame()" bei Levelend,
-   * um den fortgeschrittenen Level-Wechsel zu ermöglichen.
-   */
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
 
     if (this.character.x >= this.level.level_end_x) {
       this.levelComplete = true;
 
-      // 2) Overlay-Text anpassen
       let lvlOverlay = document.getElementById("overlay-levelcomplete");
       if (lvlOverlay) {
         lvlOverlay.innerHTML = `<h1>Level ${this.currentLevelNumber} Completed!</h1>`;
         lvlOverlay.classList.remove("hidden");
       }
 
-      // 3) Nach 1 Sekunde => Overlay wieder verstecken + next Level
       setTimeout(() => {
         if (lvlOverlay) {
           lvlOverlay.classList.add("hidden");
         }
-        goToNextLevel(); // Ruft die Funktion in game.js auf
+        goToNextLevel(); 
       }, 1000);
     }
   }
 
-  /**
-   * Neue Methode:
-   * Lädt die Leveldaten in THIS World, ohne die World neu zu instanzieren.
-   * => ZWEI Parameter: newLevel, levelNumber
-   */
   loadLevelData(newLevel, levelNumber) {
-    // 1) Arrays "überschreiben"
     this.level = newLevel;
     this.currentLevelNumber = levelNumber; 
     this.levelComplete = false; 
     this.throwableObjects = [];
-
-    // 2) Charakter an Startposition
     this.character.x = 0;
     this.character.y = 95;
     this.camera_x = 0;

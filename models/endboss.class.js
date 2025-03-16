@@ -8,6 +8,8 @@ class Endboss extends MovableObject {
   moveInterval;
   animationInterval;
   deadInterval;
+  sinkInterval;
+  gravityInterval; 
 
   IMAGES_WALK = [
     "img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -68,6 +70,7 @@ class Endboss extends MovableObject {
 
   animate() {
     this.moveInterval = setInterval(() => this.moveLeft(), 1000 / 60);
+
     this.animationInterval = setInterval(() => {
       if (this.isDead()) this.playAnimation(this.IMAGES_DEAD);
       else if (this.isHurt()) this.playAnimation(this.IMAGES_HURT);
@@ -88,11 +91,10 @@ class Endboss extends MovableObject {
   }
 
   fallToGround() {
-    // Reaktiviere Gravitation, damit Boss "runterfällt"
-    this.applyGravity();
+    this.applyGravity(); 
     setTimeout(() => {
       clearInterval(this.gravityInterval);
-      this.y = 80; // Force: Landet genau auf Boden
+      this.y = 80; 
       this.startDeadAnimationLoop();
     }, 1000);
   }
@@ -115,13 +117,20 @@ class Endboss extends MovableObject {
   }
 
   sinkBoss() {
-    let sinkInterval = setInterval(() => {
+    this.sinkInterval = setInterval(() => {
       this.y += 5;
     }, 100);
+
     setTimeout(() => {
-      clearInterval(sinkInterval);
-      // Entferne Boss aus Array oder trigger "You Win"
-      // z.B. world.removeBoss(this);
+      clearInterval(this.sinkInterval);
     }, 1500);
+  }
+  
+  stopIntervals() {
+    clearInterval(this.moveInterval);
+    clearInterval(this.animationInterval);
+    clearInterval(this.deadInterval);
+    clearInterval(this.gravityInterval);
+    clearInterval(this.sinkInterval);
   }
 }

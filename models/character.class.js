@@ -1,10 +1,8 @@
 class Character extends MovableObject {
-  // Grundwerte
   height = 250;
   y = 95;
   speed = 10;
 
-  // Lauf-Animationen (bereits bekannt)
   IMAGES_WALKING = [
     "img/2_character_pepe/2_walk/W-21.png",
     "img/2_character_pepe/2_walk/W-22.png",
@@ -14,7 +12,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/2_walk/W-26.png",
   ];
 
-  // Sprung-Animationen
   IMAGES_JUMPING = [
     "img/2_character_pepe/3_jump/J-31.png",
     "img/2_character_pepe/3_jump/J-32.png",
@@ -27,7 +24,6 @@ class Character extends MovableObject {
     "img/2_character_pepe/3_jump/J-39.png",
   ];
 
-  // Tot-Animationen
   IMAGES_DEAD = [
     "img/2_character_pepe/5_dead/D-51.png",
     "img/2_character_pepe/5_dead/D-52.png",
@@ -38,14 +34,14 @@ class Character extends MovableObject {
     "img/2_character_pepe/5_dead/D-57.png",
   ];
 
-  // Verletzungs-Animationen
+
   IMAGES_HURT = [
     "img/2_character_pepe/4_hurt/H-41.png",
     "img/2_character_pepe/4_hurt/H-42.png",
     "img/2_character_pepe/4_hurt/H-43.png",
   ];
 
-  // Idle / Long-Idle (Platzhalter – bitte richtige Pfade eintragen!)
+
   IMAGES_IDLE = [
     "img/2_character_pepe/1_idle/idle/I-1.png",
     "img/2_character_pepe/1_idle/idle/I-2.png",
@@ -71,14 +67,13 @@ class Character extends MovableObject {
     "img/2_character_pepe/1_idle/long_idle/I-20.png"
   ];
 
-  // Referenz auf die Welt, Zeitmesser
   world;
-  timeSinceLastMove = 0; // in ms (oder in "Frames", je nach Zählweise)
+  timeSinceLastMove = 0; 
+  moveInterval;
+  animationInterval;
 
   constructor() {
     super().loadImage("img/2_character_pepe/2_walk/W-21.png");
-
-    // Alle Bild-Arrays laden
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_JUMPING);
     this.loadImages(this.IMAGES_DEAD);
@@ -91,12 +86,10 @@ class Character extends MovableObject {
     this.jumpSound = new Audio('audio/jump.mp3');
   }
 
-  // Zusätzliche Variable zum „Verlangsamen“ der Idle-Animation
   idleFrameCounter = 0;
 
   animate() {
-    // 1) Bewegung & Kamera (unverändert)
-    setInterval(() => {
+    this.moveInterval = setInterval(() => {
       let noKeyPressed = true;
       if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
         this.moveRight();
@@ -114,7 +107,7 @@ class Character extends MovableObject {
       }
       if (this.world.keyboard.D) {
         noKeyPressed = false;
-      }      
+      }
 
       if (noKeyPressed) {
         this.timeSinceLastMove += 1000 / 60;
@@ -125,8 +118,7 @@ class Character extends MovableObject {
       this.world.camera_x = -this.x + 100;
     }, 1000 / 60);
 
-    // 2) Animationen (Bilder wechseln)
-    setInterval(() => {
+    this.animationInterval = setInterval(() => {
       if (this.isDead()) {
         this.playAnimation(this.IMAGES_DEAD);
       } else if (this.isHurt()) {
@@ -134,7 +126,6 @@ class Character extends MovableObject {
       } else if (this.isAboveGround()) {
         this.playAnimation(this.IMAGES_JUMPING);
       } else {
-        // => auf dem Boden => Idle oder Laufen
         this.playIdleOrWalking();
       }
     }, 50);
@@ -142,26 +133,21 @@ class Character extends MovableObject {
 
   playIdleOrWalking() {
     if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-      // Laufen => Normale Animation (alle 50ms)
       this.playAnimation(this.IMAGES_WALKING);
-      // Reset für Idle-Frame-Zähler
       this.idleFrameCounter = 0;
     } else {
-      // => Idle- / Long-Idle-Phase
       let t = this.timeSinceLastMove;
 
       if (t > 10000) {
-        // Long Idle, alle 5 Frames (Beispiel)
         this.playIdleAnimationSlow(this.IMAGES_LONG_IDLE, 5);
       } else if (t > 5000) {
-        // Idle, alle 4 Frames
         this.playIdleAnimationSlow(this.IMAGES_IDLE, 4);
       } else {
-        // Weniger als 5s => auch Idle, aber evtl. etwas schneller (alle 3 Frames)
         this.playIdleAnimationSlow(this.IMAGES_IDLE, 3);
       }
     }
   }
+
   playIdleAnimationSlow(images, skipFrames) {
     this.idleFrameCounter++;
     if (this.idleFrameCounter >= skipFrames) {
@@ -178,5 +164,10 @@ class Character extends MovableObject {
         console.log('');
       }
     }
+  }
+
+  stopIntervals() {
+    clearInterval(this.moveInterval);
+    clearInterval(this.animationInterval);
   }
 }
