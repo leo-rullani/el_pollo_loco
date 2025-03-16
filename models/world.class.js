@@ -129,6 +129,10 @@ class World {
     if (this.runInterval) clearInterval(this.runInterval);
     if (this.moveInterval) clearInterval(this.moveInterval);
     if (this.animationInterval) clearInterval(this.animationInterval);
+
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
   }
 
   setWorld() {
@@ -289,7 +293,7 @@ class World {
     this.clearCanvas();
     this.drawScene();
     let self = this;
-    requestAnimationFrame(() => self.draw());
+    this.animationFrameId = requestAnimationFrame(() => self.draw());
   }
 
   clearCanvas() {

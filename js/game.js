@@ -280,6 +280,9 @@ function toggleBreak() {
   }
 }
 
+let intervalIds = [];
+
+intervalIds.push(interval);
 /* Spiel beenden => Zurück zum Menu */
 function quitGame() {
   if (window.world) {
@@ -290,4 +293,5 @@ function quitGame() {
   document.getElementById('canvas').style.display = 'none';
   document.getElementById('overlay-menu').classList.remove('hidden');
   console.log("Quit game => Back to menu");
+  intervalIds.forEach(clearInterval);
 }
