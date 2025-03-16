@@ -168,7 +168,7 @@ class World {
 
     if (this.keyboard.D && this.bottlesCollected > 0) {
       let bottle = new ThrowableObject(
-        this.character.x + 100,
+        this.character.x + 50,
         this.character.y + 100,
         this
       );
