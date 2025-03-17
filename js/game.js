@@ -1,14 +1,9 @@
-/***** Globale Variablen *****/
 let canvas;
 let world;
 let keyboard = new Keyboard();
 let currentLevel = 1;
-
-/** Neu: Globale Mute-Flags für Music und SFX **/
 let musicMuted = false;
 let sfxMuted = false;
-
-/** Kurzer Klicksound als Standard */
 let buttonClickSound = new Audio("audio/button-click.mp3");
 buttonClickSound.volume = 1.0;
 
@@ -24,28 +19,21 @@ function loadCurrentLevel() {
   return createLevel3();
 }
 
-/***** TOGGLE MUSIC *****/
 function toggleMusic() {
-  // 1) Toggle globale Flag
   musicMuted = !musicMuted;
-
-  // 2) Icon updaten => slash an/aus
   let musicIcon = document.getElementById("music-icon");
   if (musicMuted) {
     musicIcon.classList.add("muted");
   } else {
     musicIcon.classList.remove("muted");
-    playButtonClick(); // Klicksound nur beim Unmute
+    playButtonClick();
   }
-
-  // 3) Falls schon eine World existiert => dort ebenfalls umsetzen
   if (window.world) {
     world.musicMuted = musicMuted;
     world.backgroundMusic.muted = musicMuted;
   }
 }
 
-/***** TOGGLE SFX *****/
 function toggleSfx() {
   sfxMuted = !sfxMuted;
 
@@ -54,10 +42,8 @@ function toggleSfx() {
     sfxIcon.classList.add("muted");
   } else {
     sfxIcon.classList.remove("muted");
-    playButtonClick(); // Klicksound nur beim Unmute
+    playButtonClick();
   }
-
-  // Falls World existiert => sync mit world
   if (window.world) {
     world.sfxMuted = sfxMuted;
     world.chickenDeathSound.muted = sfxMuted;
@@ -73,14 +59,12 @@ function toggleSfx() {
   }
 }
 
-/** Spielt kurzen Klicksound ab */
 function playButtonClick() {
   let clickSound = new Audio("audio/button-click.mp3");
   clickSound.volume = 1.0;
   clickSound.play();
 }
 
-/***** START GAME *****/
 function startGame() {
   document.getElementById("overlay-menu").classList.add("hidden");
   document.getElementById("canvas").style.display = "block";
@@ -88,10 +72,7 @@ function startGame() {
   if (title) title.style.display = "block";
   canvas = document.getElementById("canvas");
   currentLevel = 1;
-
   world = new World(canvas, keyboard);
-
-  // Musik & SFX-Status übernehmen:
   world.musicMuted = musicMuted;
   world.backgroundMusic.muted = musicMuted;
   world.sfxMuted = sfxMuted;
@@ -114,7 +95,6 @@ function startGame() {
   }
 }
 
-/***** RESTART GAME *****/
 function restartGame() {
   if (world) world.stopGame();
 
@@ -125,7 +105,6 @@ function restartGame() {
   if (title) title.style.display = "block";
   currentLevel = 1;
   canvas = document.getElementById("canvas");
-
   world = new World(canvas, keyboard);
   world.musicMuted = musicMuted;
   world.backgroundMusic.muted = musicMuted;
@@ -145,19 +124,14 @@ function restartGame() {
   world.loadLevelData(levelData, currentLevel);
 }
 
-/***** NEXT LEVEL *****/
 function goToNextLevel() {
   let stats = storeCurrentStats();
   showLevelCompleteOverlay(currentLevel);
-
   setTimeout(() => {
     hideLevelCompleteOverlay();
     currentLevel++;
     if (currentLevel > 3) return;
-
-    // Jetzt Sound:
     playLevelCompleteSound();
-
     world.loadLevelData(loadCurrentLevel(), currentLevel);
     restoreStats(stats);
   }, 1000);
@@ -175,7 +149,6 @@ function restoreStats(stats) {
   world.character.energy = stats.oldEnergy;
   world.coinsCollected = stats.oldCoins;
   world.bottlesCollected = stats.oldBottles;
-
   world.statusBar.setPercentage(stats.oldEnergy);
   world.coinBar.setPercentage(calcCoinPercentage(stats.oldCoins));
   world.bottleBar.setPercentage(calcBottlePercentage(stats.oldBottles));
@@ -187,10 +160,9 @@ function hideLevelCompleteOverlay() {
 }
 
 function playLevelCompleteSound() {
-  // Falls World schon existiert => nimm das Audio aus world
   if (window.world) {
     world.levelCompleteSound.currentTime = 0;
-    world.levelCompleteSound.play().catch(e => console.log(e));
+    world.levelCompleteSound.play().catch((e) => console.log(e));
   }
 }
 
@@ -243,7 +215,6 @@ function closeImpressum() {
   document.getElementById("overlay-impressum").classList.add("hidden");
 }
 
-/***** FULLSCREEN UND PAUSE *****/
 const fsBtn = document.getElementById("btn-fullscreen");
 if (fsBtn) {
   fsBtn.addEventListener("keydown", (e) => {
@@ -264,14 +235,15 @@ function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
   if (!window.world) return;
   window.paused = !window.paused;
-
   if (window.paused) {
-    clearAllIntervals();
+    world.pauseGame();
     setPausedOverlay(true);
     breakBtn.innerText = "Continue";
   } else {
+    world.resumeGame();
     setPausedOverlay(false);
     breakBtn.innerText = "Break";
+    console.log("toggleBreak => paused is", window.paused);
   }
 }
 
@@ -280,6 +252,7 @@ function setPausedOverlay(isPaused) {
   if (!c) return;
   if (isPaused) c.classList.add("paused-overlay");
   else c.classList.remove("paused-overlay");
+  console.log("setPausedOverlay => adding .paused-overlay");
 }
 
 function quitGame() {

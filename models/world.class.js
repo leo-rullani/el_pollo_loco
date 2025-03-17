@@ -295,7 +295,7 @@ class World {
   }
 
   pauseGame() {
-    this.paused = true;
+    this.paused = true; // Markiert, dass wir pausiert sind
     if (this.runInterval) {
       clearInterval(this.runInterval);
       this.runInterval = null;
@@ -304,9 +304,41 @@ class World {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
+    // Gegner / Character Intervals stoppen
     if (this.character?.stopIntervals) this.character.stopIntervals();
     this.stopEnemies();
-    let c = document.querySelector(".canvas-container");
-    if (c) c.classList.add("paused-overlay");
+    // -> optional overlay? => In game.js / setPausedOverlay
   }
-}
+
+  resumeGame() {
+    // 1) Markiere, dass wir nicht mehr pausiert sind
+    this.paused = false;
+  
+    // 2) Character und Gegner-Intervalle neu starten
+    if (this.character?.resumeIntervals) {
+      this.character.resumeIntervals();
+    }
+    if (this.level?.enemies) {
+      this.level.enemies.forEach(e => e.resumeIntervals && e.resumeIntervals());
+    }
+  
+    // 3) AnimationFrame wieder starten
+    if (!this.animationFrameId) {
+      this.animationFrameId = requestAnimationFrame(() => this.draw());
+    }
+  
+    // 4) runInterval wieder starten
+    if (!this.runInterval) {
+      this.runInterval = setInterval(() => {
+        if (!this.paused && this.level) {
+          checkCollisionsEnemies(this);
+          this.checkThrowObjects();
+          checkCollisionsThrowables(this);
+          checkCollisionsCoins(this);
+          checkCollisionsBottles(this);
+          this.checkLevelEnd();
+        }
+      }, 200);
+    }
+  }  
+}  
