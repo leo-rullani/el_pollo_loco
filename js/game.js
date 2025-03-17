@@ -2,14 +2,14 @@ let canvas;
 let world;
 let keyboard = new Keyboard();
 let currentLevel = 1;
+let buttonClickSound = new Audio("audio/button-click.mp3");
+buttonClickSound.volume = 1.0;
 
 function clearAllIntervals() {
   for (let i = 1; i < 9999; i++) {
     clearInterval(i);
   }
-  console.log("All intervals cleared (hacky method).");
 }
-
 
 function loadCurrentLevel() {
   if (currentLevel === 1) {
@@ -17,16 +17,8 @@ function loadCurrentLevel() {
   } else if (currentLevel === 2) {
     return createLevel2(); 
   } else {
-    // => Level 3
     return createLevel3();
   }
-}
-
-let buttonClickSound = new Audio("audio/button-click.mp3");
-buttonClickSound.volume = 1.0;
-
-function init() {
-  console.log("Init called");
 }
 
 function toggleMusic() {
@@ -44,23 +36,14 @@ function toggleSfx() {
 function startGame() {
   document.getElementById("overlay-menu").classList.add("hidden");
   document.getElementById("canvas").style.display = "block";
-
   let title = document.querySelector("h1");
   if (title) title.style.display = "block";
-
   canvas = document.getElementById("canvas");
   currentLevel = 1; 
-
-
   world = new World(canvas, keyboard);
-
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
-
-
   world.backgroundMusic.play().catch((err) => console.log(err));
-
-  console.log("Game started in normal browser window (canvas fills the page).");
 }
 
 function restartGame() {
@@ -69,56 +52,54 @@ function restartGame() {
   }
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
-
   document.getElementById("canvas").style.display = "block";
   let title = document.querySelector("h1");
   if (title) title.style.display = "block";
-
   currentLevel = 1;
   canvas = document.getElementById("canvas");
-
   world = new World(canvas, keyboard);
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
-
-  console.log("Restarted game, character is", world.character);
 }
-
 
 function goToNextLevel() {
-  let oldEnergy = world.character.energy;
-  let oldCoins = world.coinsCollected;
-  let oldBottles = world.bottlesCollected;
-
+  let stats = storeCurrentStats();
   playLevelCompleteSound();
   showLevelCompleteOverlay(currentLevel);
-
   setTimeout(() => {
-    let overlay = document.getElementById("overlay-levelcomplete");
-    if (overlay) overlay.classList.add("hidden");
-
+    hideLevelCompleteOverlay();
     currentLevel++;
     if (currentLevel > 3) {
-      console.log("Alle Levels abgeschlossen!");
       return;
     }
-
-    let newLevelData = loadCurrentLevel();
-    world.loadLevelData(newLevelData, currentLevel);
-
-    world.character.energy = oldEnergy;
-    world.coinsCollected = oldCoins;
-    world.bottlesCollected = oldBottles;
-
-    world.statusBar.setPercentage(oldEnergy);
-    world.coinBar.setPercentage(calcCoinPercentage(oldCoins));
-    world.bottleBar.setPercentage(calcBottlePercentage(oldBottles));
-
-    console.log(
-      `Switched to Level ${currentLevel} with old stats (HP:${oldEnergy}, coins:${oldCoins}, bottles:${oldBottles})`
-    );
+    world.loadLevelData(loadCurrentLevel(), currentLevel);
+    restoreStats(stats);
   }, 1000);
 }
+
+function storeCurrentStats() {
+  return {
+    oldEnergy: world.character.energy,
+    oldCoins: world.coinsCollected,
+    oldBottles: world.bottlesCollected
+  };
+}
+
+function restoreStats(stats) {
+  world.character.energy = stats.oldEnergy;
+  world.coinsCollected = stats.oldCoins;
+  world.bottlesCollected = stats.oldBottles;
+
+  world.statusBar.setPercentage(stats.oldEnergy);
+  world.coinBar.setPercentage(calcCoinPercentage(stats.oldCoins));
+  world.bottleBar.setPercentage(calcBottlePercentage(stats.oldBottles));
+}
+
+function hideLevelCompleteOverlay() {
+  let overlay = document.getElementById("overlay-levelcomplete");
+  if (overlay) overlay.classList.add("hidden");
+}
+
 
 function playLevelCompleteSound() {
   let levelCompleteAudio = new Audio("audio/level-complete.mp3");
@@ -139,6 +120,7 @@ function calcCoinPercentage(coinCount) {
   let percentage = coinCount * 10;
   return percentage > 100 ? 100 : percentage;
 }
+
 function calcBottlePercentage(bottleCount) {
   let percentage = bottleCount * 20;
   return percentage > 100 ? 100 : percentage;
@@ -148,10 +130,8 @@ function goToMenu() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
   document.getElementById("canvas").style.display = "none";
-
   let title = document.querySelector("h1");
   if (title) title.style.display = "none";
-
   document.getElementById("overlay-menu").classList.remove("hidden");
   console.log("Back to menu");
 }
@@ -220,84 +200,59 @@ if (fsBtn) {
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch((err) => {
-      console.error("Fehler bei Fullscreen:", err);
     });
-    console.log("Entered real fullscreen (browser).");
   } else {
     document.exitFullscreen().catch((err) => {
-      console.error("Fehler beim Exit Fullscreen:", err);
     });
-    console.log("Exited real fullscreen, back to normal window size.");
   }
-
   document.getElementById('btn-fullscreen').blur();
 }
 
 function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
   if (!window.world) return;
-
-  window.paused = !window.paused; 
+  window.paused = !window.paused;
 
   if (window.paused) {
-
     clearAllIntervals();
-
-    let canvasContainer = document.querySelector('.canvas-container');
-    if (canvasContainer) {
-      canvasContainer.classList.add('paused-overlay');
-    }
-
+    setPausedOverlay(true);
     breakBtn.innerText = "Continue";
-    console.log("Game paused (via clearAllIntervals).");
   } else {
- 
-    let canvasContainer = document.querySelector('.canvas-container');
-    if (canvasContainer) {
-      canvasContainer.classList.remove('paused-overlay');
-    }
-    
+    setPausedOverlay(false);
     breakBtn.innerText = "Break";
-    console.log("Game continued (nothing restarted yet).");
   }
+}
+
+function setPausedOverlay(isPaused) {
+  let c = document.querySelector('.canvas-container');
+  if (!c) return;
+  if (isPaused) c.classList.add('paused-overlay');
+  else c.classList.remove('paused-overlay');
 }
 
 function quitGame() {
   if (window.world) {
     world.stopGame();
-
-    // Hintergrundmusik komplett stoppen + zurücksetzen
     if (world.backgroundMusic) {
       world.backgroundMusic.loop = false;
       world.backgroundMusic.pause();
       world.backgroundMusic.currentTime = 0;
     }    
-
-    // Endboss-Musik oder sonstige Loops ausschalten?
-    // if (world.endbossDeathSound) {
-    //   world.endbossDeathSound.pause();
-    //   world.endbossDeathSound.currentTime = 0;
-    // }
-
     world = null;
   }
   clearAllIntervals(); 
   document.getElementById('canvas').style.display = 'none';
   document.getElementById('overlay-menu').classList.remove('hidden');
-  console.log("Quit game => Back to menu");
 }
 
 function checkRotateOverlay() {
   const overlay = document.getElementById('overlay-rotate');
   if (!overlay) return;
-
-  // Beispiel: wenn Querformat => Overlay ausblenden
   if (window.innerWidth > window.innerHeight) {
-    overlay.classList.add('hidden'); // => transparent
+    overlay.classList.add('hidden'); 
   } else {
-    overlay.classList.remove('hidden'); // => sichtbar
+    overlay.classList.remove('hidden'); 
   }
 }
-
 window.addEventListener('load', checkRotateOverlay);
 window.addEventListener('resize', checkRotateOverlay);
