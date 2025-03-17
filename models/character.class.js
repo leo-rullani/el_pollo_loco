@@ -80,7 +80,6 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_HURT);
     this.loadImages(this.IMAGES_IDLE);
     this.loadImages(this.IMAGES_LONG_IDLE);
-
     this.applyGravity();
     this.animate();
     this.jumpSound = new Audio('audio/jump.mp3');
@@ -108,13 +107,11 @@ class Character extends MovableObject {
       if (this.world.keyboard.D) {
         noKeyPressed = false;
       }
-
       if (noKeyPressed) {
         this.timeSinceLastMove += 1000 / 60;
       } else {
         this.timeSinceLastMove = 0;
       }
-
       this.world.camera_x = -this.x + 100;
     }, 1000 / 60);
 

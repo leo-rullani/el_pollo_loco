@@ -4,12 +4,9 @@ function init() {
 }
 
 function restartGame() {
-  if (world) {
-    world.stopGame();
-  }
+  if (world) world.stopGame();
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
-
   let canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
 }
@@ -43,39 +40,31 @@ class World {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
-
     this.level = null;
-
-    this.backgroundMusic = new Audio("audio/game-sound.mp3");
-    this.backgroundMusic.volume = 0.2;
-    this.backgroundMusic.loop = true;
-    this.backgroundMusic.preload = "auto";
-    this.backgroundMusic.load();
-
-    this.chickenDeathSound = new Audio("audio/chicken-noise.mp3");
-    this.chickenDeathSound.preload = "auto";
-    this.chickenDeathSound.load();
-
-    this.pepeHurtSound = new Audio("audio/pepe-hurt.mp3");
-    this.pepeHurtSound.preload = "auto";
-    this.pepeHurtSound.load();
-
-    this.pepeDiesSound = new Audio("audio/pepe-dies.mp3");
-    this.pepeDiesSound.preload = "auto";
-    this.pepeDiesSound.load();
-
-    this.endbossDeathSound = new Audio("audio/endboss-noise.mp3");
-
-    this.winGameSound = new Audio("audio/win-game.mp3");
-    this.winGameSound.preload = "auto";
-    this.winGameSound.load();
-
-    this.musicMuted = false;
-    this.sfxMuted = false;
-
+    this.initAudio();
     this.draw();
     this.setWorld();
     this.run();
+  }
+
+  initAudio() {
+    this.backgroundMusic = this.makeAudio("audio/game-sound.mp3", 0.2, true);
+    this.chickenDeathSound = this.makeAudio("audio/chicken-noise.mp3");
+    this.pepeHurtSound = this.makeAudio("audio/pepe-hurt.mp3");
+    this.pepeDiesSound = this.makeAudio("audio/pepe-dies.mp3");
+    this.endbossDeathSound = new Audio("audio/endboss-noise.mp3");
+    this.winGameSound = this.makeAudio("audio/win-game.mp3");
+    this.musicMuted = false;
+    this.sfxMuted = false;
+  }
+
+  makeAudio(src, vol = 1, loop = false) {
+    let a = new Audio(src);
+    a.volume = vol;
+    a.loop = loop;
+    a.preload = "auto";
+    a.load();
+    return a;
   }
 
   toggleMusicMute() {
@@ -85,36 +74,28 @@ class World {
 
   toggleSfxMute() {
     this.sfxMuted = !this.sfxMuted;
-    this.chickenDeathSound.muted = this.sfxMuted;
-    this.pepeHurtSound.muted = this.sfxMuted;
-    this.pepeDiesSound.muted = this.sfxMuted;
-    this.endbossDeathSound.muted = this.sfxMuted;
-    this.winGameSound.muted = this.sfxMuted;
+    let m = this.sfxMuted;
+    this.chickenDeathSound.muted = m;
+    this.pepeHurtSound.muted = m;
+    this.pepeDiesSound.muted = m;
+    this.endbossDeathSound.muted = m;
+    this.winGameSound.muted = m;
   }
 
   stopGame() {
-    // 1) Alle Intervalls beenden
     if (this.runInterval) clearInterval(this.runInterval);
-
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-    }
-
-    if (this.character && this.character.stopIntervals) {
-      this.character.stopIntervals();
-    }
-    if (this.level && this.level.enemies) {
-      this.level.enemies.forEach((enemy) => {
-        if (enemy.stopIntervals) {
-          enemy.stopIntervals();
-        }
-      });
-    }
-
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    if (this.character?.stopIntervals) this.character.stopIntervals();
+    this.stopEnemies();
     if (this.backgroundMusic) {
       this.backgroundMusic.pause();
-      this.backgroundMusic.currentTime = 0; 
+      this.backgroundMusic.currentTime = 0;
     }
+  }
+
+  stopEnemies() {
+    if (!this.level?.enemies) return;
+    this.level.enemies.forEach((e) => e.stopIntervals && e.stopIntervals());
   }
 
   setWorld() {
@@ -123,11 +104,7 @@ class World {
 
   run() {
     this.runInterval = setInterval(() => {
-      if (this.paused) {
-        return;
-      }
-
-      if (this.level) {
+      if (!this.paused && this.level) {
         this.checkCollisionsEnemies();
         this.checkThrowObjects();
         this.checkCollisionsThrowables();
@@ -140,58 +117,69 @@ class World {
 
   checkThrowObjects() {
     if (!this.level) return;
-    if (this.keyboard.D && this.bottlesCollected > 0) {
-      let bottle = new ThrowableObject(
-        this.character.x + 50,
-        this.character.y + 100,
-        this
-      );
-      this.throwableObjects.push(bottle);
-      this.bottlesCollected--;
-      let percentage = this.bottlesCollected * 20;
-      if (percentage < 0) percentage = 0;
-      this.bottleBar.setPercentage(percentage);
-    }
+    if (this.keyboard.D && this.bottlesCollected > 0) this.throwBottle();
+  }
+
+  throwBottle() {
+    let b = new ThrowableObject(
+      this.character.x + 50,
+      this.character.y + 100,
+      this
+    );
+    this.throwableObjects.push(b);
+    this.bottlesCollected--;
+    let perc = this.bottlesCollected * 20;
+    if (perc < 0) perc = 0;
+    this.bottleBar.setPercentage(perc);
   }
 
   checkCollisionsEnemies() {
     if (!this.level) return;
-    this.level.enemies.forEach((enemy) => {
-      let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
-      let isBoss = enemy instanceof Endboss;
-      if (this.gameOverShown) return;
+    this.level.enemies.forEach((e) => this.handleEnemy(e));
+    if (this.character.energy <= 0 && !this.gameOverShown)
+      this.handleGameOver();
+  }
 
-      if (isHuhn && !enemy.isDeadChicken && this.character.isColliding(enemy)) {
-        if (this.character.speedY < 0) {
-          this.killChicken(enemy);
-        } else {
-          this.character.hit(enemy.damage);
-          this.statusBar.setPercentage(this.character.energy);
-          this.pepeHurtSound.play();
-        }
-      }
-      if (isBoss && this.character.isColliding(enemy)) {
-        this.character.hit(enemy.damage * 2);
-        this.statusBar.setPercentage(this.character.energy);
-        this.pepeHurtSound.play();
-        if (this.character.x + this.character.width > enemy.x) {
-          this.character.x = enemy.x - this.character.width;
-        }
-      }
-    });
-    if (this.character.energy <= 0 && !this.gameOverShown) {
-      this.gameOverShown = true;
-      this.pepeDiesSound.play();
-      this.stopGame();
-      this.showGameOver();
+  handleEnemy(e) {
+    let isHuhn = e instanceof chicken || e instanceof SmallChicken;
+    let isBoss = e instanceof Endboss;
+    if (this.gameOverShown) return;
+    if (isHuhn && !e.isDeadChicken && this.character.isColliding(e)) {
+      this.huhnCollision(e);
     }
+    if (isBoss && this.character.isColliding(e)) {
+      this.bossCollision(e);
+    }
+  }
+
+  huhnCollision(enemy) {
+    if (this.character.speedY < 0) this.killChicken(enemy);
+    else {
+      this.character.hit(enemy.damage);
+      this.statusBar.setPercentage(this.character.energy);
+      this.pepeHurtSound.play();
+    }
+  }
+
+  bossCollision(boss) {
+    this.character.hit(boss.damage * 2);
+    this.statusBar.setPercentage(this.character.energy);
+    this.pepeHurtSound.play();
+    if (this.character.x + this.character.width > boss.x) {
+      this.character.x = boss.x - this.character.width;
+    }
+  }
+
+  handleGameOver() {
+    this.gameOverShown = true;
+    this.pepeDiesSound.play();
+    this.stopGame();
+    this.showGameOver();
   }
 
   checkCollisionsThrowables() {
     if (!this.level) return;
-    this.throwableObjects.forEach((bottle) => {
-      this.handleBottleCollisions(bottle);
-    });
+    this.throwableObjects.forEach((b) => this.handleBottleCollisions(b));
   }
 
   killChicken(chicken) {
@@ -199,31 +187,30 @@ class World {
     chicken.isDeadChicken = true;
     chicken.playDeadAnimation();
     setTimeout(() => {
-      let i = this.level.enemies.indexOf(chicken);
-      if (i > -1) {
-        this.level.enemies.splice(i, 1);
-      }
+      let idx = this.level.enemies.indexOf(chicken);
+      if (idx > -1) this.level.enemies.splice(idx, 1);
     }, 250);
   }
 
   handleBottleCollisions(bottle) {
-    if (!this.level) return;
-    this.level.enemies.forEach((enemy) => {
-      let isHuhn = enemy instanceof chicken || enemy instanceof SmallChicken;
-      let isBoss = enemy instanceof Endboss;
-      if (isHuhn && !enemy.isDeadChicken && bottle.isColliding(enemy)) {
-        this.killChicken(enemy);
-        bottle.triggerSplash();
-      }
-      if (isBoss && bottle.isColliding(enemy)) {
-        enemy.hit(1);
-        this.bossBar.setPercentage(enemy.energy * 20);
-        bottle.triggerSplash();
-        if (enemy.isDead()) {
-          this.killEndboss(enemy);
-        }
-      }
-    });
+    this.level.enemies.forEach((e) => this.collideBottleEnemy(bottle, e));
+  }
+
+  collideBottleEnemy(bottle, e) {
+    let h = e instanceof chicken || e instanceof SmallChicken;
+    let b = e instanceof Endboss;
+    if (h && !e.isDeadChicken && bottle.isColliding(e)) {
+      this.killChicken(e);
+      bottle.triggerSplash();
+    }
+    if (b && bottle.isColliding(e)) this.bottleHitsBoss(bottle, e);
+  }
+
+  bottleHitsBoss(bottle, boss) {
+    boss.hit(1);
+    this.bossBar.setPercentage(boss.energy * 20);
+    bottle.triggerSplash();
+    if (boss.isDead()) this.killEndboss(boss);
   }
 
   killEndboss(boss) {
@@ -232,8 +219,8 @@ class World {
     setTimeout(() => {
       boss.sinkBoss();
       setTimeout(() => {
-        let i = this.level.enemies.indexOf(boss);
-        if (i > -1) this.level.enemies.splice(i, 1);
+        let idx = this.level.enemies.indexOf(boss);
+        if (idx > -1) this.level.enemies.splice(idx, 1);
         this.stopGame();
         this.showYouWin();
       }, 2000);
@@ -242,13 +229,13 @@ class World {
 
   showGameOver() {
     this.backgroundMusic.pause();
-    document.getElementById("overlay-gameover").classList.remove("hidden");
+    document.getElementById("overlay-gameover")?.classList.remove("hidden");
   }
 
   showYouWin() {
     this.backgroundMusic.pause();
     this.winGameSound.play();
-    document.getElementById("overlay-youwin").classList.remove("hidden");
+    document.getElementById("overlay-youwin")?.classList.remove("hidden");
     this.stopGame();
   }
 
@@ -260,8 +247,7 @@ class World {
   draw() {
     this.clearCanvas();
     this.drawScene();
-    let self = this;
-    this.animationFrameId = requestAnimationFrame(() => self.draw());
+    this.animationFrameId = requestAnimationFrame(() => this.draw());
   }
 
   clearCanvas() {
@@ -269,9 +255,7 @@ class World {
   }
 
   drawScene() {
-    if (!this.level) {
-      return;
-    }
+    if (!this.level) return;
     this.ctx.translate(this.camera_x, 0);
     this.addObjectsToMap(this.level.backgroundObjects);
     this.ctx.translate(-this.camera_x, 0);
@@ -290,13 +274,12 @@ class World {
   }
 
   drawBossBarIfVisible() {
-    let boss = this.findBoss();
-    if (boss) {
-      this.ctx.save();
-      this.ctx.translate(-this.camera_x, 0);
-      this.addToMap(this.bossBar);
-      this.ctx.restore();
-    }
+    let b = this.findBoss();
+    if (!b) return;
+    this.ctx.save();
+    this.ctx.translate(-this.camera_x, 0);
+    this.addToMap(this.bossBar);
+    this.ctx.restore();
   }
 
   findBoss() {
@@ -309,84 +292,79 @@ class World {
   }
 
   addToMap(mo) {
-    if (mo.otherDirection) {
-      this.flipImage(mo);
-    }
+    if (mo.otherDirection) this.flipImage(mo);
     mo.draw(this.ctx);
     mo.drawFrame(this.ctx);
-    if (mo.otherDirection) {
-      this.flipImageBack(mo);
-    }
+    if (mo.otherDirection) this.flipImageBack(mo);
   }
 
   flipImage(mo) {
     this.ctx.save();
     this.ctx.translate(mo.width, 0);
     this.ctx.scale(-1, 1);
-    mo.x = mo.x * -1;
+    mo.x *= -1;
   }
 
   flipImageBack(mo) {
-    mo.x = mo.x * -1;
+    mo.x *= -1;
     this.ctx.restore();
   }
 
   checkCollisionsCoins() {
     if (!this.level) return;
     for (let i = this.level.coins.length - 1; i >= 0; i--) {
-      let coin = this.level.coins[i];
-      if (this.character.isColliding(coin) && this.character.isAboveGround()) {
-        this.level.coins.splice(i, 1);
-        this.coinsCollected++;
-        let percentage = calcCoinPercentage(this.coinsCollected);
-        if (percentage > 100) percentage = 100;
-        this.coinBar.setPercentage(percentage);
-
-        if (percentage >= 100) {
-          this.coinsCollected = 0;
-          this.coinBar.setPercentage(0);
-          this.character.energy += 20;
-          if (this.character.energy > 100) {
-            this.character.energy = 100;
-          }
-          this.statusBar.setPercentage(this.character.energy);
-        }
-        let coinSound = new Audio("audio/collect-coin.mp3");
-        coinSound.play();
-        console.log("Coin #", this.coinsCollected, "=>", percentage, "%");
-      }
+      this.handleCoinCollision(this.level.coins[i], i);
     }
+  }
+
+  handleCoinCollision(coin, idx) {
+    if (!this.character.isColliding(coin) || !this.character.isAboveGround())
+      return;
+    this.level.coins.splice(idx, 1);
+    this.coinsCollected++;
+    let p = calcCoinPercentage(this.coinsCollected);
+    if (p > 100) p = 100;
+    this.coinBar.setPercentage(p);
+    if (p >= 100) this.boostCharacterEnergy();
+    new Audio("audio/collect-coin.mp3").play();
+  }
+
+  boostCharacterEnergy() {
+    this.coinsCollected = 0;
+    this.coinBar.setPercentage(0);
+    this.character.energy += 20;
+    if (this.character.energy > 100) this.character.energy = 100;
+    this.statusBar.setPercentage(this.character.energy);
   }
 
   checkCollisionsBottles() {
     if (!this.level) return;
     for (let i = this.level.bottles.length - 1; i >= 0; i--) {
-      let bottleItem = this.level.bottles[i];
-      if (this.character.isColliding(bottleItem)) {
-        this.level.bottles.splice(i, 1);
-        this.bottlesCollected++;
-        let percentage = this.bottlesCollected * 20;
-        if (percentage > 100) percentage = 100;
-        this.bottleBar.setPercentage(percentage);
-        let bottleSound = new Audio("audio/collect-bottle.mp3");
-        bottleSound.play();
-      }
+      this.handleBottleItem(this.level.bottles[i], i);
     }
+  }
+
+  handleBottleItem(bottleItem, idx) {
+    if (!this.character.isColliding(bottleItem)) return;
+    this.level.bottles.splice(idx, 1);
+    this.bottlesCollected++;
+    let p = this.bottlesCollected * 20;
+    if (p > 100) p = 100;
+    this.bottleBar.setPercentage(p);
+    new Audio("audio/collect-bottle.mp3").play();
   }
 
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
     if (this.character.x >= this.level.level_end_x) {
       this.levelComplete = true;
-      let lvlOverlay = document.getElementById("overlay-levelcomplete");
-      if (lvlOverlay) {
-        lvlOverlay.innerHTML = `<h1>Level ${this.currentLevelNumber} Completed!</h1>`;
-        lvlOverlay.classList.remove("hidden");
+      let o = document.getElementById("overlay-levelcomplete");
+      if (o) {
+        o.innerHTML = `<h1>Level ${this.currentLevelNumber} Completed!</h1>`;
+        o.classList.remove("hidden");
       }
       setTimeout(() => {
-        if (lvlOverlay) {
-          lvlOverlay.classList.add("hidden");
-        }
+        if (o) o.classList.add("hidden");
         goToNextLevel();
       }, 1000);
     }
@@ -403,10 +381,7 @@ class World {
   }
 
   pauseGame() {
-    // 1) Markiere, dass wir pausiert sind
     this.paused = true;
-  
-    // 2) Stoppe alle World-Intervalle
     if (this.runInterval) {
       clearInterval(this.runInterval);
       this.runInterval = null;
@@ -415,25 +390,9 @@ class World {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-  
-    // 3) Character- und Gegner-Intervalle stoppen
-    if (this.character && this.character.stopIntervals) {
-      this.character.stopIntervals();
-    }
-    if (this.level && this.level.enemies) {
-      this.level.enemies.forEach((enemy) => {
-        if (enemy.stopIntervals) {
-          enemy.stopIntervals();
-        }
-      });
-    }
-  
-    // 4) Canvas dunkler machen => z.B. per CSS-Klasse
-    let canvasContainer = document.querySelector('.canvas-container');
-    if (canvasContainer) {
-      canvasContainer.classList.add('paused-overlay');
-    }
+    if (this.character?.stopIntervals) this.character.stopIntervals();
+    this.stopEnemies();
+    let c = document.querySelector(".canvas-container");
+    if (c) c.classList.add("paused-overlay");
   }
-  
 }
-
