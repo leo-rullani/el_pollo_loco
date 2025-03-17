@@ -1,7 +1,14 @@
+/***** Globale Variablen *****/
 let canvas;
 let world;
 let keyboard = new Keyboard();
 let currentLevel = 1;
+
+/** Neu: Globale Mute-Flags für Music und SFX **/
+let musicMuted = false;
+let sfxMuted = false;
+
+/** Kurzer Klicksound als Standard */
 let buttonClickSound = new Audio("audio/button-click.mp3");
 buttonClickSound.volume = 1.0;
 
@@ -12,44 +19,102 @@ function clearAllIntervals() {
 }
 
 function loadCurrentLevel() {
-  if (currentLevel === 1) {
-    return createLevel1();
-  } else if (currentLevel === 2) {
-    return createLevel2(); 
-  } else {
-    return createLevel3();
-  }
+  if (currentLevel === 1) return createLevel1();
+  if (currentLevel === 2) return createLevel2();
+  return createLevel3();
 }
 
+/***** TOGGLE MUSIC *****/
 function toggleMusic() {
+  // 1) Toggle globale Flag
+  musicMuted = !musicMuted;
+
+  // 2) Icon updaten => slash an/aus
+  let musicIcon = document.getElementById("music-icon");
+  if (musicMuted) {
+    musicIcon.classList.add("muted");
+  } else {
+    musicIcon.classList.remove("muted");
+    playButtonClick(); // Klicksound nur beim Unmute
+  }
+
+  // 3) Falls schon eine World existiert => dort ebenfalls umsetzen
   if (window.world) {
-    world.toggleMusicMute();
+    world.musicMuted = musicMuted;
+    world.backgroundMusic.muted = musicMuted;
   }
 }
 
+/***** TOGGLE SFX *****/
 function toggleSfx() {
+  sfxMuted = !sfxMuted;
+
+  let sfxIcon = document.getElementById("sfx-icon");
+  if (sfxMuted) {
+    sfxIcon.classList.add("muted");
+  } else {
+    sfxIcon.classList.remove("muted");
+    playButtonClick(); // Klicksound nur beim Unmute
+  }
+
+  // Falls World existiert => sync mit world
   if (window.world) {
-    world.toggleSfxMute();
+    world.sfxMuted = sfxMuted;
+    // Mute / Unmute deine Sounds direkt
+    world.chickenDeathSound.muted = sfxMuted;
+    world.pepeHurtSound.muted = sfxMuted;
+    world.pepeDiesSound.muted = sfxMuted;
+    world.endbossDeathSound.muted = sfxMuted;
+    world.winGameSound.muted = sfxMuted;
+    // Falls du coinSound usw. hast, auch muten
   }
 }
 
+/** Spielt kurzen Klicksound ab */
+function playButtonClick() {
+  let clickSound = new Audio("audio/button-click.mp3");
+  clickSound.volume = 1.0;
+  clickSound.play();
+}
+
+/***** START GAME *****/
 function startGame() {
   document.getElementById("overlay-menu").classList.add("hidden");
   document.getElementById("canvas").style.display = "block";
   let title = document.querySelector("h1");
   if (title) title.style.display = "block";
   canvas = document.getElementById("canvas");
-  currentLevel = 1; 
+  currentLevel = 1;
+
+  // 1) Erzeuge World
   world = new World(canvas, keyboard);
+
+  // 2) Global gemute Musik übernehmen
+  world.musicMuted = musicMuted;
+  world.backgroundMusic.muted = musicMuted;
+
+  // 3) Global gemute SFX übernehmen
+  world.sfxMuted = sfxMuted;
+  world.chickenDeathSound.muted = sfxMuted;
+  world.pepeHurtSound.muted = sfxMuted;
+  world.pepeDiesSound.muted = sfxMuted;
+  world.endbossDeathSound.muted = sfxMuted;
+  world.winGameSound.muted = sfxMuted;
+  // falls coinSound etc. => ebenfalls muten
+
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
-  world.backgroundMusic.play().catch((err) => console.log(err));
+
+  // Falls Musik nicht gemutet => abspielen
+  if (!musicMuted) {
+    world.backgroundMusic.play().catch((err) => console.log(err));
+  }
 }
 
+/***** RESTART GAME *****/
 function restartGame() {
-  if (world) {
-    world.stopGame();
-  }
+  if (world) world.stopGame();
+
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
   document.getElementById("canvas").style.display = "block";
@@ -57,21 +122,34 @@ function restartGame() {
   if (title) title.style.display = "block";
   currentLevel = 1;
   canvas = document.getElementById("canvas");
+
   world = new World(canvas, keyboard);
+
+  // Wieder globale Mute-Flags auf die neue World anwenden
+  world.musicMuted = musicMuted;
+  world.backgroundMusic.muted = musicMuted;
+  world.sfxMuted = sfxMuted;
+  world.chickenDeathSound.muted = sfxMuted;
+  world.pepeHurtSound.muted = sfxMuted;
+  world.pepeDiesSound.muted = sfxMuted;
+  world.endbossDeathSound.muted = sfxMuted;
+  world.winGameSound.muted = sfxMuted;
+
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
 }
 
+/***** NEXT LEVEL *****/
 function goToNextLevel() {
   let stats = storeCurrentStats();
   playLevelCompleteSound();
   showLevelCompleteOverlay(currentLevel);
+
   setTimeout(() => {
     hideLevelCompleteOverlay();
     currentLevel++;
-    if (currentLevel > 3) {
-      return;
-    }
+    if (currentLevel > 3) return;
+
     world.loadLevelData(loadCurrentLevel(), currentLevel);
     restoreStats(stats);
   }, 1000);
@@ -81,7 +159,7 @@ function storeCurrentStats() {
   return {
     oldEnergy: world.character.energy,
     oldCoins: world.coinsCollected,
-    oldBottles: world.bottlesCollected
+    oldBottles: world.bottlesCollected,
   };
 }
 
@@ -99,7 +177,6 @@ function hideLevelCompleteOverlay() {
   let overlay = document.getElementById("overlay-levelcomplete");
   if (overlay) overlay.classList.add("hidden");
 }
-
 
 function playLevelCompleteSound() {
   let levelCompleteAudio = new Audio("audio/level-complete.mp3");
@@ -155,57 +232,21 @@ function closeImpressum() {
   document.getElementById("overlay-impressum").classList.add("hidden");
 }
 
-function toggleMusic() {
-  let musicIcon = document.getElementById("music-icon");
-  if (!musicMuted) {
-    musicMuted = true;
-    musicIcon.classList.add("muted");
-    console.log("Music muted.");
-  } else {
-    musicMuted = false;
-    musicIcon.classList.remove("muted");
-    console.log("Music unmuted.");
-    playButtonClick();
-  }
-}
-
-function toggleSoundEffects() {
-  let sfxIcon = document.getElementById("sfx-icon");
-  if (!soundEffectsMuted) {
-    soundEffectsMuted = true;
-    sfxIcon.classList.add("muted");
-    console.log("Sound effects muted.");
-  } else {
-    soundEffectsMuted = false;
-    sfxIcon.classList.remove("muted");
-    console.log("Sound effects unmuted.");
-    playButtonClick();
-  }
-}
-
-function playButtonClick() {
-  buttonClickSound.currentTime = 0;
-  buttonClickSound.play();
-}
-
-const fsBtn = document.getElementById('btn-fullscreen');
+/***** FULLSCREEN UND PAUSE *****/
+const fsBtn = document.getElementById("btn-fullscreen");
 if (fsBtn) {
-  fsBtn.addEventListener('keydown', (e) => {
-    if (e.key === ' ' || e.keyCode === 32) {
-      e.preventDefault();
-    }
+  fsBtn.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.keyCode === 32) e.preventDefault();
   });
 }
 
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch((err) => {
-    });
+    document.documentElement.requestFullscreen().catch((err) => {});
   } else {
-    document.exitFullscreen().catch((err) => {
-    });
+    document.exitFullscreen().catch((err) => {});
   }
-  document.getElementById('btn-fullscreen').blur();
+  document.getElementById("btn-fullscreen").blur();
 }
 
 function toggleBreak() {
@@ -224,10 +265,10 @@ function toggleBreak() {
 }
 
 function setPausedOverlay(isPaused) {
-  let c = document.querySelector('.canvas-container');
+  let c = document.querySelector(".canvas-container");
   if (!c) return;
-  if (isPaused) c.classList.add('paused-overlay');
-  else c.classList.remove('paused-overlay');
+  if (isPaused) c.classList.add("paused-overlay");
+  else c.classList.remove("paused-overlay");
 }
 
 function quitGame() {
@@ -240,19 +281,19 @@ function quitGame() {
     }
     world = null;
   }
-  clearAllIntervals();  
-  document.getElementById('canvas').style.display = 'none';
-  document.getElementById('overlay-menu').classList.remove('hidden');
+  clearAllIntervals();
+  document.getElementById("canvas").style.display = "none";
+  document.getElementById("overlay-menu").classList.remove("hidden");
 }
 
 function checkRotateOverlay() {
-  const overlay = document.getElementById('overlay-rotate');
+  const overlay = document.getElementById("overlay-rotate");
   if (!overlay) return;
   if (window.innerWidth > window.innerHeight) {
-    overlay.classList.add('hidden'); 
+    overlay.classList.add("hidden");
   } else {
-    overlay.classList.remove('hidden'); 
+    overlay.classList.remove("hidden");
   }
 }
-window.addEventListener('load', checkRotateOverlay);
-window.addEventListener('resize', checkRotateOverlay);
+window.addEventListener("load", checkRotateOverlay);
+window.addEventListener("resize", checkRotateOverlay);

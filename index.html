@@ -11,7 +11,6 @@
 
     <link rel="icon" type="image/png" href="/img/background/chicken-flaticon.png" />
     <title>El Pollo Loco</title>
-
 </head>
 
 <body>
@@ -94,7 +93,7 @@
                     </svg>
                 </div>
                 <!-- Sound effects button (WHITE) -->
-                <div id="sfx-button" class="circle-button" onclick="toggleSoundEffects()">
+                <div id="sfx-button" class="circle-button" onclick="toggleSfx()">
                     <!-- Inline SVG: speaker + hidden slash -->
                     <svg id="sfx-icon" viewBox="0 0 50 50" width="32" height="32" fill="black">
                         <path d="M10 20 L18 20 L30 10 L30 40 L18 30 L10 30 Z" />
@@ -274,6 +273,16 @@
     <!-- game.js -->
     <script src="/js/game.js"></script>
 
+    <!-- Minimal CSS, kannst du auch in style.css packen -->
+    <style>
+        .slash {
+            display: none;
+        }
+
+        .muted .slash {
+            display: inline;
+        }
+    </style>
 </body>
 
 </html>

@@ -265,7 +265,7 @@ button:hover::before {
   display: none;
 }
 .muted .slash {
-  display: inline;
+  display: inline; 
 }
 
 .help-content {
