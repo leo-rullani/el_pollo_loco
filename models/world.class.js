@@ -35,6 +35,7 @@ class World {
   bottlesCollected = 0;
   currentLevelNumber;
   paused = false;
+  gameOverShown = false; // Neu: braucht ihr für "if (!world.gameOverShown)..."
 
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
@@ -103,13 +104,15 @@ class World {
   }
 
   run() {
+    // WICHTIG: Hier rufen wir die ausgelagerten Collision-Funktionen auf,
+    // die in world-collisions.js definiert sind:
     this.runInterval = setInterval(() => {
       if (!this.paused && this.level) {
-        this.checkCollisionsEnemies();
+        checkCollisionsEnemies(this); // => in world-collisions.js
         this.checkThrowObjects();
-        this.checkCollisionsThrowables();
-        this.checkCollisionsCoins();
-        this.checkCollisionsBottles();
+        checkCollisionsThrowables(this); // => in world-collisions.js
+        checkCollisionsCoins(this); // => in world-collisions.js
+        checkCollisionsBottles(this); // => in world-collisions.js
         this.checkLevelEnd();
       }
     }, 200);
@@ -133,54 +136,7 @@ class World {
     this.bottleBar.setPercentage(perc);
   }
 
-  checkCollisionsEnemies() {
-    if (!this.level) return;
-    this.level.enemies.forEach((e) => this.handleEnemy(e));
-    if (this.character.energy <= 0 && !this.gameOverShown)
-      this.handleGameOver();
-  }
-
-  handleEnemy(e) {
-    let isHuhn = e instanceof chicken || e instanceof SmallChicken;
-    let isBoss = e instanceof Endboss;
-    if (this.gameOverShown) return;
-    if (isHuhn && !e.isDeadChicken && this.character.isColliding(e)) {
-      this.huhnCollision(e);
-    }
-    if (isBoss && this.character.isColliding(e)) {
-      this.bossCollision(e);
-    }
-  }
-
-  huhnCollision(enemy) {
-    if (this.character.speedY < 0) this.killChicken(enemy);
-    else {
-      this.character.hit(enemy.damage);
-      this.statusBar.setPercentage(this.character.energy);
-      this.pepeHurtSound.play();
-    }
-  }
-
-  bossCollision(boss) {
-    this.character.hit(boss.damage * 2);
-    this.statusBar.setPercentage(this.character.energy);
-    this.pepeHurtSound.play();
-    if (this.character.x + this.character.width > boss.x) {
-      this.character.x = boss.x - this.character.width;
-    }
-  }
-
-  handleGameOver() {
-    this.gameOverShown = true;
-    this.pepeDiesSound.play();
-    this.stopGame();
-    this.showGameOver();
-  }
-
-  checkCollisionsThrowables() {
-    if (!this.level) return;
-    this.throwableObjects.forEach((b) => this.handleBottleCollisions(b));
-  }
+  // bleibende Methoden, weil world-collisions.js ruft z.B. "world.killChicken(...)"
 
   killChicken(chicken) {
     this.chickenDeathSound.play();
@@ -190,27 +146,6 @@ class World {
       let idx = this.level.enemies.indexOf(chicken);
       if (idx > -1) this.level.enemies.splice(idx, 1);
     }, 250);
-  }
-
-  handleBottleCollisions(bottle) {
-    this.level.enemies.forEach((e) => this.collideBottleEnemy(bottle, e));
-  }
-
-  collideBottleEnemy(bottle, e) {
-    let h = e instanceof chicken || e instanceof SmallChicken;
-    let b = e instanceof Endboss;
-    if (h && !e.isDeadChicken && bottle.isColliding(e)) {
-      this.killChicken(e);
-      bottle.triggerSplash();
-    }
-    if (b && bottle.isColliding(e)) this.bottleHitsBoss(bottle, e);
-  }
-
-  bottleHitsBoss(bottle, boss) {
-    boss.hit(1);
-    this.bossBar.setPercentage(boss.energy * 20);
-    bottle.triggerSplash();
-    if (boss.isDead()) this.killEndboss(boss);
   }
 
   killEndboss(boss) {
@@ -308,50 +243,6 @@ class World {
   flipImageBack(mo) {
     mo.x *= -1;
     this.ctx.restore();
-  }
-
-  checkCollisionsCoins() {
-    if (!this.level) return;
-    for (let i = this.level.coins.length - 1; i >= 0; i--) {
-      this.handleCoinCollision(this.level.coins[i], i);
-    }
-  }
-
-  handleCoinCollision(coin, idx) {
-    if (!this.character.isColliding(coin) || !this.character.isAboveGround())
-      return;
-    this.level.coins.splice(idx, 1);
-    this.coinsCollected++;
-    let p = calcCoinPercentage(this.coinsCollected);
-    if (p > 100) p = 100;
-    this.coinBar.setPercentage(p);
-    if (p >= 100) this.boostCharacterEnergy();
-    new Audio("audio/collect-coin.mp3").play();
-  }
-
-  boostCharacterEnergy() {
-    this.coinsCollected = 0;
-    this.coinBar.setPercentage(0);
-    this.character.energy += 20;
-    if (this.character.energy > 100) this.character.energy = 100;
-    this.statusBar.setPercentage(this.character.energy);
-  }
-
-  checkCollisionsBottles() {
-    if (!this.level) return;
-    for (let i = this.level.bottles.length - 1; i >= 0; i--) {
-      this.handleBottleItem(this.level.bottles[i], i);
-    }
-  }
-
-  handleBottleItem(bottleItem, idx) {
-    if (!this.character.isColliding(bottleItem)) return;
-    this.level.bottles.splice(idx, 1);
-    this.bottlesCollected++;
-    let p = this.bottlesCollected * 20;
-    if (p > 100) p = 100;
-    this.bottleBar.setPercentage(p);
-    new Audio("audio/collect-bottle.mp3").play();
   }
 
   checkLevelEnd() {
