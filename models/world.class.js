@@ -268,6 +268,9 @@ class World {
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
     if (this.character.x >= this.level.level_end_x) {
+      this.levelCompleteSound.currentTime = 0;
+      this.levelCompleteSound.play();
+
       this.levelComplete = true;
       let o = document.getElementById("overlay-levelcomplete");
       if (o) {

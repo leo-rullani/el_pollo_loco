@@ -127,8 +127,6 @@ function restartGame() {
   canvas = document.getElementById("canvas");
 
   world = new World(canvas, keyboard);
-
-  // Musik & SFX-Status übernehmen
   world.musicMuted = musicMuted;
   world.backgroundMusic.muted = musicMuted;
   world.sfxMuted = sfxMuted;
@@ -150,13 +148,15 @@ function restartGame() {
 /***** NEXT LEVEL *****/
 function goToNextLevel() {
   let stats = storeCurrentStats();
-  playLevelCompleteSound();
   showLevelCompleteOverlay(currentLevel);
 
   setTimeout(() => {
     hideLevelCompleteOverlay();
     currentLevel++;
     if (currentLevel > 3) return;
+
+    // Jetzt Sound:
+    playLevelCompleteSound();
 
     world.loadLevelData(loadCurrentLevel(), currentLevel);
     restoreStats(stats);
@@ -187,8 +187,11 @@ function hideLevelCompleteOverlay() {
 }
 
 function playLevelCompleteSound() {
-  let levelCompleteAudio = new Audio("audio/level-complete.mp3");
-  levelCompleteAudio.play().catch((e) => console.log(e));
+  // Falls World schon existiert => nimm das Audio aus world
+  if (window.world) {
+    world.levelCompleteSound.currentTime = 0;
+    world.levelCompleteSound.play().catch(e => console.log(e));
+  }
 }
 
 function showLevelCompleteOverlay(levelNumber) {
