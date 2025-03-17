@@ -401,4 +401,39 @@ class World {
     this.character.y = 95;
     this.camera_x = 0;
   }
+
+  pauseGame() {
+    // 1) Markiere, dass wir pausiert sind
+    this.paused = true;
+  
+    // 2) Stoppe alle World-Intervalle
+    if (this.runInterval) {
+      clearInterval(this.runInterval);
+      this.runInterval = null;
+    }
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  
+    // 3) Character- und Gegner-Intervalle stoppen
+    if (this.character && this.character.stopIntervals) {
+      this.character.stopIntervals();
+    }
+    if (this.level && this.level.enemies) {
+      this.level.enemies.forEach((enemy) => {
+        if (enemy.stopIntervals) {
+          enemy.stopIntervals();
+        }
+      });
+    }
+  
+    // 4) Canvas dunkler machen => z.B. per CSS-Klasse
+    let canvasContainer = document.querySelector('.canvas-container');
+    if (canvasContainer) {
+      canvasContainer.classList.add('paused-overlay');
+    }
+  }
+  
 }
+

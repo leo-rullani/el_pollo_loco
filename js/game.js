@@ -237,13 +237,28 @@ function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
   if (!window.world) return;
 
-  world.paused = !world.paused;
-  if (world.paused) {
+  window.paused = !window.paused; 
+
+  if (window.paused) {
+
+    clearAllIntervals();
+
+    let canvasContainer = document.querySelector('.canvas-container');
+    if (canvasContainer) {
+      canvasContainer.classList.add('paused-overlay');
+    }
+
     breakBtn.innerText = "Continue";
-    console.log("Game paused");
+    console.log("Game paused (via clearAllIntervals).");
   } else {
+ 
+    let canvasContainer = document.querySelector('.canvas-container');
+    if (canvasContainer) {
+      canvasContainer.classList.remove('paused-overlay');
+    }
+    
     breakBtn.innerText = "Break";
-    console.log("Game continued");
+    console.log("Game continued (nothing restarted yet).");
   }
 }
 
@@ -271,3 +286,18 @@ function quitGame() {
   document.getElementById('overlay-menu').classList.remove('hidden');
   console.log("Quit game => Back to menu");
 }
+
+function checkRotateOverlay() {
+  const overlay = document.getElementById('overlay-rotate');
+  if (!overlay) return;
+
+  // Beispiel: wenn Querformat => Overlay ausblenden
+  if (window.innerWidth > window.innerHeight) {
+    overlay.classList.add('hidden'); // => transparent
+  } else {
+    overlay.classList.remove('hidden'); // => sichtbar
+  }
+}
+
+window.addEventListener('load', checkRotateOverlay);
+window.addEventListener('resize', checkRotateOverlay);
