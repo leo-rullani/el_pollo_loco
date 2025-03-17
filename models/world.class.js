@@ -63,11 +63,16 @@ class World {
     this.chickenDeathSound = this.makeAudio("audio/chicken-noise.mp3");
     this.pepeHurtSound = this.makeAudio("audio/pepe-hurt.mp3");
     this.pepeDiesSound = this.makeAudio("audio/pepe-dies.mp3");
-    this.endbossDeathSound = new Audio("audio/endboss-noise.mp3");
+    this.endbossDeathSound = this.makeAudio("audio/endboss-noise.mp3");
     this.winGameSound = this.makeAudio("audio/win-game.mp3");
+    this.coinSound = this.makeAudio("audio/collect-coin.mp3");
+    this.bottleSound = this.makeAudio("audio/collect-bottle.mp3");
+    this.jumpSound = this.makeAudio("audio/jump.mp3");
+    this.levelCompleteSound = this.makeAudio("audio/level-complete.mp3");
+    this.bottleShatterSound = this.makeAudio("audio/bottle-shattering.mp3");
     this.musicMuted = false;
     this.sfxMuted = false;
-  }
+  }  
 
   makeAudio(src, vol = 1, loop = false) {
     let a = new Audio(src);
@@ -91,7 +96,12 @@ class World {
     this.pepeDiesSound.muted = m;
     this.endbossDeathSound.muted = m;
     this.winGameSound.muted = m;
-  }
+    this.coinSound.muted = m;
+    this.bottleSound.muted = m;
+    this.bottleShatterSound.muted = m;
+    this.jumpSound.muted = m;
+    this.levelCompleteSound.muted = m;
+  }  
 
   stopGame() {
     if (this.runInterval) clearInterval(this.runInterval);

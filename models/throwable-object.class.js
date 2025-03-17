@@ -49,21 +49,26 @@ class ThrowableObject extends MovableObject {
     }, 25);
   }
 
-  triggerSplash() {
-    this.landed = true; 
-    clearInterval(this.rotationInterval);
-    clearInterval(this.movementInterval);
-    let splashSound = new Audio('audio/bottle-shattering.mp3');
-    splashSound.play();
-    this.currentImage = 0;
-    this.splashInterval = setInterval(() => {
-      this.playAnimation(this.IMAGES_SPLASH);
-    }, 80);
-    setTimeout(() => {
-      clearInterval(this.splashInterval);
-      this.removeBottleFromWorld(); 
-    }, 700);
-  } 
+  // Angenommen du hast in world.class.js:
+// this.bottleShatterSound = this.makeAudio("audio/bottle-shattering.mp3");
+// ...
+// toggleSfxMute() { this.bottleShatterSound.muted = m; }
+
+triggerSplash() {
+  this.landed = true;
+  clearInterval(this.rotationInterval);
+  clearInterval(this.movementInterval);
+  this.world.bottleShatterSound.currentTime = 0;
+  this.world.bottleShatterSound.play();
+  this.currentImage = 0;
+  this.splashInterval = setInterval(() => {
+    this.playAnimation(this.IMAGES_SPLASH);
+  }, 80);
+  setTimeout(() => {
+    clearInterval(this.splashInterval);
+    this.removeBottleFromWorld();
+  }, 700);
+}
 
   onGroundHit() {
     this.landed = true;

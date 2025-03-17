@@ -60,13 +60,16 @@ function toggleSfx() {
   // Falls World existiert => sync mit world
   if (window.world) {
     world.sfxMuted = sfxMuted;
-    // Mute / Unmute deine Sounds direkt
     world.chickenDeathSound.muted = sfxMuted;
     world.pepeHurtSound.muted = sfxMuted;
     world.pepeDiesSound.muted = sfxMuted;
     world.endbossDeathSound.muted = sfxMuted;
     world.winGameSound.muted = sfxMuted;
-    // Falls du coinSound usw. hast, auch muten
+    world.coinSound.muted = sfxMuted;
+    world.bottleSound.muted = sfxMuted;
+    world.jumpSound.muted = sfxMuted;
+    world.bottleShatterSound.muted = sfxMuted;
+    world.levelCompleteSound.muted = sfxMuted;
   }
 }
 
@@ -86,26 +89,26 @@ function startGame() {
   canvas = document.getElementById("canvas");
   currentLevel = 1;
 
-  // 1) Erzeuge World
   world = new World(canvas, keyboard);
 
-  // 2) Global gemute Musik übernehmen
+  // Musik & SFX-Status übernehmen:
   world.musicMuted = musicMuted;
   world.backgroundMusic.muted = musicMuted;
-
-  // 3) Global gemute SFX übernehmen
   world.sfxMuted = sfxMuted;
   world.chickenDeathSound.muted = sfxMuted;
   world.pepeHurtSound.muted = sfxMuted;
   world.pepeDiesSound.muted = sfxMuted;
   world.endbossDeathSound.muted = sfxMuted;
   world.winGameSound.muted = sfxMuted;
-  // falls coinSound etc. => ebenfalls muten
+  world.coinSound.muted = sfxMuted;
+  world.bottleSound.muted = sfxMuted;
+  world.jumpSound.muted = sfxMuted;
+  world.bottleShatterSound.muted = sfxMuted;
+  world.levelCompleteSound.muted = sfxMuted;
 
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
 
-  // Falls Musik nicht gemutet => abspielen
   if (!musicMuted) {
     world.backgroundMusic.play().catch((err) => console.log(err));
   }
@@ -125,7 +128,7 @@ function restartGame() {
 
   world = new World(canvas, keyboard);
 
-  // Wieder globale Mute-Flags auf die neue World anwenden
+  // Musik & SFX-Status übernehmen
   world.musicMuted = musicMuted;
   world.backgroundMusic.muted = musicMuted;
   world.sfxMuted = sfxMuted;
@@ -134,6 +137,11 @@ function restartGame() {
   world.pepeDiesSound.muted = sfxMuted;
   world.endbossDeathSound.muted = sfxMuted;
   world.winGameSound.muted = sfxMuted;
+  world.coinSound.muted = sfxMuted;
+  world.bottleSound.muted = sfxMuted;
+  world.jumpSound.muted = sfxMuted;
+  world.bottleShatterSound.muted = sfxMuted;
+  world.levelCompleteSound.muted = sfxMuted;
 
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
