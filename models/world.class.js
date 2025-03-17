@@ -4,11 +4,18 @@ function init() {
 }
 
 function restartGame() {
-  if (world) world.stopGame();
+  if (world) {
+    world.stopGame();
+  }
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
   let canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
+  let levelData = loadCurrentLevel();
+  world.loadLevelData(levelData, currentLevel);
+  if (!world.musicMuted) {
+    world.backgroundMusic.play().catch(e => {});
+  }
 }
 
 function goToMenu() {
@@ -43,6 +50,9 @@ class World {
     this.keyboard = keyboard;
     this.level = null;
     this.initAudio();
+    if (!this.musicMuted) {
+      this.backgroundMusic.play().catch(e => {});
+    }
     this.draw();
     this.setWorld();
     this.run();
