@@ -34,13 +34,11 @@ class Character extends MovableObject {
     "img/2_character_pepe/5_dead/D-57.png",
   ];
 
-
   IMAGES_HURT = [
     "img/2_character_pepe/4_hurt/H-41.png",
     "img/2_character_pepe/4_hurt/H-42.png",
     "img/2_character_pepe/4_hurt/H-43.png",
   ];
-
 
   IMAGES_IDLE = [
     "img/2_character_pepe/1_idle/idle/I-1.png",
@@ -52,7 +50,7 @@ class Character extends MovableObject {
     "img/2_character_pepe/1_idle/idle/I-7.png",
     "img/2_character_pepe/1_idle/idle/I-8.png",
     "img/2_character_pepe/1_idle/idle/I-9.png",
-    "img/2_character_pepe/1_idle/idle/I-10.png"
+    "img/2_character_pepe/1_idle/idle/I-10.png",
   ];
 
   IMAGES_LONG_IDLE = [
@@ -64,13 +62,14 @@ class Character extends MovableObject {
     "img/2_character_pepe/1_idle/long_idle/I-17.png",
     "img/2_character_pepe/1_idle/long_idle/I-18.png",
     "img/2_character_pepe/1_idle/long_idle/I-19.png",
-    "img/2_character_pepe/1_idle/long_idle/I-20.png"
+    "img/2_character_pepe/1_idle/long_idle/I-20.png",
   ];
 
   world;
-  timeSinceLastMove = 0; 
+  timeSinceLastMove = 0;
   moveInterval;
   animationInterval;
+  idleFrameCounter = 0;
 
   constructor() {
     super().loadImage("img/2_character_pepe/2_walk/W-21.png");
@@ -82,49 +81,48 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_LONG_IDLE);
     this.applyGravity();
     this.animate();
-    this.jumpSound = new Audio('audio/jump.mp3');
+    this.jumpSound = new Audio("audio/jump.mp3");
   }
 
-  idleFrameCounter = 0;
-
   animate() {
+    this.startMoveInterval();
+    this.startAnimationInterval();
+  }
+
+  startMoveInterval() {
     this.moveInterval = setInterval(() => {
-      let noKeyPressed = true;
+      let noKey = true;
       if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
         this.moveRight();
         this.otherDirection = false;
-        noKeyPressed = false;
+        noKey = false;
       }
       if (this.world.keyboard.LEFT && this.x > 0) {
         this.moveLeft();
         this.otherDirection = true;
-        noKeyPressed = false;
+        noKey = false;
       }
-      if ((this.world.keyboard.SPACE || this.world.keyboard.UP) && !this.isAboveGround()) {
+      if (
+        (this.world.keyboard.SPACE || this.world.keyboard.UP) &&
+        !this.isAboveGround()
+      ) {
         this.jump();
-        noKeyPressed = false;
+        noKey = false;
       }
-      if (this.world.keyboard.D) {
-        noKeyPressed = false;
-      }
-      if (noKeyPressed) {
-        this.timeSinceLastMove += 1000 / 60;
-      } else {
-        this.timeSinceLastMove = 0;
-      }
+      if (this.world.keyboard.D) noKey = false;
+      noKey
+        ? (this.timeSinceLastMove += 1000 / 60)
+        : (this.timeSinceLastMove = 0);
       this.world.camera_x = -this.x + 100;
     }, 1000 / 60);
+  }
 
+  startAnimationInterval() {
     this.animationInterval = setInterval(() => {
-      if (this.isDead()) {
-        this.playAnimation(this.IMAGES_DEAD);
-      } else if (this.isHurt()) {
-        this.playAnimation(this.IMAGES_HURT);
-      } else if (this.isAboveGround()) {
-        this.playAnimation(this.IMAGES_JUMPING);
-      } else {
-        this.playIdleOrWalking();
-      }
+      if (this.isDead()) this.playAnimation(this.IMAGES_DEAD);
+      else if (this.isHurt()) this.playAnimation(this.IMAGES_HURT);
+      else if (this.isAboveGround()) this.playAnimation(this.IMAGES_JUMPING);
+      else this.playIdleOrWalking();
     }, 50);
   }
 
@@ -134,14 +132,9 @@ class Character extends MovableObject {
       this.idleFrameCounter = 0;
     } else {
       let t = this.timeSinceLastMove;
-
-      if (t > 10000) {
-        this.playIdleAnimationSlow(this.IMAGES_LONG_IDLE, 5);
-      } else if (t > 5000) {
-        this.playIdleAnimationSlow(this.IMAGES_IDLE, 4);
-      } else {
-        this.playIdleAnimationSlow(this.IMAGES_IDLE, 3);
-      }
+      if (t > 10000) this.playIdleAnimationSlow(this.IMAGES_LONG_IDLE, 5);
+      else if (t > 5000) this.playIdleAnimationSlow(this.IMAGES_IDLE, 4);
+      else this.playIdleAnimationSlow(this.IMAGES_IDLE, 3);
     }
   }
 
@@ -156,10 +149,7 @@ class Character extends MovableObject {
   jump() {
     if (!this.isAboveGround()) {
       this.speedY = 23;
-      if (!this.sfxMuted) {
-        this.jumpSound.play();
-        console.log('');
-      }
+      if (!this.sfxMuted) this.jumpSound.play();
     }
   }
 

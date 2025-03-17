@@ -70,7 +70,6 @@ class Endboss extends MovableObject {
 
   animate() {
     this.moveInterval = setInterval(() => this.moveLeft(), 1000 / 60);
-
     this.animationInterval = setInterval(() => {
       if (this.isDead()) this.playAnimation(this.IMAGES_DEAD);
       else if (this.isHurt()) this.playAnimation(this.IMAGES_HURT);
