@@ -3,12 +3,19 @@ let world;
 let keyboard = new Keyboard();
 let currentLevel = 1;
 
+function clearAllIntervals() {
+  for (let i = 1; i < 9999; i++) {
+    clearInterval(i);
+  }
+  console.log("All intervals cleared (hacky method).");
+}
+
 
 function loadCurrentLevel() {
   if (currentLevel === 1) {
     return createLevel1();
   } else if (currentLevel === 2) {
-    return createLevel2();
+    return createLevel2(); 
   } else {
     // => Level 3
     return createLevel3();
@@ -243,10 +250,23 @@ function toggleBreak() {
 function quitGame() {
   if (window.world) {
     world.stopGame();
-    world.backgroundMusic.pause();
+
+    // Hintergrundmusik komplett stoppen + zurücksetzen
+    if (world.backgroundMusic) {
+      world.backgroundMusic.loop = false;
+      world.backgroundMusic.pause();
+      world.backgroundMusic.currentTime = 0;
+    }    
+
+    // Endboss-Musik oder sonstige Loops ausschalten?
+    // if (world.endbossDeathSound) {
+    //   world.endbossDeathSound.pause();
+    //   world.endbossDeathSound.currentTime = 0;
+    // }
+
     world = null;
-    console.log("quitGame() => world.stopGame() aufgerufen");
   }
+  clearAllIntervals(); 
   document.getElementById('canvas').style.display = 'none';
   document.getElementById('overlay-menu').classList.remove('hidden');
   console.log("Quit game => Back to menu");
