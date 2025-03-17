@@ -231,16 +231,16 @@ function setPausedOverlay(isPaused) {
 }
 
 function quitGame() {
-  if (window.world) {
+  if (world) {
     world.stopGame();
     if (world.backgroundMusic) {
-      world.backgroundMusic.loop = false;
       world.backgroundMusic.pause();
       world.backgroundMusic.currentTime = 0;
-    }    
+      world.backgroundMusic.loop = false;
+    }
     world = null;
   }
-  clearAllIntervals(); 
+  clearAllIntervals();  
   document.getElementById('canvas').style.display = 'none';
   document.getElementById('overlay-menu').classList.remove('hidden');
 }
