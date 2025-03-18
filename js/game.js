@@ -233,19 +233,32 @@ function toggleFullscreen() {
 
 function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
-  // if (!window.world) return;
+  const pauseContent = document.getElementById("pause-content"); // Enthält Pause-Icon + "Break"
+  const playContent = document.getElementById("play-content");   // Enthält Play-Icon + "Continue"
+
+  // Togglen der Pause-Variable
   window.paused = !window.paused;
   world.paused = window.paused;
-  
+
   if (window.paused) {
+    // Spiel pausieren
     world.pauseGame();
     setPausedOverlay(true);
-    breakBtn.innerText = "Continue";
+
+    // Icon/Text wechseln: Pause ausblenden, Play/Continue einblenden
+    pauseContent.style.display = "none";
+    playContent.style.display = "inline-flex";
   } else {
+    // Spiel fortsetzen
     world.resumeGame();
     setPausedOverlay(false);
-    breakBtn.innerText = "Break";
-    console.log("toggleBreak => paused is", window.paused);
+
+    // Icon/Text wechseln: Play/Continue ausblenden, Pause einblenden
+    playContent.style.display = "none";
+    pauseContent.style.display = "inline-flex";
+
+    // Fokus entfernen, damit Space nicht versehentlich Pause erneut auslöst
+    breakBtn.blur();
   }
 }
 
@@ -254,7 +267,7 @@ function setPausedOverlay(isPaused) {
   if (!c) return;
   if (isPaused) c.classList.add("paused-overlay");
   else c.classList.remove("paused-overlay");
-  console.log("setPausedOverlay => adding .paused-overlay");
+  console.log("setPausedOverlay => .paused-overlay =", isPaused);
 }
 
 function quitGame() {
@@ -267,9 +280,30 @@ function quitGame() {
     }
     world = null;
   }
+
+  // 1) Falls noch pausiert, zurücksetzen
+  window.paused = false;
+  // setze auch world.paused = false, falls world noch exisitert
+  // (falls oben nicht "null"; aber in der Regel setzt du world=null)
+  
+  // 2) Overlay entfernen
+  setPausedOverlay(false);
+
+  // 3) Button-Icons zurücksetzen (Pause-Icon anzeigen, Play-Icon verstecken)
+  const pauseContent = document.getElementById("pause-content");
+  const playContent = document.getElementById("play-content");
+  if (pauseContent && playContent) {
+    pauseContent.style.display = "inline-flex";
+    playContent.style.display = "none";
+  }
+
+  // (Optional) Clear ggf. weitere Intervalle, falls du es brauchst
   clearAllIntervals();
+
+  // Canvas weg & Menü anzeigen
   document.getElementById("canvas").style.display = "none";
   document.getElementById("overlay-menu").classList.remove("hidden");
+  console.log("Quit game => Pause overlay reset, back to menu");
 }
 
 function checkRotateOverlay() {

@@ -203,13 +203,24 @@
                              M 38 30 L 40 30 L 40 40 L 30 40 L 30 38 L 38 38 Z" />
                 </svg>
             </button>
+
+            <!-- PAUSE/CONTINUE-BUTTON mit 2 Icons (Pause / Play), 1 davon versteckt -->
             <button id="btn-break" type="button" onclick="toggleBreak()" class="circle-icon-btn">
-                <!-- Pause-Symbol "||" -->
-                <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
-                    <rect x="12" y="10" width="6" height="30" />
-                    <rect x="26" y="10" width="6" height="30" />
-                </svg>
+                <!-- Default: Pause-Icon (Sichtbar) -->
+                <div id="pause-content">
+                    <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
+                        <rect x="12" y="10" width="6" height="30" />
+                        <rect x="26" y="10" width="6" height="30" />
+                    </svg>
+                </div>
+                <!-- Play-Icon (versteckt) -->
+                <div id="play-content" style="display: none;">
+                    <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
+                        <polygon points="15,10 35,25 15,40" />
+                    </svg>
+                </div>
             </button>
+
             <button id="btn-quit" type="button" onclick="quitGame()" class="circle-icon-btn">
                 <!-- X-Symbol -->
                 <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
@@ -239,7 +250,7 @@
 
         <!-- Unten Rechts: THROW -->
         <div id="mobile-throw" class="mobile-btn hidden">
-            <img src="/img/background/beer-throw.png" alt="Throw" />
+            <img src="img/background/beer-throw.png" alt="Throw" />
         </div>
     </div>
 
