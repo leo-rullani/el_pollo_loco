@@ -233,8 +233,10 @@ function toggleFullscreen() {
 
 function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
-  if (!window.world) return;
+  // if (!window.world) return;
   window.paused = !window.paused;
+  world.paused = window.paused;
+  
   if (window.paused) {
     world.pauseGame();
     setPausedOverlay(true);
