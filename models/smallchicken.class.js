@@ -45,9 +45,4 @@ class SmallChicken extends MovableObject {
     }, 10);
   }
 
-  stopIntervals() {
-    clearInterval(this.moveInterval);
-    clearInterval(this.walkInterval);
-    clearInterval(this.deadInterval);
-  }
 }

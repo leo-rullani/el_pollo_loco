@@ -125,11 +125,4 @@ class Endboss extends MovableObject {
     }, 1500);
   }
   
-  stopIntervals() {
-    clearInterval(this.moveInterval);
-    clearInterval(this.animationInterval);
-    clearInterval(this.deadInterval);
-    clearInterval(this.gravityInterval);
-    clearInterval(this.sinkInterval);
-  }
 }
