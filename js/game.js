@@ -235,29 +235,18 @@ function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
   const pauseContent = document.getElementById("pause-content"); // Enthält Pause-Icon + "Break"
   const playContent = document.getElementById("play-content");   // Enthält Play-Icon + "Continue"
-
-  // Togglen der Pause-Variable
   window.paused = !window.paused;
   world.paused = window.paused;
-
   if (window.paused) {
-    // Spiel pausieren
     world.pauseGame();
     setPausedOverlay(true);
-
-    // Icon/Text wechseln: Pause ausblenden, Play/Continue einblenden
     pauseContent.style.display = "none";
     playContent.style.display = "inline-flex";
   } else {
-    // Spiel fortsetzen
     world.resumeGame();
     setPausedOverlay(false);
-
-    // Icon/Text wechseln: Play/Continue ausblenden, Pause einblenden
     playContent.style.display = "none";
     pauseContent.style.display = "inline-flex";
-
-    // Fokus entfernen, damit Space nicht versehentlich Pause erneut auslöst
     breakBtn.blur();
   }
 }
@@ -267,7 +256,6 @@ function setPausedOverlay(isPaused) {
   if (!c) return;
   if (isPaused) c.classList.add("paused-overlay");
   else c.classList.remove("paused-overlay");
-  console.log("setPausedOverlay => .paused-overlay =", isPaused);
 }
 
 function quitGame() {

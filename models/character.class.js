@@ -153,5 +153,4 @@ class Character extends MovableObject {
       this.world.jumpSound.play();
     }
   }
-
-  }
+}
