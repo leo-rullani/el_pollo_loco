@@ -1,23 +1,28 @@
+/**
+ * world.class.js - Manages the core game world, including drawing, updates,
+ * audio, and collisions.*/
+/** Initializes the canvas and world at application start. */
 function init() {
   let canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
 }
 
+/**
+ * Restarts the game by stopping the current world, hiding overlays,
+ * recreating the world, and loading the current level again.
+ */
 function restartGame() {
-  if (world) {
-    world.stopGame();
-  }
+  if (world) world.stopGame();
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
   let canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
-  if (!world.musicMuted) {
-    world.backgroundMusic.play().catch(e => {});
-  }
+  if (!world.musicMuted) world.backgroundMusic.play().catch((e) => {});
 }
 
+/** Returns to the main menu by hiding overlays and canvas. */
 function goToMenu() {
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
@@ -26,37 +31,73 @@ function goToMenu() {
   if (title) title.style.display = "none";
   document.getElementById("overlay-menu").classList.remove("hidden");
 }
-class World {
-  character = new Character();
-  canvas;
-  ctx;
-  keyboard;
-  camera_x = 0;
-  statusBar = new StatusBar();
-  throwableObjects = [];
-  bossBar = new BossStatusBar();
-  coinBar = new CoinBar();
-  coinsCollected = 0;
-  bottleBar = new BottleBar();
-  bottlesCollected = 0;
-  currentLevelNumber;
-  paused = false;
-  gameOverShown = false; 
 
+/**
+ * The main World class, containing the character, level data, audio,
+ * drawing methods, and overall game logic loops.
+ */
+class World {
+  /** @type {Character} */
+  character = new Character();
+  /** @type {HTMLCanvasElement} */
+  canvas;
+  /** @type {CanvasRenderingContext2D} */
+  ctx;
+  /** @type {Keyboard} */
+  keyboard;
+  /** @type {number} */
+  camera_x = 0;
+  /** @type {StatusBar} */
+  statusBar = new StatusBar();
+  /** @type {ThrowableObject[]} */
+  throwableObjects = [];
+  /** @type {BossStatusBar} */
+  bossBar = new BossStatusBar();
+  /** @type {CoinBar} */
+  coinBar = new CoinBar();
+  /** @type {number} */
+  coinsCollected = 0;
+  /** @type {BottleBar} */
+  bottleBar = new BottleBar();
+  /** @type {number} */
+  bottlesCollected = 0;
+  /** @type {number} */
+  currentLevelNumber;
+  /** @type {boolean} */
+  paused = false;
+  /** @type {boolean} */
+  gameOverShown = false;
+  /** @type {Level|null} */
+  level = null;
+  /** @type {boolean} */
+  musicMuted = false;
+  /** @type {boolean} */
+  sfxMuted = false;
+  /** @type {number|undefined} */
+  runInterval;
+  /** @type {number|undefined} */
+  animationFrameId;
+  /** @type {boolean} */
+  levelComplete = false;
+
+  /**
+   * Creates a new World instance, initializes audio, draws the scene,
+   * and starts the update loop (run).
+   * @param {HTMLCanvasElement} canvas - The game's drawing canvas.
+   * @param {Keyboard} keyboard - The keyboard instance for controls.
+   */
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
-    this.level = null;
     this.initAudio();
-    if (!this.musicMuted) {
-      this.backgroundMusic.play().catch(e => {});
-    }
+    if (!this.musicMuted) this.backgroundMusic.play().catch((e) => {});
     this.draw();
     this.setWorld();
     this.run();
   }
 
+  /** Initializes all audio objects (music, sfx) and sets default mute states. */
   initAudio() {
     this.backgroundMusic = this.makeAudio("audio/game-sound.mp3", 0.2, true);
     this.chickenDeathSound = this.makeAudio("audio/chicken-noise.mp3");
@@ -71,8 +112,15 @@ class World {
     this.bottleShatterSound = this.makeAudio("audio/bottle-shattering.mp3");
     this.musicMuted = false;
     this.sfxMuted = false;
-  }  
+  }
 
+  /**
+   * Creates a new Audio object with given src, volume, and loop settings.
+   * @param {string} src - Audio file path.
+   * @param {number} [vol=1] - Volume (0–1).
+   * @param {boolean} [loop=false] - Whether the audio should loop.
+   * @returns {HTMLAudioElement} The configured audio object.
+   */
   makeAudio(src, vol = 1, loop = false) {
     let a = new Audio(src);
     a.volume = vol;
@@ -82,11 +130,13 @@ class World {
     return a;
   }
 
+  /** Toggles background music on/off. */
   toggleMusicMute() {
     this.musicMuted = !this.musicMuted;
     this.backgroundMusic.muted = this.musicMuted;
   }
 
+  /** Toggles sound effects on/off. */
   toggleSfxMute() {
     this.sfxMuted = !this.sfxMuted;
     let m = this.sfxMuted;
@@ -100,8 +150,9 @@ class World {
     this.bottleShatterSound.muted = m;
     this.jumpSound.muted = m;
     this.levelCompleteSound.muted = m;
-  }  
+  }
 
+  /** Stops the main update loops, animation, and enemy intervals, and pauses music. */
   stopGame() {
     if (this.runInterval) clearInterval(this.runInterval);
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -113,33 +164,43 @@ class World {
     }
   }
 
+  /** Calls stopIntervals on each enemy, if available, to halt their movement/animation. */
   stopEnemies() {
     if (!this.level?.enemies) return;
     this.level.enemies.forEach((e) => e.stopIntervals && e.stopIntervals());
   }
 
+  /** Registers the world reference in the character so it can interact with the environment. */
   setWorld() {
     this.character.world = this;
   }
 
+  /**
+   * Sets up a loop to periodically check collisions and other updates,
+   * unless the game is paused or the level is missing.
+   */
   run() {
     this.runInterval = setInterval(() => {
       if (!this.paused && this.level) {
         checkCollisionsEnemies(this);
         this.checkThrowObjects();
-        checkCollisionsThrowables(this); 
-        checkCollisionsCoins(this); 
-        checkCollisionsBottles(this); 
+        checkCollisionsThrowables(this);
+        checkCollisionsCoins(this);
+        checkCollisionsBottles(this);
         this.checkLevelEnd();
       }
     }, 200);
   }
 
+  /**
+   * Checks if the player wants to throw a bottle (D key pressed) and has bottles available.
+   */
   checkThrowObjects() {
     if (!this.level) return;
     if (this.keyboard.D && this.bottlesCollected > 0) this.throwBottle();
   }
 
+  /** Creates a new ThrowableObject, updates bottle count, and animates the throw. */
   throwBottle() {
     let b = new ThrowableObject(
       this.character.x + 50,
@@ -153,6 +214,11 @@ class World {
     this.bottleBar.setPercentage(perc);
   }
 
+  /**
+   * Plays the chicken-death sound, triggers the dead animation, and removes
+   * the chicken from the level after a short delay.
+   * @param {chicken|SmallChicken} chicken - The chicken to be removed.
+   */
   killChicken(chicken) {
     this.chickenDeathSound.play();
     chicken.isDeadChicken = true;
@@ -163,6 +229,11 @@ class World {
     }, 250);
   }
 
+  /**
+   * Plays the endboss-death sound, triggers its death/fall animations,
+   * removes the boss, ends the game, and shows the "You Win" overlay.
+   * @param {Endboss} boss - The end boss to remove.
+   */
   killEndboss(boss) {
     this.endbossDeathSound.play();
     boss.playDeadAnimation();
@@ -177,11 +248,13 @@ class World {
     }, 500);
   }
 
+  /** Pauses background music and shows the "Game Over" overlay. */
   showGameOver() {
     this.backgroundMusic.pause();
     document.getElementById("overlay-gameover")?.classList.remove("hidden");
   }
 
+  /** Pauses background music, plays win sound, shows "You Win", and stops the game. */
   showYouWin() {
     this.backgroundMusic.pause();
     this.winGameSound.play();
@@ -189,21 +262,32 @@ class World {
     this.stopGame();
   }
 
+  /** Removes the given bottle from the throwableObjects array in this world. */
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);
     if (i > -1) this.throwableObjects.splice(i, 1);
   }
 
+  /**
+   * The main render loop: clears canvas, draws scene, and requests the next frame.
+   */
   draw() {
     this.clearCanvas();
     this.drawScene();
     this.animationFrameId = requestAnimationFrame(() => this.draw());
   }
 
+  /** Clears the entire canvas area before drawing the next frame. */
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
+  /**
+   * Draws all game objects and HUD elements in the correct order,
+   * translating the camera as needed.
+   *
+   * (Compressed into fewer lines to keep function <= 14 lines)
+   */
   drawScene() {
     if (!this.level) return;
     this.ctx.translate(this.camera_x, 0);
@@ -223,6 +307,7 @@ class World {
     this.ctx.translate(-this.camera_x, 0);
   }
 
+  /** If a boss is present, temporarily untranslate the camera to draw its status bar. */
   drawBossBarIfVisible() {
     let b = this.findBoss();
     if (!b) return;
@@ -232,15 +317,21 @@ class World {
     this.ctx.restore();
   }
 
+  /** Finds the Endboss in the current level's enemies list, if any. */
   findBoss() {
     if (!this.level) return null;
     return this.level.enemies.find((e) => e instanceof Endboss);
   }
 
+  /** Iterates over the given objects array, drawing each onto the map. */
   addObjectsToMap(objects) {
     objects.forEach((o) => this.addToMap(o));
   }
 
+  /**
+   * Draws a movable object or status bar, flipping if necessary.
+   * @param {DrawableObject} mo - The object to draw.
+   */
   addToMap(mo) {
     if (mo.otherDirection) this.flipImage(mo);
     mo.draw(this.ctx);
@@ -248,6 +339,10 @@ class World {
     if (mo.otherDirection) this.flipImageBack(mo);
   }
 
+  /**
+   * Flips the canvas horizontally for mirrored drawing (e.g., facing left).
+   * @param {MovableObject} mo - The object to be flipped.
+   */
   flipImage(mo) {
     this.ctx.save();
     this.ctx.translate(mo.width, 0);
@@ -255,11 +350,16 @@ class World {
     mo.x *= -1;
   }
 
+  /** Restores the canvas after flipping, returning the object to normal orientation. */
   flipImageBack(mo) {
     mo.x *= -1;
     this.ctx.restore();
   }
 
+  /**
+   * Checks whether the character has reached the end of the level,
+   * triggers a level-complete overlay, and calls goToNextLevel().
+   */
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
     if (this.character.x >= this.level.level_end_x) {
@@ -278,6 +378,12 @@ class World {
     }
   }
 
+  /**
+   * Loads a new level's data, resets the camera/character positions,
+   * and clears previous throwable objects.
+   * @param {Level} newLevel - The new level to load.
+   * @param {number} levelNumber - The level index (e.g., 1,2,3).
+   */
   loadLevelData(newLevel, levelNumber) {
     this.level = newLevel;
     this.currentLevelNumber = levelNumber;
@@ -288,8 +394,12 @@ class World {
     this.camera_x = 0;
   }
 
+  /**
+   * Pauses the game by stopping intervals and canceling animation,
+   * also pausing the character and all enemies.
+   */
   pauseGame() {
-    this.paused = true; 
+    this.paused = true;
     if (this.runInterval) {
       clearInterval(this.runInterval);
       this.runInterval = null;
@@ -302,13 +412,17 @@ class World {
     this.stopEnemies();
   }
 
+  /**
+   * Resumes the game by restoring intervals, resuming animations, and
+   * continuing collision checks if the level exists.
+   */
   resumeGame() {
     this.paused = false;
-    if (this.character?.resumeIntervals) {
-      this.character.resumeIntervals();
-    }
+    if (this.character?.resumeIntervals) this.character.resumeIntervals();
     if (this.level?.enemies) {
-      this.level.enemies.forEach(e => e.resumeIntervals && e.resumeIntervals());
+      this.level.enemies.forEach(
+        (e) => e.resumeIntervals && e.resumeIntervals()
+      );
     }
     if (!this.animationFrameId) {
       this.animationFrameId = requestAnimationFrame(() => this.draw());
@@ -325,5 +439,5 @@ class World {
         }
       }, 200);
     }
-  }  
-}  
+  }
+}
