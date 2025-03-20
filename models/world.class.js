@@ -26,7 +26,6 @@ function goToMenu() {
   if (title) title.style.display = "none";
   document.getElementById("overlay-menu").classList.remove("hidden");
 }
-
 class World {
   character = new Character();
   canvas;
@@ -42,7 +41,7 @@ class World {
   bottlesCollected = 0;
   currentLevelNumber;
   paused = false;
-  gameOverShown = false; // Neu: braucht ihr für "if (!world.gameOverShown)..."
+  gameOverShown = false; 
 
   constructor(canvas, keyboard) {
     this.ctx = canvas.getContext("2d");
@@ -124,15 +123,13 @@ class World {
   }
 
   run() {
-    // WICHTIG: Hier rufen wir die ausgelagerten Collision-Funktionen auf,
-    // die in world-collisions.js definiert sind:
     this.runInterval = setInterval(() => {
       if (!this.paused && this.level) {
-        checkCollisionsEnemies(this); // => in world-collisions.js
+        checkCollisionsEnemies(this);
         this.checkThrowObjects();
-        checkCollisionsThrowables(this); // => in world-collisions.js
-        checkCollisionsCoins(this); // => in world-collisions.js
-        checkCollisionsBottles(this); // => in world-collisions.js
+        checkCollisionsThrowables(this); 
+        checkCollisionsCoins(this); 
+        checkCollisionsBottles(this); 
         this.checkLevelEnd();
       }
     }, 200);
@@ -155,8 +152,6 @@ class World {
     if (perc < 0) perc = 0;
     this.bottleBar.setPercentage(perc);
   }
-
-  // bleibende Methoden, weil world-collisions.js ruft z.B. "world.killChicken(...)"
 
   killChicken(chicken) {
     this.chickenDeathSound.play();
@@ -270,7 +265,6 @@ class World {
     if (this.character.x >= this.level.level_end_x) {
       this.levelCompleteSound.currentTime = 0;
       this.levelCompleteSound.play();
-
       this.levelComplete = true;
       let o = document.getElementById("overlay-levelcomplete");
       if (o) {
@@ -295,7 +289,7 @@ class World {
   }
 
   pauseGame() {
-    this.paused = true; // Markiert, dass wir pausiert sind
+    this.paused = true; 
     if (this.runInterval) {
       clearInterval(this.runInterval);
       this.runInterval = null;
@@ -304,30 +298,21 @@ class World {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-    // Gegner / Character Intervals stoppen
     if (this.character?.stopIntervals) this.character.stopIntervals();
     this.stopEnemies();
-    // -> optional overlay? => In game.js / setPausedOverlay
   }
 
   resumeGame() {
-    // 1) Markiere, dass wir nicht mehr pausiert sind
     this.paused = false;
-  
-    // 2) Character und Gegner-Intervalle neu starten
     if (this.character?.resumeIntervals) {
       this.character.resumeIntervals();
     }
     if (this.level?.enemies) {
       this.level.enemies.forEach(e => e.resumeIntervals && e.resumeIntervals());
     }
-  
-    // 3) AnimationFrame wieder starten
     if (!this.animationFrameId) {
       this.animationFrameId = requestAnimationFrame(() => this.draw());
     }
-  
-    // 4) runInterval wieder starten
     if (!this.runInterval) {
       this.runInterval = setInterval(() => {
         if (!this.paused && this.level) {
