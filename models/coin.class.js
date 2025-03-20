@@ -1,14 +1,39 @@
+/**
+ * Represents a collectible coin within the game, extending MovableObject.
+ * Its position is randomly generated along the x-axis and within a certain y range.
+ * @extends MovableObject
+ */
 class Coin extends MovableObject {
-    constructor() {
-      super().loadImage('img/8_coin/coin_1.png');
-      
-      // In der Coin-Klasse oder dort, wo du 'x' und 'y' randomisierst:
-      this.x = 200 + Math.random() * 4500;
-      this.y = 190 - Math.random() * 50; 
-// => z.B. verteilt zwischen y=70 und y=120
+  /**
+   * Creates a new Coin instance with random position and fixed dimensions.
+   */
+  constructor() {
+    super().loadImage("img/8_coin/coin_1.png");
 
-  
-      this.width = 100;
-      this.height = 100;
-    }
-  }  
+    /**
+     * The X-position of the coin.
+     * Randomly placed between 200 and 4700.
+     * @type {number}
+     */
+    this.x = 200 + Math.random() * 4500;
+
+    /**
+     * The Y-position of the coin.
+     * Randomly placed between 140 and 190.
+     * @type {number}
+     */
+    this.y = 190 - Math.random() * 50;
+
+    /**
+     * The width of the coin in pixels.
+     * @type {number}
+     */
+    this.width = 100;
+
+    /**
+     * The height of the coin in pixels.
+     * @type {number}
+     */
+    this.height = 100;
+  }
+}
