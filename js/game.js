@@ -233,8 +233,8 @@ function toggleFullscreen() {
 
 function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
-  const pauseContent = document.getElementById("pause-content"); // Enthält Pause-Icon + "Break"
-  const playContent = document.getElementById("play-content");   // Enthält Play-Icon + "Continue"
+  const pauseContent = document.getElementById("pause-content"); 
+  const playContent = document.getElementById("play-content");   
   window.paused = !window.paused;
   world.paused = window.paused;
   if (window.paused) {
@@ -268,27 +268,15 @@ function quitGame() {
     }
     world = null;
   }
-
-  // 1) Falls noch pausiert, zurücksetzen
   window.paused = false;
-  // setze auch world.paused = false, falls world noch exisitert
-  // (falls oben nicht "null"; aber in der Regel setzt du world=null)
-  
-  // 2) Overlay entfernen
   setPausedOverlay(false);
-
-  // 3) Button-Icons zurücksetzen (Pause-Icon anzeigen, Play-Icon verstecken)
   const pauseContent = document.getElementById("pause-content");
   const playContent = document.getElementById("play-content");
   if (pauseContent && playContent) {
     pauseContent.style.display = "inline-flex";
     playContent.style.display = "none";
   }
-
-  // (Optional) Clear ggf. weitere Intervalle, falls du es brauchst
   clearAllIntervals();
-
-  // Canvas weg & Menü anzeigen
   document.getElementById("canvas").style.display = "none";
   document.getElementById("overlay-menu").classList.remove("hidden");
   console.log("Quit game => Pause overlay reset, back to menu");

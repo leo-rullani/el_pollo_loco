@@ -1,4 +1,3 @@
-/* Container for the main menu's 3 buttons (stacked vertically) */
 .menu-buttons {
   display: flex;
   flex-direction: column;
@@ -16,7 +15,6 @@
   display: block;
 }
 
-/* Each row (icon + button) in the menu */
 .menu-column {
   display: flex;
   flex-direction: row;
@@ -40,7 +38,6 @@
   width: 200px; 
 }
 
-/* Vertical Buttons for Game Over / Win */
 .menu-buttons--vertical {
   display: flex;
   flex-direction: column;
@@ -48,7 +45,6 @@
   margin-top: 8px;
 }
 
-/* Extra row for Impressum link */
 .impressum-row {
   display: flex;
   justify-content: center;

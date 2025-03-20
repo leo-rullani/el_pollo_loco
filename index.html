@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- CSS -->
+    <!-- css -->
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="menu.css" />
 
@@ -14,39 +14,39 @@
 </head>
 
 <body>
-    <!-- MENU Overlay (visible by default) -->
+    <!-- menu overlay (visible by default) -->
     <div id="overlay-menu" class="overlay">
         <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Menu" />
 
-        <!-- Main menu buttons -->
+        <!-- main menu buttons -->
         <div class="menu-buttons">
             <div class="menu-column">
-                <!-- GREEN background: Start -->
+                <!-- green background: start -->
                 <button id="btn-start" onclick="startGame()">Start</button>
             </div>
             <div class="menu-column">
-                <!-- WHITE background: Settings -->
+                <!-- white background: settings -->
                 <button id="btn-settings" onclick="openSettings()">Settings</button>
             </div>
             <div class="menu-column">
-                <!-- RED background: Help -->
+                <!-- red background: help -->
                 <button id="btn-help" onclick="openHelp()">Help</button>
             </div>
         </div>
 
-        <!-- Impressum link, placed further down -->
+        <!-- impressum link, placed further down -->
         <div class="impressum-row">
             <div id="impressum-link" onclick="openImpressum()">Impressum</div>
         </div>
     </div>
-    <!-- END MENU Overlay -->
+    <!-- end menu overlay -->
 
-    <!-- Level Complete Overlay -->
+    <!-- level complete overlay -->
     <div id="overlay-levelcomplete" class="overlay hidden">
         <h2>Level Complete!</h2>
     </div>
 
-    <!-- GAME OVER Overlay -->
+    <!-- game over overlay -->
     <div id="overlay-gameover" class="overlay hidden">
         <img src="img/You won, you lost/Game Over.png" alt="Game Over" />
         <div class="menu-buttons--vertical">
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <!-- YOU WIN Overlay -->
+    <!-- you win overlay -->
     <div id="overlay-youwin" class="overlay hidden">
         <img src="img/You won, you lost/You Won B.png" alt="You Won" />
         <div class="menu-buttons--vertical">
@@ -64,7 +64,7 @@
         </div>
     </div>
 
-    <!-- SETTINGS Overlay -->
+    <!-- settings overlay -->
     <div id="overlay-settings" class="overlay hidden">
         <h1>Game Settings</h1>
         <div class="settings-content">
@@ -81,9 +81,9 @@
             <h3>Adjust your audio preferences below:</h3>
 
             <div class="audio-buttons-container">
-                <!-- Music button (GREEN) -->
+                <!-- music button (green) -->
                 <div id="music-button" class="circle-button" onclick="toggleMusic()">
-                    <!-- Inline SVG: music note with hidden slash -->
+                    <!-- inline svg: music note with hidden slash -->
                     <svg id="music-icon" viewBox="0 0 50 50" width="32" height="32" fill="black">
                         <path d="M15 7 L35 7 L35 28 C30 26 25 28 21 31 C18 34 17 38 17 41 
                                 C17 44 19 45 21 45 C23 45 25 44 25 41 C25 39 23 38 21 38 
@@ -92,15 +92,15 @@
                         <path class="slash" d="M5 45 L45 5" stroke="black" stroke-width="5" fill="none" />
                     </svg>
                 </div>
-                <!-- Sound effects button (WHITE) -->
+                <!-- sound effects button (white) -->
                 <div id="sfx-button" class="circle-button" onclick="toggleSfx()">
-                    <!-- Inline SVG: speaker + hidden slash -->
+                    <!-- inline svg: speaker + hidden slash -->
                     <svg id="sfx-icon" viewBox="0 0 50 50" width="32" height="32" fill="black">
                         <path d="M10 20 L18 20 L30 10 L30 40 L18 30 L10 30 Z" />
                         <path class="slash" d="M5 45 L45 5" stroke="black" stroke-width="5" fill="none" />
                     </svg>
                 </div>
-                <!-- Close button (RED) -->
+                <!-- close button (red) -->
                 <div id="close-button" class="circle-button" onclick="closeSettings()">
                     <svg viewBox="0 0 50 50" width="32" height="32" stroke="black" stroke-width="5" fill="none">
                         <line x1="10" y1="10" x2="40" y2="40" />
@@ -110,9 +110,9 @@
             </div>
         </div>
     </div>
-    <!-- END SETTINGS Overlay -->
+    <!-- end settings overlay -->
 
-    <!-- HELP Overlay -->
+    <!-- help overlay -->
     <div id="overlay-help" class="overlay hidden">
         <h2>Help</h2>
         <div class="help-content">
@@ -128,7 +128,7 @@
             </h3>
         </div>
 
-        <!-- Single green circle with black X to close -->
+        <!-- single green circle with black x to close -->
         <div class="help-close-container">
             <div id="help-close-button" class="circle-button" onclick="closeHelp()">
                 <svg viewBox="0 0 50 50" width="32" height="32" stroke="black" stroke-width="5" fill="none">
@@ -138,9 +138,9 @@
             </div>
         </div>
     </div>
-    <!-- END HELP Overlay -->
+    <!-- end overlay help -->
 
-    <!-- IMPRESSUM Overlay -->
+    <!-- impressum overlay -->
     <div id="overlay-impressum" class="overlay hidden">
         <h1>Impressum</h1>
         <div class="impressum-content">
@@ -151,7 +151,7 @@
                 Switzerland | 5610 Wohlen<br><br>
                 Feel free to connect on LinkedIn:<br>
             </h3>
-            <!-- Circle LinkedIn button in official color -->
+            <!-- circle linkedIn button in official color -->
             <div class="linkedin-container">
                 <a href="https://www.linkedin.com/in/leo-rullani-5b17a5274/" target="_blank" class="circle-button"
                     id="linkedin-button">
@@ -170,7 +170,7 @@
         </div>
 
         <div class="impressum-close-container">
-            <!-- White circle with black X to close (no click sound) -->
+            <!-- white circle with black x to close (no click sound) -->
             <div id="impressum-close-button" class="circle-button" onclick="closeImpressum()">
                 <svg viewBox="0 0 50 50" width="32" height="32" stroke="black" stroke-width="5" fill="none">
                     <line x1="10" y1="10" x2="40" y2="40" />
@@ -179,23 +179,23 @@
             </div>
         </div>
     </div>
-    <!-- END IMPRESSUM Overlay -->
+    <!-- end impressum overlay -->
 
-    <!-- NEW OVERLAY for rotate.png (hidden by default) -->
+    <!-- new overlay for rotate.png (hidden by default) -->
     <div id="overlay-rotate" class="overlay hidden">
         <img src="img/background/rotate.png" alt="Rotate Device" />
     </div>
-    <!-- END rotate overlay -->
+    <!-- end rotate overlay -->
 
-    <!-- CANVAS-Bereich + Buttons -->
+    <!-- canvas-area + buttons -->
     <div class="canvas-container">
-        <!-- Canvas (initially display: none -> shown on startGame()) -->
+        <!-- canvas (initially display: none -> shown on startGame()) -->
         <canvas id="canvas" width="720" height="480" style="display: none;"></canvas>
 
-        <!-- DIE 3 BUTTONS OBEN RECHTS -->
+        <!-- 3 buttons on top right -->
         <div class="canvas-buttons">
             <button id="btn-fullscreen" type="button" onclick="toggleFullscreen()" class="circle-icon-btn">
-                <!-- FS Icon -->
+                <!-- fs icon -->
                 <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
                     <path d="M 10 10 L 20 10 L 20 12 L 12 12 L 12 20 L 10 20 Z
                              M 30 10 L 40 10 L 40 20 L 38 20 L 38 12 L 30 12 Z
@@ -204,7 +204,7 @@
                 </svg>
             </button>
 
-            <!-- PAUSE/CONTINUE-BUTTON mit 2 Icons (Pause / Play), 1 davon versteckt -->
+            <!-- paus/continue button with 2 icons (pause / play), 1 of it hidden -->
             <button id="btn-break" type="button" onclick="toggleBreak()" class="circle-icon-btn">
                 <!-- Default: Pause-Icon (Sichtbar) -->
                 <div id="pause-content">
@@ -213,7 +213,7 @@
                         <rect x="26" y="10" width="6" height="30" />
                     </svg>
                 </div>
-                <!-- Play-Icon (versteckt) -->
+                <!-- play-icon (hidden) -->
                 <div id="play-content" style="display: none;">
                     <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
                         <polygon points="15,10 35,25 15,40" />
@@ -222,7 +222,7 @@
             </button>
 
             <button id="btn-quit" type="button" onclick="quitGame()" class="circle-icon-btn">
-                <!-- X-Symbol -->
+                <!-- x-symbol -->
                 <svg viewBox="0 0 50 50" width="24" height="24" fill="black">
                     <line x1="10" y1="10" x2="40" y2="40" stroke="black" stroke-width="5" />
                     <line x1="40" y1="10" x2="10" y2="40" stroke="black" stroke-width="5" />
@@ -231,30 +231,30 @@
         </div>
     </div>
 
-    <!-- Container für Mobile-Buttons (z.B. unten im Body) -->
+    <!-- container for mobile-buttons (for example down in body) -->
     <div id="mobile-buttons">
-        <!-- Unten Links: LEFT -->
+        <!-- down left: left -->
         <div id="mobile-left" class="mobile-btn hidden">
             <img src="img/background/arrow-left.png" alt="Left arrow" />
         </div>
 
-        <!-- Unten Links: RIGHT -->
+        <!-- down left: right -->
         <div id="mobile-right" class="mobile-btn hidden">
             <img src="img/background/arrow-right.png" alt="Right arrow" />
         </div>
 
-        <!-- Unten Rechts: UP / JUMP -->
+        <!--down right: up / jump -->
         <div id="mobile-jump" class="mobile-btn hidden">
             <img src="/img/background/arrow-up.png" alt="Up arrow" />
         </div>
 
-        <!-- Unten Rechts: THROW -->
+        <!-- down right: throw -->
         <div id="mobile-throw" class="mobile-btn hidden">
             <img src="img/background/beer-throw.png" alt="Throw" />
         </div>
     </div>
 
-    <!-- Game Scripts -->
+    <!-- game scripts -->
     <script src="models/drawable-object.class.js"></script>
     <script src="/models/movable-object.class.js"></script>
     <script src="models/bottle.class.js"></script>
@@ -272,7 +272,7 @@
     <script src="models/level.class.js"></script>
     <script src="models/throwable-object.class.js"></script>
 
-    <!-- Level definitions -->
+    <!-- level definitions -->
     <script src="levels/level1.js"></script>
     <script src="levels/level2.js"></script>
     <script src="levels/level3.js"></script>

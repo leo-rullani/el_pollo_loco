@@ -30,6 +30,7 @@ body::before {
   background: rgba(0, 0, 0, 0.3);
   z-index: -1;
 }
+
 body::after {
   content: "";
   position: absolute;
@@ -81,6 +82,7 @@ body::after {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 0 10px #ffecb3;
 }
+
 .circle-icon-btn:hover {
   transform: scale(1.07);
   box-shadow: 0 0 25px #ffecb3;
@@ -101,12 +103,14 @@ h1 {
   margin-block-start: 0;
   margin-block-end: 0;
 }
+
 h2 {
   font-size: 48px;
   letter-spacing: 4px;
   color: #ffc105;
   text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
 }
+
 h3 {
   font-size: 24px;
   letter-spacing: 3px;
@@ -120,9 +124,7 @@ h3 {
   left: 0;
   width: 100%;
   height: 100%;
-  background:
-    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-    url('/img/background/desert.png') no-repeat center center;
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/img/background/desert.png') no-repeat center center;
   background-size: cover;
   display: flex;
   flex-direction: column;
@@ -170,10 +172,12 @@ button {
   box-shadow: 0 0 10px #ffecb3;
   position: relative;
 }
+
 button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 25px #ffecb3;
 }
+
 button::before {
   content: "";
   position: absolute;
@@ -185,6 +189,7 @@ button::before {
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
 }
+
 button:hover::before {
   opacity: 1;
 }
@@ -192,9 +197,11 @@ button:hover::before {
 #btn-start {
   background-color: #006845;
 }
+
 #btn-settings {
   background-color: #FFFFFF;
 }
+
 #btn-help {
   background-color: #cf0821;
 }
@@ -213,6 +220,7 @@ button:hover::before {
   transition: transform 0.3s ease, color 0.3s ease;
   margin-top: 10px;
 }
+
 #impressum-link:hover {
   transform: scale(1.05);
   color: #ffc105;
@@ -225,6 +233,7 @@ button:hover::before {
   color: #fff;
   font-size: 20px;
 }
+
 .audio-buttons-container {
   display: flex;
   justify-content: center;
@@ -232,6 +241,7 @@ button:hover::before {
   gap: 25px;
   margin-top: 20px;
 }
+
 .circle-button {
   width: 60px;
   height: 60px;
@@ -245,25 +255,32 @@ button:hover::before {
   position: relative;
   text-decoration: none;
 }
+
 .circle-button:hover {
   transform: scale(1.1);
   box-shadow: 0 0 25px #ffecb3;
 }
+
 .circle-button svg {
   pointer-events: none;
 }
+
 #music-button {
   background-color: #006847;
 }
+
 #sfx-button {
   background-color: #FFFFFF;
 }
+
 #close-button {
   background-color: #CE1126;
 }
+
 .slash {
   display: none;
 }
+
 .muted .slash {
   display: inline;
 }
@@ -275,9 +292,11 @@ button:hover::before {
   color: #fff;
   font-size: 20px;
 }
+
 .help-close-container {
   margin-top: 20px;
 }
+
 #help-close-button {
   background-color: #006847;
 }
@@ -289,16 +308,20 @@ button:hover::before {
   color: #fff;
   font-size: 20px;
 }
+
 .impressum-close-container {
   margin-top: 20px;
 }
+
 #impressum-close-button {
   background-color: #FFFFFF;
 }
+
 .linkedin-container {
   display: flex;
   justify-content: center;
 }
+
 #linkedin-button {
   background-color: #0077B5;
 }
@@ -319,17 +342,10 @@ button:hover::before {
   font-size: 24px;
 }
 
-/* 
-   Hier definieren wir das "Pause-Overlay" 
-   an .canvas-container wenn .paused-overlay gesetzt ist 
-*/
 .canvas-container.paused-overlay {
   position: relative;
 }
 
-/* 
-   Dark overlay via ::after 
-*/
 .canvas-container.paused-overlay::after {
   content: "";
   position: absolute;
@@ -337,14 +353,11 @@ button:hover::before {
   left: 0;
   width: 100%; 
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* dunkler Hintergrund */
-  pointer-events: all; /* blockiert Klicks */
-  z-index: 10;       /* über Canvas */
+  background: rgba(0, 0, 0, 0.5); 
+  pointer-events: all; 
+  z-index: 10;     
 }
 
-/* 
-   Schrift "PAUSED" via ::before 
-*/
 .canvas-container.paused-overlay::before {
   content: "PAUSED";
   position: absolute;
@@ -354,16 +367,9 @@ button:hover::before {
   color: #ffc105;
   font-size: 48px;
   text-align: center;
-  z-index: 1000; /* noch über dem ::after */
+  z-index: 1000; 
 }
 
-/* 
-   Ursprünglicher .paused-overlay 
-   (Falls wir "nur" .paused-overlay an Body oder so vergeben wollten)
-   lassen wir weg oder entfernen Doppelseitiges.
-*/
-
-/* Mobile-Btns */
 .mobile-btn {
   position: absolute;
   width: 40px;
@@ -381,6 +387,7 @@ button:hover::before {
   align-items: center;
   justify-content: center;
 }
+
 .mobile-btn img {
   width: 20px;
   height: 20px;
@@ -395,9 +402,6 @@ button:hover::before {
   transition: all 0.3s ease;
 }
 
-/* 
-   Responsives Rotate-Overlay 
-*/
 @media (max-width: 1400px) {
   #mobile-left,
   #mobile-right,
@@ -405,18 +409,22 @@ button:hover::before {
   #mobile-throw {
     opacity: 1;
   }
+
   #mobile-left {
     bottom: 20px;
     left: 20px;
   }
+
   #mobile-right {
     bottom: 20px;
     left: 80px;
   }
+
   #mobile-jump {
     bottom: 20px;
     right: 70px;
   }
+
   #mobile-throw {
     bottom: 20px;
     right: 10px;
@@ -453,6 +461,7 @@ button:hover::before {
   .canvas-container canvas {
     border-radius: 0;
   }
+
   body {
     background-image: none;
   }
@@ -526,6 +535,7 @@ button:hover::before {
   .overlay.hidden {
     font-size: 32px;
   }
+
   button {
     font-size: 16px; 
     width: 100px;
@@ -535,6 +545,7 @@ button:hover::before {
     max-height: 30%;
     margin-bottom: 0px;
   }
+  
   .audio-buttons-container {
     margin-top: 0px;
   }
