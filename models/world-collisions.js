@@ -28,14 +28,23 @@ function handleEnemy(world, e) {
   }
 }
 
-/**
- * Handles collision logic specifically for normal or small chickens.
- * @param {World} world - The current game world.
- * @param {chicken|SmallChicken} enemy - The chicken enemy to handle collision with.
- */
 function huhnCollision(world, enemy) {
-  if (world.character.speedY < 0) {
+  /**
+   * The "feet" position of the character, calculated at 90% of its height.
+   * This makes it easier to land on the chicken without exact pixel precision.
+   * @type {number}
+   */
+  let characterFeet = world.character.y + (world.character.height * 0.9);
+
+  /**
+   * The "top" of the chicken, set at 70% of its height.
+   * Adjust this to make the chicken easier or harder to stomp.
+   * @type {number}
+   */
+  let chickenTop = enemy.y + (enemy.height * 0.7);
+  if (characterFeet < chickenTop) {
     world.killChicken(enemy);
+    world.character.speedY = 20;
   } else {
     world.character.hit(enemy.damage);
     world.statusBar.setPercentage(world.character.energy);
@@ -94,21 +103,7 @@ function handleBottleCollisions(world, bottle) {
  * @param {ThrowableObject} bottle - The thrown bottle.
  * @param {MovableObject} e - The enemy to check collision with (chicken or end boss).
  */
-function collideBottleEnemy(world, bottle, e) {
-  let h = e instanceof chicken || e instanceof SmallChicken;
-  let b = e instanceof Endboss;
 
-  if (h && !e.isDeadChicken && bottle.isColliding(e)) {
-    world.killChicken(e);
-    bottle.triggerSplash();
-  }
-  if (b && bottle.isColliding(e)) {
-    e.hit(1);
-    world.bossBar.setPercentage(e.energy * 20);
-    bottle.triggerSplash();
-    if (e.isDead()) world.killEndboss(e);
-  }
-}
 
 /**
  * Checks for collisions between the character and coins on the ground.
@@ -119,7 +114,8 @@ function checkCollisionsCoins(world) {
   if (!world.level) return;
   for (let i = world.level.coins.length - 1; i >= 0; i--) {
     let coin = world.level.coins[i];
-    if (world.character.isColliding(coin) && world.character.isAboveGround()) {
+    if (isCollidingWithOffset(world.character, coin, 20) 
+        && world.character.isAboveGround()) {
       world.level.coins.splice(i, 1);
       world.coinsCollected++;
       let p = calcCoinPercentage(world.coinsCollected);
@@ -130,6 +126,62 @@ function checkCollisionsCoins(world) {
       world.coinSound.play();
     }
   }
+}
+
+function isCollidingWithOffset(a, b, offset) {
+  // a.x + a.width - offset > b.x + offset => du brauchst noch mehr Überlappung
+  return (
+    (a.x + a.width - offset) > (b.x + offset) &&
+    (a.y + a.height - offset) > (b.y + offset) &&
+    (a.x + offset) < (b.x + b.width - offset) &&
+    (a.y + offset) < (b.y + b.height - offset)
+  );
+}
+
+/**
+ * Checks if a thrown bottle collides with a chicken or the end boss
+ * using a standard bounding box overlap (offset = 0).
+ * Triggers splash or kills the enemy if conditions are met.
+ *
+ * @param {World} world - The current game world.
+ * @param {ThrowableObject} bottle - The thrown bottle to check for collisions.
+ * @param {MovableObject} e - The enemy to check collision with (chicken or end boss).
+ */
+function collideBottleEnemy(world, bottle, e) {
+  let h = e instanceof chicken || e instanceof SmallChicken;
+  let b = e instanceof Endboss;
+
+  // If it's a chicken and not yet dead
+  if (h && !e.isDeadChicken && isCollidingWithOffset(bottle, e, 0)) {
+    world.killChicken(e);
+    bottle.triggerSplash();
+  }
+
+  // If it's the end boss
+  if (b && isCollidingWithOffset(bottle, e, 0)) {
+    e.hit(1);
+    world.bossBar.setPercentage(e.energy * 20);
+    bottle.triggerSplash();
+    if (e.isDead()) world.killEndboss(e);
+  }
+}
+
+/**
+ * Checks a collision between two objects 'a' and 'b'
+ * with a provided offset in all directions (0 means no offset).
+ * 
+ * @param {MovableObject|ThrowableObject} a - First object (e.g. bottle).
+ * @param {MovableObject} b - Second object (e.g. enemy).
+ * @param {number} offset - Positive shrinks the box, negative grows it (0 = exact bounding box).
+ * @returns {boolean} True if the two objects (with offset) overlap, otherwise false.
+ */
+function isCollidingWithOffset(a, b, offset) {
+  return (
+    (a.x + a.width - offset) > (b.x + offset) &&
+    (a.y + a.height - offset) > (b.y + offset) &&
+    (a.x + offset) < (b.x + b.width - offset) &&
+    (a.y + offset) < (b.y + b.height - offset)
+  );
 }
 
 /**

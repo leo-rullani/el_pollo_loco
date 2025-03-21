@@ -47,37 +47,37 @@ class MovableObject extends DrawableObject {
   gravityInterval;
 
   /**
-   * Applies gravity to this object at a fixed interval.
-   * If the object is above the ground or moving upward,
-   * it continues to move/fall. Otherwise, it stops or triggers onGroundHit().
-   */
-  applyGravity() {
-    this.gravityInterval = setInterval(() => {
-      if (this.isAboveGround() || this.speedY > 0) {
-        this.y -= this.speedY;
-        this.speedY -= this.acceleration;
-      } else {
-        this.speedY = 0;
-        if (this instanceof ThrowableObject) {
-          this.onGroundHit();
-          clearInterval(this.gravityInterval);
-        }
+ * Applies gravity by adjusting the object's vertical position (y) and speedY.
+ * If the object is no longer above ground, it snaps to y=180 and stops falling.
+ */
+applyGravity() {
+  this.gravityInterval = setInterval(() => {
+    this.y -= this.speedY;
+    this.speedY -= this.acceleration;
+    if (!this.isAboveGround()) {
+      this.y = 185;     
+      this.speedY = 0;   
+      if (this instanceof ThrowableObject) {
+        this.onGroundHit();
+        clearInterval(this.gravityInterval);
       }
-    }, 1000 / 25);
-  }
+    }
+  }, 1000 / 25);
+}
 
-  /**
-   * Checks if the object is currently above the ground level.
-   * Special cases:
-   * - ThrowableObject: considered above ground if y < 360.
-   * - Endboss: considered above ground if y < 85.
-   * @returns {boolean} True if above the ground, otherwise false.
-   */
-  isAboveGround() {
-    if (this instanceof ThrowableObject) return this.y < 360;
-    if (this instanceof Endboss) return this.y < 85;
-    return this.y < 180;
-  }
+/**
+ * Checks if the object is currently above the ground level.
+ * Special cases:
+ * - ThrowableObject: considered above ground if y < 360.
+ * - Endboss: considered above ground if y < 85.
+ * - Character: considered above ground if y < 180.
+ * @returns {boolean} True if above the ground, otherwise false.
+ */
+isAboveGround() {
+  if (this instanceof ThrowableObject) return this.y < 360;
+  if (this instanceof Endboss) return this.y < 85;
+  return this.y < 185; 
+}
 
   /**
    * Checks collision with another movable object.
