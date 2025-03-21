@@ -3,7 +3,6 @@ function init() {
   let canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
 }
-
 /**
  * Restarts the game by stopping the current world, hiding overlays, recreating the world, and loading the current level again.
  */
@@ -17,7 +16,6 @@ function restartGame() {
   world.loadLevelData(levelData, currentLevel);
   if (!world.musicMuted) world.backgroundMusic.play().catch(e => {});
 }
-
 /** Returns to the main menu by hiding overlays and canvas. */
 function goToMenu() {
   document.getElementById("overlay-gameover").classList.add("hidden");
@@ -27,7 +25,6 @@ function goToMenu() {
   if (title) title.style.display = "none";
   document.getElementById("overlay-menu").classList.remove("hidden");
 }
-
 /**
  * The main World class, containing the character, level data, audio, drawing methods, and overall game logic loops.
  */
@@ -90,7 +87,6 @@ class World {
     this.setWorld();
     this.run();
   }
-
   /** Initializes all audio objects (music, sfx) and sets default mute states. */
   initAudio() {
     this.backgroundMusic = this.makeAudio("audio/game-sound.mp3", 0.2, true);
@@ -107,7 +103,6 @@ class World {
     this.musicMuted = false;
     this.sfxMuted = false;
   }
-
   /**
    * Creates a new Audio object with given src, volume, and loop settings.
    * @param {string} src - Audio file path.
@@ -123,14 +118,12 @@ class World {
     a.load();
     return a;
   }
-
   /** Toggles background music on/off. */
   toggleMusicMute() {
     this.musicMuted = !this.musicMuted;
     localStorage.setItem("musicMuted", this.musicMuted); // <-- ADDED LINE
     this.backgroundMusic.muted = this.musicMuted;
   }
-
   /** Toggles sound effects on/off. */
   toggleSfxMute() {
     this.sfxMuted = !this.sfxMuted;
@@ -147,7 +140,6 @@ class World {
     this.jumpSound.muted = m;
     this.levelCompleteSound.muted = m;
   }
-
   /** Stops the main update loops, animation, and enemy intervals, and pauses music. */
   stopGame() {
     if (this.runInterval) clearInterval(this.runInterval);
@@ -159,18 +151,15 @@ class World {
       this.backgroundMusic.currentTime = 0;
     }
   }
-
   /** Calls stopIntervals on each enemy, if available, to halt their movement/animation. */
   stopEnemies() {
     if (!this.level?.enemies) return;
     this.level.enemies.forEach((e) => e.stopIntervals && e.stopIntervals());
   }
-
   /** Registers the world reference in the character so it can interact with the environment. */
   setWorld() {
     this.character.world = this;
   }
-
   /**
    * Sets up a loop to periodically check collisions and other updates, unless the game is paused or the level is missing.
    */
@@ -186,7 +175,6 @@ class World {
       }
     }, 200);
   }
-
   /**
    * Checks if the player wants to throw a bottle (D key pressed) and has bottles available.
    */
@@ -194,7 +182,6 @@ class World {
     if (!this.level) return;
     if (this.keyboard.D && this.bottlesCollected > 0) this.throwBottle();
   }
-
   /** Creates a new ThrowableObject, updates bottle count, and animates the throw. */
   throwBottle() {
     let b = new ThrowableObject(this.character.x + 50, this.character.y + 100, this);
@@ -204,7 +191,6 @@ class World {
     if (perc < 0) perc = 0;
     this.bottleBar.setPercentage(perc);
   }
-
   /**
    * Plays the chicken-death sound, triggers the dead animation, and removes the chicken from the level after a short delay.
    * @param {chicken|SmallChicken} chicken - The chicken to be removed.
@@ -218,7 +204,6 @@ class World {
       if (idx > -1) this.level.enemies.splice(idx, 1);
     }, 250);
   }
-
   /**
    * Plays the endboss-death sound, triggers its death/fall animations, removes the boss, ends the game, and shows the "You Win" overlay.
    * @param {Endboss} boss - The end boss to remove.
@@ -236,13 +221,11 @@ class World {
       }, 2000);
     }, 500);
   }
-
   /** Pauses background music and shows the "Game Over" overlay. */
   showGameOver() {
     this.backgroundMusic.pause();
     document.getElementById("overlay-gameover")?.classList.remove("hidden");
   }
-
   /** Pauses background music, plays win sound, shows "You Win", and stops the game. */
   showYouWin() {
     this.backgroundMusic.pause();
@@ -250,13 +233,11 @@ class World {
     document.getElementById("overlay-youwin")?.classList.remove("hidden");
     this.stopGame();
   }
-
   /** Removes the given bottle from the throwableObjects array in this world. */
   removeThrowableObject(bottle) {
     let i = this.throwableObjects.indexOf(bottle);
     if (i > -1) this.throwableObjects.splice(i, 1);
   }
-
   /**
    * The main render loop: clears canvas, draws scene, and requests the next frame.
    */
@@ -265,12 +246,10 @@ class World {
     this.drawScene();
     this.animationFrameId = requestAnimationFrame(() => this.draw());
   }
-
   /** Clears the entire canvas area before drawing the next frame. */
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
-
   /**
    * Draws all game objects and HUD elements in the correct order, translating the camera as needed.
    * 
@@ -285,7 +264,6 @@ class World {
     this.addObjectsToMap(this.level.bottles); this.drawBossBarIfVisible();
     this.ctx.translate(-this.camera_x, 0);
   }
-
   /** If a boss is present, temporarily untranslate the camera to draw its status bar. */
   drawBossBarIfVisible() {
     let b = this.findBoss();
@@ -295,7 +273,6 @@ class World {
     this.addToMap(this.bossBar);
     this.ctx.restore();
   }
-
   /** Finds the Endboss in the current level's enemies list, if any. */
   findBoss() {
     if (!this.level) return null;
@@ -306,7 +283,6 @@ class World {
   addObjectsToMap(objects) {
     objects.forEach((o) => this.addToMap(o));
   }
-
   /**
    * Draws a movable object or status bar, flipping if necessary.
    * @param {DrawableObject} mo - The object to draw.
@@ -317,7 +293,6 @@ class World {
     mo.drawFrame(this.ctx);
     if (mo.otherDirection) this.flipImageBack(mo);
   }
-
   /**
    * Flips the canvas horizontally for mirrored drawing (e.g., facing left).
    * @param {MovableObject} mo - The object to be flipped.
@@ -328,13 +303,11 @@ class World {
     this.ctx.scale(-1, 1);
     mo.x *= -1;
   }
-
   /** Restores the canvas after flipping, returning the object to normal orientation. */
   flipImageBack(mo) {
     mo.x *= -1;
     this.ctx.restore();
   }
-
   /**
    * Checks whether the character has reached the end of the level, triggers a level-complete overlay, and calls goToNextLevel().
    */
@@ -355,7 +328,6 @@ class World {
       }, 1000);
     }
   }
-
   /**
    * Loads a new level's data, resets the camera/character positions, and clears previous throwable objects.
    * @param {Level} newLevel - The new level to load.
@@ -370,7 +342,6 @@ class World {
     this.character.y = 95;
     this.camera_x = 0;
   }
-
   /**
    * Pauses the game by stopping intervals and canceling animation, also pausing the character and all enemies.
    */
@@ -387,10 +358,8 @@ class World {
     if (this.character?.stopIntervals) this.character.stopIntervals();
     this.stopEnemies();
   }
-
   /**
    * Resumes the game by restoring intervals, resuming animations, and continuing collision checks if the level exists.
-   * (Compressed to <= 14 lines)
    */
   resumeGame() {
     this.paused = false;

@@ -19,11 +19,10 @@ function handleEnemy(world, e) {
   if (world.gameOverShown) return;
   let isHuhn = e instanceof chicken || e instanceof SmallChicken;
   let isBoss = e instanceof Endboss;
-
-  if (isHuhn && !e.isDeadChicken && world.character.isColliding(e)) {
+  if (isHuhn && !e.isDeadChicken && isCollidingWithOffset(world.character, e, 5)) {
     huhnCollision(world, e);
   }
-  if (isBoss && world.character.isColliding(e)) {
+  if (isBoss && isCollidingWithOffset(world.character, e, 0)) {
     bossCollision(world, e);
   }
 }
