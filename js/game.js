@@ -1,12 +1,6 @@
 /**
- * The main game script, handling menu actions, level loading,
- * fullscreen toggles, sound management, and more.
+ * The main game script, handling menu actions, level loading, fullscreen toggles, sound management, and more.
  */
-
-// -----------------------------------------------------------
-// Global Variables
-// -----------------------------------------------------------
-
 /** @type {HTMLCanvasElement|undefined} */
 let canvas;
 
@@ -26,13 +20,8 @@ let currentLevel = 1;
 let buttonClickSound = new Audio("audio/button-click.mp3");
 buttonClickSound.volume = 1.0;
 
-// -----------------------------------------------------------
-// Core Functions
-// -----------------------------------------------------------
-
 /**
- * Clears all intervals from 1 to 9999.
- * Helps avoid interval conflicts on restarts or quits.
+ * Clears all intervals from 1 to 9999. Helps avoid interval conflicts on restarts or quits.
  */
 function clearAllIntervals() {
   for (let i = 1; i < 9999; i++) {
@@ -51,8 +40,7 @@ function loadCurrentLevel() {
 }
 
 /**
- * Toggles background music mute/unmute.
- * Also updates the music icon and world settings if applicable.
+ * Toggles background music mute/unmute. Also updates the music icon and world settings if applicable.
  */
 function toggleMusic() {
   musicMuted = !musicMuted;
@@ -111,20 +99,13 @@ function playButtonClick() {
   clickSound.play();
 }
 
-// -----------------------------------------------------------
-// Game Start / World Creation
-// -----------------------------------------------------------
-
 /**
- * Initializes the canvas, the game world, and the SoundManager at application start.
- * Attaches an event listener to the mute/unmute button to toggle sound.
+ * Initializes the canvas, the game world, and the SoundManager at application start. Attaches an event listener to the mute/unmute button to toggle sound.
  */
 function init() {
   soundManager = new SoundManager();
   const canvasElem = document.getElementById('canvas');
   world = new World(canvasElem, keyboard);
-
-  // Example: Mute button if it exists
   const muteBtn = document.getElementById('muteBtn');
   if (muteBtn) {
     muteBtn.addEventListener('click', () => {
@@ -134,29 +115,20 @@ function init() {
 }
 
 /**
- * Starts the game by hiding the menu overlay, showing the canvas,
- * creating a new world, and loading the first level.
+ * Starts the game by hiding the menu overlay, showing the canvas, creating a new world, and loading the first level.
  */
 function startGame() {
   document.getElementById("overlay-menu").classList.add("hidden");
   document.getElementById("canvas").style.display = "block";
   let title = document.querySelector("h1");
   if (title) title.style.display = "block";
-
   canvas = document.getElementById("canvas");
   currentLevel = 1;
-
-  // SoundManager
   soundManager = new SoundManager();
-
-  // Create the world
   world = new World(canvas, keyboard);
-
   setupWorldAudio();
-
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
-
   if (!musicMuted) {
     world.backgroundMusic.play().catch((err) => console.log(err));
   }
@@ -180,21 +152,16 @@ function setupWorldAudio() {
 }
 
 /**
- * Restarts the game by stopping the current world, hiding overlays,
- * recreating the world, and loading the current level again.
+ * Restarts the game by stopping the current world, hiding overlays, recreating the world, and loading the current level again.
  */
 function restartGame() {
   if (world) world.stopGame();
-
   document.getElementById("overlay-gameover").classList.add("hidden");
   document.getElementById("overlay-youwin").classList.add("hidden");
-
   canvas = document.getElementById("canvas");
   world = new World(canvas, keyboard);
-
   let levelData = loadCurrentLevel();
   world.loadLevelData(levelData, currentLevel);
-
   if (!world.musicMuted) {
     world.backgroundMusic.play().catch((e) => {});
   }
@@ -210,10 +177,6 @@ function goToMenu() {
   document.getElementById("overlay-menu").classList.remove("hidden");
   console.log("Back to menu");
 }
-
-// -----------------------------------------------------------
-// Level / Stats / Overlays
-// -----------------------------------------------------------
 
 function goToNextLevel() {
   let stats = storeCurrentStats();
@@ -287,10 +250,6 @@ function calcBottlePercentage(bottleCount) {
   return percentage > 100 ? 100 : percentage;
 }
 
-// -----------------------------------------------------------
-// Quit / Pause / Fullscreen
-// -----------------------------------------------------------
-
 function quitGame() {
   if (world) quitGameCleanup();
   resetPauseIcons();
@@ -346,8 +305,7 @@ function handlePauseState(breakBtn, pauseContent, playContent) {
 }
 
 /**
- * Adds or removes the "paused-overlay" class on the canvas container,
- * depending on the isPaused parameter.
+ * Adds or removes the "paused-overlay" class on the canvas container, depending on the isPaused parameter.
  * @param {boolean} isPaused - Whether the game is currently paused.
  */
 function setPausedOverlay(isPaused) {
@@ -367,8 +325,7 @@ function toggleFullscreen() {
 }
 
 /**
- * Checks if the screen is in landscape mode. If not, shows a "rotate device" overlay,
- * called on window load and resize events.
+ * Checks if the screen is in landscape mode. If not, shows a "rotate device" overlay, called on window load and resize events.
  */
 function checkRotateOverlay() {
   const overlay = document.getElementById("overlay-rotate");

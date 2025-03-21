@@ -1,7 +1,5 @@
 /**
- * The main World class, containing the character, level data, audio,
- * drawing methods, and overall game logic loops.
- * (NO global 'world' variable here!)
+ * The main World class, containing the character, level data, audio, drawing methods, and overall game logic loops.
  */
 class World {
   /** @type {Character} */
@@ -44,8 +42,7 @@ class World {
   levelComplete = false;
 
   /**
-   * Creates a new World instance, initializes audio, draws the scene,
-   * and starts the update loop (run).
+   * Creates a new World instance, initializes audio, draws the scene, and starts the update loop (run).
    * @param {HTMLCanvasElement} canvas - The game's drawing canvas.
    * @param {Keyboard} keyboard - The keyboard instance for controls.
    */
@@ -53,18 +50,12 @@ class World {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
-
     this.initAudio();
-
-    // Play background music through the SoundManager if available;
-    // otherwise, play it directly as a fallback.
     if (window.soundManager) {
       soundManager.playSound(this.backgroundMusic, true);
     } else {
       this.backgroundMusic.play().catch((e) => {});
     }
-
-    // Start drawing loop and world logic
     this.draw();
     this.setWorld();
     this.run();
@@ -126,8 +117,7 @@ class World {
   }
 
   /**
-   * Sets up a loop to periodically check collisions and other updates,
-   * unless the game is paused or the level is missing.
+   * Sets up a loop to periodically check collisions and other updates, unless the game is paused or the level is missing.
    */
   run() {
     this.runInterval = setInterval(() => {
@@ -143,8 +133,7 @@ class World {
   }
 
   /**
-   * Checks if the player wants to throw a bottle (D key pressed)
-   * and has bottles available.
+   * Checks if the player wants to throw a bottle (D key pressed) and has bottles available.
    */
   checkThrowObjects() {
     if (!this.level) return;
@@ -167,12 +156,10 @@ class World {
   }
 
   /**
-   * Plays the chicken-death sound, triggers the dead animation,
-   * and removes the chicken from the level after a short delay.
+   * Plays the chicken-death sound, triggers the dead animation, and removes the chicken from the level after a short delay.
    * @param {chicken|SmallChicken} chicken - The chicken to be removed.
    */
   killChicken(chicken) {
-    // Use SoundManager if available, else fallback to direct play
     if (window.soundManager) {
       soundManager.playSound(this.chickenDeathSound, false);
     } else {
@@ -188,8 +175,7 @@ class World {
   }
 
   /**
-   * Plays the endboss-death sound, triggers its death/fall animations,
-   * removes the boss, ends the game, and shows the "You Win" overlay.
+   * Plays the endboss-death sound, triggers its death/fall animations, removes the boss, ends the game, and shows the "You Win" overlay.
    * @param {Endboss} boss - The end boss to remove.
    */
   killEndboss(boss) {
@@ -198,7 +184,6 @@ class World {
     } else {
       this.endbossDeathSound.play();
     }
-
     boss.playDeadAnimation();
     setTimeout(() => {
       boss.sinkBoss();
@@ -215,7 +200,6 @@ class World {
   showGameOver() {
     this.backgroundMusic.pause();
     this.backgroundMusic.currentTime = 0;
-
     document.getElementById("overlay-gameover")?.classList.remove("hidden");
   }
 
@@ -223,13 +207,11 @@ class World {
   showYouWin() {
     this.backgroundMusic.pause();
     this.backgroundMusic.currentTime = 0;
-
     if (window.soundManager) {
       soundManager.playSound(this.winGameSound, false);
     } else {
       this.winGameSound.play();
     }
-
     document.getElementById("overlay-youwin")?.classList.remove("hidden");
     this.stopGame();
   }
@@ -241,8 +223,7 @@ class World {
   }
 
   /**
-   * The main render loop: clears canvas, draws scene,
-   * and requests the next frame.
+   * The main render loop: clears canvas, draws scene, and requests the next frame.
    */
   draw() {
     this.clearCanvas();
@@ -256,25 +237,16 @@ class World {
   }
 
   /**
-   * Draws all game objects and HUD elements in the correct order,
-   * translating the camera as needed.
+   * Draws all game objects and HUD elements in the correct order, translating the camera as needed.
    */
   drawScene() {
     if (!this.level) return;
-
-    // Move camera
     this.ctx.translate(this.camera_x, 0);
-
-    // Background
     this.addObjectsToMap(this.level.backgroundObjects);
-
-    // Reset camera to draw UI
     this.ctx.translate(-this.camera_x, 0);
     this.addToMap(this.statusBar);
     this.addToMap(this.coinBar);
     this.addToMap(this.bottleBar);
-
-    // Camera again for character & enemies
     this.ctx.translate(this.camera_x, 0);
     this.addToMap(this.character);
     this.addObjectsToMap(this.level.clouds);
@@ -282,10 +254,7 @@ class World {
     this.addObjectsToMap(this.throwableObjects);
     this.addObjectsToMap(this.level.coins);
     this.addObjectsToMap(this.level.bottles);
-
     this.drawBossBarIfVisible();
-
-    // Reset camera
     this.ctx.translate(-this.camera_x, 0);
   }
 
@@ -369,8 +338,7 @@ class World {
   }
 
   /**
-   * Loads a new level's data, resets the camera/character positions,
-   * and clears previous throwable objects.
+   * Loads a new level's data, resets the camera/character positions,and clears previous throwable objects.
    * @param {Level} newLevel - The new level to load.
    * @param {number} levelNumber - The level index (e.g., 1,2,3).
    */
@@ -385,8 +353,7 @@ class World {
   }
 
   /**
-   * Pauses the game by stopping intervals and canceling animation,
-   * also pausing the character and all enemies.
+   * Pauses the game by stopping intervals and canceling animation, also pausing the character and all enemies.
    */
   pauseGame() {
     this.paused = true;
@@ -403,14 +370,12 @@ class World {
   }
 
   /**
-   * Resumes the game by restoring intervals, resuming animations,
-   * and continuing collision checks if the level exists.
+   * Resumes the game by restoring intervals, resuming animations, and continuing collision checks if the level exists.
    */
   resumeGame() {
     this.paused = false;
     this.character?.resumeIntervals?.();
     this.level?.enemies?.forEach((e) => e.resumeIntervals?.());
-
     if (!this.animationFrameId) {
       this.animationFrameId = requestAnimationFrame(() => this.draw());
     }
