@@ -56,8 +56,7 @@ function toggleMusic() {
 }
 
 /**
- * Toggles sound effects mute/unmute, splitting into two helper functions
- * so as not to exceed 14 lines.
+ * Toggles sound effects mute/unmute, splitting into two helper functions so as not to exceed 14 lines.
  */
 function toggleSfx() {
   sfxMuted = !sfxMuted;
@@ -99,8 +98,7 @@ function playButtonClick() {
 }
 
 /**
- * Starts the game by hiding the menu overlay, showing the canvas,
- * creating a new world, and loading the first level.
+ * Starts the game by hiding the menu overlay, showing the canvas, creating a new world, and loading the first level.
  */
 function startGame() {
   document.getElementById("overlay-menu").classList.add("hidden");
@@ -136,8 +134,7 @@ function setupWorldAudio() {
 }
 
 /**
- * Restarts the game from level 1, hiding 'game over' or 'you win' overlays,
- * and creating a fresh world with the initial audio settings.
+ * Restarts the game from level 1, hiding 'game over' or 'you win' overlays, and creating a fresh world with the initial audio settings.
  */
 function restartGame() {
   if (world) world.stopGame();
@@ -156,8 +153,7 @@ function restartGame() {
 }
 
 /**
- * Moves the game on to the next level, preserving stats,
- * and playing a level-complete sound if not past the last level.
+ * Moves the game on to the next level, preserving stats, and playing a level-complete sound if not past the last level.
  */
 function goToNextLevel() {
   let stats = storeCurrentStats();
@@ -173,8 +169,7 @@ function goToNextLevel() {
 }
 
 /**
- * Stores certain character/world properties (energy, coins, bottles)
- * so they can be restored after loading a new level.
+ * Stores certain character/world properties (energy, coins, bottles)so they can be restored after loading a new level.
  * @returns {{oldEnergy: number, oldCoins: number, oldBottles: number}}
  */
 function storeCurrentStats() {
@@ -186,8 +181,7 @@ function storeCurrentStats() {
 }
 
 /**
- * Restores the character's energy, coin count, and bottle count
- * after a new level is loaded, also updating status bars accordingly.
+ * Restores the character's energy, coin count, and bottle count after a new level is loaded, also updating status bars accordingly.
  * @param {{oldEnergy: number, oldCoins: number, oldBottles: number}} stats - The stored stats.
  */
 function restoreStats(stats) {
@@ -248,8 +242,7 @@ function calcBottlePercentage(bottleCount) {
 }
 
 /**
- * Returns the user to the main menu by hiding the canvas and overlays,
- * and showing the menu overlay again.
+ * Returns the user to the main menu by hiding the canvas and overlays,and showing the menu overlay again.
  */
 function goToMenu() {
   document.getElementById("overlay-gameover").classList.add("hidden");
@@ -299,8 +292,7 @@ if (fsBtn) {
 }
 
 /**
- * Toggles the browser fullscreen mode on or off.
- * Also blurs the fullscreen button to avoid focus states.
+ * Toggles the browser fullscreen mode on or off, also blurs the fullscreen button to avoid focus states.
  */
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
@@ -312,8 +304,7 @@ function toggleFullscreen() {
 }
 
 /**
- * Pauses or resumes the game, toggling the pause overlay and icons.
- * Split to helper method to keep function short.
+ * Pauses or resumes the game, toggling the pause overlay and icons, split to helper method to keep function short.
  */
 function toggleBreak() {
   const breakBtn = document.getElementById("btn-break");
@@ -343,8 +334,7 @@ function handlePauseState(breakBtn, pauseContent, playContent) {
 }
 
 /**
- * Adds or removes the "paused-overlay" class on the canvas container,
- * depending on the isPaused parameter.
+ * Adds or removes the "paused-overlay" class on the canvas container,depending on the isPaused parameter.
  * @param {boolean} isPaused - Whether the game is currently paused.
  */
 function setPausedOverlay(isPaused) {
@@ -355,8 +345,7 @@ function setPausedOverlay(isPaused) {
 }
 
 /**
- * Quits the current game, stops all intervals, pauses music,
- * and returns to the menu overlay.
+ * Quits the current game, stops all intervals, pauses music, and returns to the menu overlay.
  */
 function quitGame() {
   if (world) quitGameCleanup();
@@ -391,8 +380,7 @@ function resetPauseIcons() {
 }
 
 /**
- * Checks if the screen is in landscape mode. If not, shows a "rotate device" overlay.
- * Called on window load and resize events.
+ * Checks if the screen is in landscape mode. If not, shows a "rotate device" overlay, called on window load and resize events.
  */
 function checkRotateOverlay() {
   const overlay = document.getElementById("overlay-rotate");
