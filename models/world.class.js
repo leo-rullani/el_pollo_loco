@@ -36,10 +36,6 @@ class World {
   gameOverShown = false;
   /** @type {Level|null} */
   level = null;
-  /** @type {boolean} */
-  musicMuted = false;
-  /** @type {boolean} */
-  sfxMuted = false;
   /** @type {number|undefined} */
   runInterval;
   /** @type {number|undefined} */
@@ -60,8 +56,11 @@ class World {
 
     this.initAudio();
 
-    // If music is not muted, start background music immediately
-    if (!this.musicMuted) {
+    // Play background music through the SoundManager if available;
+    // otherwise, play it directly as a fallback.
+    if (window.soundManager) {
+      soundManager.playSound(this.backgroundMusic, true);
+    } else {
       this.backgroundMusic.play().catch((e) => {});
     }
 
@@ -71,7 +70,7 @@ class World {
     this.run();
   }
 
-  /** Initializes all audio objects (music, sfx) and sets default mute states. */
+  /** Initializes all audio objects (music, sfx). */
   initAudio() {
     this.backgroundMusic = this.makeAudio("audio/game-sound.mp3", 0.2, true);
     this.chickenDeathSound = this.makeAudio("audio/chicken-noise.mp3");
@@ -84,9 +83,6 @@ class World {
     this.jumpSound = this.makeAudio("audio/jump.mp3");
     this.levelCompleteSound = this.makeAudio("audio/level-complete.mp3");
     this.bottleShatterSound = this.makeAudio("audio/bottle-shattering.mp3");
-
-    this.musicMuted = false;
-    this.sfxMuted = false;
   }
 
   /**
@@ -103,28 +99,6 @@ class World {
     a.preload = "auto";
     a.load();
     return a;
-  }
-
-  /** Toggles background music on/off. */
-  toggleMusicMute() {
-    this.musicMuted = !this.musicMuted;
-    this.backgroundMusic.muted = this.musicMuted;
-  }
-
-  /** Toggles sound effects on/off. */
-  toggleSfxMute() {
-    this.sfxMuted = !this.sfxMuted;
-    let m = this.sfxMuted;
-    this.chickenDeathSound.muted = m;
-    this.pepeHurtSound.muted = m;
-    this.pepeDiesSound.muted = m;
-    this.endbossDeathSound.muted = m;
-    this.winGameSound.muted = m;
-    this.coinSound.muted = m;
-    this.bottleSound.muted = m;
-    this.bottleShatterSound.muted = m;
-    this.jumpSound.muted = m;
-    this.levelCompleteSound.muted = m;
   }
 
   /** Stops the main update loops, animation, and enemy intervals, and pauses music. */
@@ -198,7 +172,13 @@ class World {
    * @param {chicken|SmallChicken} chicken - The chicken to be removed.
    */
   killChicken(chicken) {
-    this.chickenDeathSound.play();
+    // Use SoundManager if available, else fallback to direct play
+    if (window.soundManager) {
+      soundManager.playSound(this.chickenDeathSound, false);
+    } else {
+      this.chickenDeathSound.play();
+    }
+
     chicken.isDeadChicken = true;
     chicken.playDeadAnimation();
     setTimeout(() => {
@@ -213,7 +193,12 @@ class World {
    * @param {Endboss} boss - The end boss to remove.
    */
   killEndboss(boss) {
-    this.endbossDeathSound.play();
+    if (window.soundManager) {
+      soundManager.playSound(this.endbossDeathSound, false);
+    } else {
+      this.endbossDeathSound.play();
+    }
+
     boss.playDeadAnimation();
     setTimeout(() => {
       boss.sinkBoss();
@@ -229,13 +214,22 @@ class World {
   /** Pauses background music and shows the "Game Over" overlay. */
   showGameOver() {
     this.backgroundMusic.pause();
+    this.backgroundMusic.currentTime = 0;
+
     document.getElementById("overlay-gameover")?.classList.remove("hidden");
   }
 
   /** Pauses background music, plays win sound, shows "You Win", and stops the game. */
   showYouWin() {
     this.backgroundMusic.pause();
-    this.winGameSound.play();
+    this.backgroundMusic.currentTime = 0;
+
+    if (window.soundManager) {
+      soundManager.playSound(this.winGameSound, false);
+    } else {
+      this.winGameSound.play();
+    }
+
     document.getElementById("overlay-youwin")?.classList.remove("hidden");
     this.stopGame();
   }
@@ -353,7 +347,12 @@ class World {
 
     if (this.character.x >= this.level.level_end_x) {
       this.levelCompleteSound.currentTime = 0;
-      this.levelCompleteSound.play();
+      if (window.soundManager) {
+        soundManager.playSound(this.levelCompleteSound, false);
+      } else {
+        this.levelCompleteSound.play();
+      }
+
       this.levelComplete = true;
 
       let o = document.getElementById("overlay-levelcomplete");

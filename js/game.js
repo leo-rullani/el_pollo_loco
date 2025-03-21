@@ -22,11 +22,6 @@ let keyboard = new Keyboard();
 /** @type {number} */
 let currentLevel = 1;
 
-/** Indicates if background music is muted. */
-let musicMuted = false;
-/** Indicates if sound effects (SFX) are muted. */
-let sfxMuted = false;
-
 /** Click sound for menu buttons. */
 let buttonClickSound = new Audio("audio/button-click.mp3");
 buttonClickSound.volume = 1.0;
