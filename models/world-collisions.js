@@ -156,7 +156,7 @@ function collideBottleEnemy(world, bottle, e) {
   }
   if (b && isCollidingWithOffset(bottle, e, 0)) {
     e.hit(1);
-    world.bossBar.setPercentage(e.energy * 20);
+    world.bossBar.setPercentage(e.energy * 15);
     bottle.triggerSplash();
     if (e.isDead()) world.killEndboss(e);
   }
