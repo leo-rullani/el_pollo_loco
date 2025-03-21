@@ -150,14 +150,10 @@ function isCollidingWithOffset(a, b, offset) {
 function collideBottleEnemy(world, bottle, e) {
   let h = e instanceof chicken || e instanceof SmallChicken;
   let b = e instanceof Endboss;
-
-  // If it's a chicken and not yet dead
   if (h && !e.isDeadChicken && isCollidingWithOffset(bottle, e, 0)) {
     world.killChicken(e);
     bottle.triggerSplash();
   }
-
-  // If it's the end boss
   if (b && isCollidingWithOffset(bottle, e, 0)) {
     e.hit(1);
     world.bossBar.setPercentage(e.energy * 20);
