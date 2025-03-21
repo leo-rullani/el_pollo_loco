@@ -1,9 +1,3 @@
-/*****************************************************************************
- * world.class.js - Manages the core game world, including drawing, updates,
- * audio, and collisions. Preserves the 1:1 logic while ensuring each function
- * remains <= 14 lines and total lines remain under 400.
- *****************************************************************************/
-
 /** Initializes the canvas and world at application start. */
 function init() {
   let canvas = document.getElementById("canvas");
@@ -11,8 +5,7 @@ function init() {
 }
 
 /**
- * Restarts the game by stopping the current world, hiding overlays,
- * recreating the world, and loading the current level again.
+ * Restarts the game by stopping the current world, hiding overlays, recreating the world, and loading the current level again.
  */
 function restartGame() {
   if (world) world.stopGame();
@@ -36,8 +29,7 @@ function goToMenu() {
 }
 
 /**
- * The main World class, containing the character, level data, audio,
- * drawing methods, and overall game logic loops.
+ * The main World class, containing the character, level data, audio, drawing methods, and overall game logic loops.
  */
 class World {
   /** @type {Character} */
@@ -84,8 +76,7 @@ class World {
   levelComplete = false;
 
   /**
-   * Creates a new World instance, initializes audio, draws the scene,
-   * and starts the update loop (run).
+   * Creates a new World instance, initializes audio, draws the scene, and starts the update loop (run).
    * @param {HTMLCanvasElement} canvas - The game's drawing canvas.
    * @param {Keyboard} keyboard - The keyboard instance for controls.
    */
@@ -136,12 +127,14 @@ class World {
   /** Toggles background music on/off. */
   toggleMusicMute() {
     this.musicMuted = !this.musicMuted;
+    localStorage.setItem("musicMuted", this.musicMuted); // <-- ADDED LINE
     this.backgroundMusic.muted = this.musicMuted;
   }
 
   /** Toggles sound effects on/off. */
   toggleSfxMute() {
     this.sfxMuted = !this.sfxMuted;
+    localStorage.setItem("sfxMuted", this.sfxMuted); // <-- ADDED LINE
     let m = this.sfxMuted;
     this.chickenDeathSound.muted = m;
     this.pepeHurtSound.muted = m;
@@ -179,8 +172,7 @@ class World {
   }
 
   /**
-   * Sets up a loop to periodically check collisions and other updates,
-   * unless the game is paused or the level is missing.
+   * Sets up a loop to periodically check collisions and other updates, unless the game is paused or the level is missing.
    */
   run() {
     this.runInterval = setInterval(() => {
@@ -196,8 +188,7 @@ class World {
   }
 
   /**
-   * Checks if the player wants to throw a bottle (D key pressed) and
-   * has bottles available.
+   * Checks if the player wants to throw a bottle (D key pressed) and has bottles available.
    */
   checkThrowObjects() {
     if (!this.level) return;
@@ -215,8 +206,7 @@ class World {
   }
 
   /**
-   * Plays the chicken-death sound, triggers the dead animation, and removes
-   * the chicken from the level after a short delay.
+   * Plays the chicken-death sound, triggers the dead animation, and removes the chicken from the level after a short delay.
    * @param {chicken|SmallChicken} chicken - The chicken to be removed.
    */
   killChicken(chicken) {
@@ -230,8 +220,7 @@ class World {
   }
 
   /**
-   * Plays the endboss-death sound, triggers its death/fall animations,
-   * removes the boss, ends the game, and shows the "You Win" overlay.
+   * Plays the endboss-death sound, triggers its death/fall animations, removes the boss, ends the game, and shows the "You Win" overlay.
    * @param {Endboss} boss - The end boss to remove.
    */
   killEndboss(boss) {
@@ -283,10 +272,8 @@ class World {
   }
 
   /**
-   * Draws all game objects and HUD elements in the correct order,
-   * translating the camera as needed.
+   * Draws all game objects and HUD elements in the correct order, translating the camera as needed.
    * 
-   * (Compressed into fewer lines to keep function <= 14 lines)
    */
   drawScene() {
     if (!this.level) return; this.ctx.translate(this.camera_x, 0);
@@ -349,8 +336,7 @@ class World {
   }
 
   /**
-   * Checks whether the character has reached the end of the level,
-   * triggers a level-complete overlay, and calls goToNextLevel().
+   * Checks whether the character has reached the end of the level, triggers a level-complete overlay, and calls goToNextLevel().
    */
   checkLevelEnd() {
     if (!this.level || this.levelComplete) return;
@@ -371,8 +357,7 @@ class World {
   }
 
   /**
-   * Loads a new level's data, resets the camera/character positions,
-   * and clears previous throwable objects.
+   * Loads a new level's data, resets the camera/character positions, and clears previous throwable objects.
    * @param {Level} newLevel - The new level to load.
    * @param {number} levelNumber - The level index (e.g., 1,2,3).
    */
@@ -387,8 +372,7 @@ class World {
   }
 
   /**
-   * Pauses the game by stopping intervals and canceling animation,
-   * also pausing the character and all enemies.
+   * Pauses the game by stopping intervals and canceling animation, also pausing the character and all enemies.
    */
   pauseGame() {
     this.paused = true;
@@ -405,29 +389,23 @@ class World {
   }
 
   /**
-   * Resumes the game by restoring intervals, resuming animations, and
-   * continuing collision checks if the level exists.
+   * Resumes the game by restoring intervals, resuming animations, and continuing collision checks if the level exists.
+   * (Compressed to <= 14 lines)
    */
   resumeGame() {
     this.paused = false;
-    if (this.character?.resumeIntervals) this.character.resumeIntervals();
-    if (this.level?.enemies) {
-      this.level.enemies.forEach(e => e.resumeIntervals && e.resumeIntervals());
-    }
-    if (!this.animationFrameId) {
-      this.animationFrameId = requestAnimationFrame(() => this.draw());
-    }
-    if (!this.runInterval) {
-      this.runInterval = setInterval(() => {
-        if (!this.paused && this.level) {
-          checkCollisionsEnemies(this);
-          this.checkThrowObjects();
-          checkCollisionsThrowables(this);
-          checkCollisionsCoins(this);
-          checkCollisionsBottles(this);
-          this.checkLevelEnd();
-        }
-      }, 200);
-    }
+    this.character?.resumeIntervals && this.character.resumeIntervals();
+    this.level?.enemies?.forEach(e => e.resumeIntervals && e.resumeIntervals());
+    if (!this.animationFrameId) this.animationFrameId = requestAnimationFrame(() => this.draw());
+    if (!this.runInterval) this.runInterval = setInterval(() => {
+      if (!this.paused && this.level) {
+        checkCollisionsEnemies(this);
+        this.checkThrowObjects();
+        checkCollisionsThrowables(this);
+        checkCollisionsCoins(this);
+        checkCollisionsBottles(this);
+        this.checkLevelEnd();
+      }
+    }, 200);
   }
 }
