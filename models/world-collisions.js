@@ -40,7 +40,7 @@ function huhnCollision(world, enemy) {
    * Adjust this to make the chicken easier or harder to stomp.
    * @type {number}
    */
-  let chickenTop = enemy.y + (enemy.height * 0.7);
+  let chickenTop = enemy.y + (enemy.height * 0.6);
   if (characterFeet < chickenTop) {
     world.killChicken(enemy);
     world.character.speedY = 20;
@@ -203,7 +203,7 @@ function checkCollisionsBottles(world) {
   if (!world.level) return;
   for (let i = world.level.bottles.length - 1; i >= 0; i--) {
     let bottleItem = world.level.bottles[i];
-    if (world.character.isColliding(bottleItem)) {
+    if (isCollidingWithOffset(world.character, bottleItem, 20)) {
       world.level.bottles.splice(i, 1);
       world.bottlesCollected++;
       let p = world.bottlesCollected * 20;
